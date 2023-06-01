@@ -1,0 +1,12 @@
+## Datasource
+#spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+#spring.datasource.url=jdbc:mysql://{ADDRESS}:{PORT}/{DB_NAME}
+#spring.datasource.username={USERNAME}
+#spring.datasource.password={PASSWORD}
+## JPA
+#spring.jpa.generate-ddl=true
+#spring.jpa.hibernate.ddl-auto=create-drop
+#spring.jpa.open-in-view=false
+#spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5InnoDBDialect
+# Swagger
+spring.mvc.pathmatch.matching-strategy=ant_path_matcher
