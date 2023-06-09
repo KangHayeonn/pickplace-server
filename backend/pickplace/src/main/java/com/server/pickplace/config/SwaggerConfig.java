@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Pageable;
 
 import com.fasterxml.classmate.TypeResolver;
-import com.server.pickplace.common.MyPageable;
+import com.server.pickplace.common.common.MyPageable;
 
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;

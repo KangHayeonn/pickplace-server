@@ -5,38 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3f68df72-b403-4540-82a3-5dd113a36e9d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/build.gradle" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/pickplace-server.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/dto/CommonResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/dto/ErrorResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/dto/ListResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/dto/SingleResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/service/ResponseService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/pickplace/docker-compose.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/gradlew" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/gradlew.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/naver-checkstyle-rules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/naver-intellij-formatter.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/settings.gradle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/PickplaceApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/BaseEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/GlobalExceptionHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/MyPageable.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/config/SwaggerConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/controller/MemberController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/dto/MemberDetailResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/dto/MemberListResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/dto/MemberModifyRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/dto/MemberSaveRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/dto/MemberSaveResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/entity/Member.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/error/MemberErrorResult.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/error/MemberException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/repository/MemberRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/service/MemberService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/resources/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/test/java/com/server/pickplace/PickplaceApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/test/java/com/server/pickplace/member/controller/MemberControllerTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/test/java/com/server/pickplace/member/repository/MemberRepositoryTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/test/java/com/server/pickplace/member/service/MemberServiceTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/test/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/BaseEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/common/BaseEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/handler/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/MyPageable.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/common/MyPageable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/config/SwaggerConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/config/SwaggerConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/controller/MemberController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/controller/MemberController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/entity/Member.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/entity/Member.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/test/java/com/server/pickplace/member/controller/MemberControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pickplace/src/test/java/com/server/pickplace/member/controller/MemberControllerTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,6 +49,13 @@
         </projects_view>
       </state>
     </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="FormatOnSaveOptions">
     <option name="myRunOnSave" value="true" />
@@ -89,8 +83,9 @@
     <property name="RequestMappingsPanelWidth2" value="75" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/backend/pickplace/src/main/resources" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../python-for-coding-test-book" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
@@ -102,6 +97,10 @@
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\pickplace-server\backend\pickplace\src\main\resources" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.server.pickplace.common.service" />
+      <recent name="com.server.pickplace.common" />
     </key>
   </component>
   <component name="RunManager">
@@ -124,10 +123,25 @@
       <workItem from="1685622785414" duration="1516000" />
       <workItem from="1685626084306" duration="611000" />
       <workItem from="1685626789619" duration="3206000" />
+      <workItem from="1685972722989" duration="634000" />
+      <workItem from="1686051618072" duration="716000" />
+      <workItem from="1686311991865" duration="92000" />
+      <workItem from="1686320136075" duration="1063000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>
