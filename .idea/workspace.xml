@@ -5,38 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3f68df72-b403-4540-82a3-5dd113a36e9d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/build.gradle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/docker-compose.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/gradlew" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/gradlew.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/naver-checkstyle-rules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/naver-intellij-formatter.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/settings.gradle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/PickplaceApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/BaseEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/GlobalExceptionHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/MyPageable.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/config/SwaggerConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/controller/MemberController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/dto/MemberDetailResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/dto/MemberListResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/dto/MemberModifyRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/dto/MemberSaveRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/dto/MemberSaveResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/entity/Member.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/error/MemberErrorResult.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/error/MemberException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/repository/MemberRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/service/MemberService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/resources/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/test/java/com/server/pickplace/PickplaceApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/test/java/com/server/pickplace/member/controller/MemberControllerTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/test/java/com/server/pickplace/member/repository/MemberRepositoryTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/test/java/com/server/pickplace/member/service/MemberServiceTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/test/resources/application.properties" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/pickplace/appspec.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/pickplace/deploy.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,6 +41,11 @@
     <option name="myRunOnSave" value="true" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="develop" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -76,29 +55,20 @@
     <option name="myRunOnSave" value="true" />
   </component>
   <component name="ProjectId" id="2QbWUnJBDwgmLllmDekkQtSyXeh" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="RequestMappingsPanelOrder0" value="0" />
-    <property name="RequestMappingsPanelOrder1" value="1" />
-    <property name="RequestMappingsPanelOrder2" value="2" />
-    <property name="RequestMappingsPanelWidth0" value="75" />
-    <property name="RequestMappingsPanelWidth1" value="75" />
-    <property name="RequestMappingsPanelWidth2" value="75" />
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/backend/pickplace/src/main/resources" />
-    <property name="node.js.detected.package.eslint" value="true" />
-    <property name="node.js.selected.package.eslint" value="(autodetect)" />
-    <property name="nodejs_package_manager_path" value="npm" />
-    <property name="project.structure.last.edited" value="SDKs" />
-    <property name="project.structure.proportion" value="0.15" />
-    <property name="project.structure.side.proportion" value="0.2" />
-    <property name="settings.editor.selected.configurable" value="org.infernus.idea.checkstyle.CheckStyleConfigurable" />
-  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;
+  }
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\pickplace-server\backend\pickplace\src\main\resources" />
@@ -129,5 +99,28 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/sohyun-99-patch-1" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>
