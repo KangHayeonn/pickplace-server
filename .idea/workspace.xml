@@ -4,13 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3f68df72-b403-4540-82a3-5dd113a36e9d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/pickplace/appspec.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/pickplace/deploy.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="3f68df72-b403-4540-82a3-5dd113a36e9d" name="Changes" comment="[UPDATE] : deploy.yml location">
+      <change afterPath="$PROJECT_DIR$/.github/workplace/deploy.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pickplace/.github/workspace/deploy.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pickplace/.github/workspace/deploy.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,7 +40,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="develop" />
+        <entry key="$PROJECT_DIR$" value="release/setting" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -74,7 +71,20 @@
       <recent name="C:\pickplace-server\backend\pickplace\src\main\resources" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.PickplaceApplication">
+    <configuration name="PickplaceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.server.pickplace.PickplaceApplication" />
+      <module name="pickplace.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.server.pickplace.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="PickplaceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
       <module name="pickplace.main" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.server.pickplace.PickplaceApplication" />
@@ -82,6 +92,11 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.PickplaceApplication" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -95,6 +110,21 @@
       <workItem from="1685626084306" duration="611000" />
       <workItem from="1685626789619" duration="3206000" />
     </task>
+    <task id="LOCAL-00001" summary="[ADD] : init cicd setting">
+      <created>1686498926400</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1686498926400</updated>
+    </task>
+    <task id="LOCAL-00002" summary="[UPDATE] : deploy.yml location">
+      <created>1686543667149</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1686543667149</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -122,5 +152,21 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="[ADD] : init cicd setting" />
+    <MESSAGE value="[UPDATE] : deploy.yml location" />
+    <option name="LAST_COMMIT_MESSAGE" value="[UPDATE] : deploy.yml location" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/PickplaceApplication.java</url>
+          <line>8</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
