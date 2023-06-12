@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.google.gson.Gson;
-import com.server.pickplace.common.GlobalExceptionHandler;
+import com.server.pickplace.common.handler.GlobalExceptionHandler;
 import com.server.pickplace.member.dto.MemberDetailResponse;
 import com.server.pickplace.member.dto.MemberListResponse;
 import com.server.pickplace.member.dto.MemberSaveRequest;

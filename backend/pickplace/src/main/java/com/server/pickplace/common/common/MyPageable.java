@@ -1,4 +1,4 @@
-package com.server.pickplace.common;
+package com.server.pickplace.common.common;
 
 import java.util.List;
 
