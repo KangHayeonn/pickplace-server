@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3f68df72-b403-4540-82a3-5dd113a36e9d" name="Changes" comment="[UPDATE] : deploy.yml change" />
+    <list default="true" id="3f68df72-b403-4540-82a3-5dd113a36e9d" name="Changes" comment="[BUGFIX] : build.gradle">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -53,16 +55,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "reference.settingsdialog.project.gradle"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\pickplace-server\backend\pickplace\src\main\resources" />
@@ -135,7 +137,28 @@
       <option name="project" value="LOCAL" />
       <updated>1686545326199</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="[BUGFIX] : deploy.yml gradle issue">
+      <created>1686545532543</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1686545532543</updated>
+    </task>
+    <task id="LOCAL-00006" summary="[BUGFIX] : build.gradle test part">
+      <created>1686546392641</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1686546392641</updated>
+    </task>
+    <task id="LOCAL-00007" summary="[BUGFIX] : build.gradle">
+      <created>1686546694060</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1686546694060</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -147,6 +170,13 @@
         <entry key="MAIN">
           <value>
             <State>
+              <option name="COLUMN_ID_WIDTH">
+                <map>
+                  <entry key="Table.Default.Author.ColumnIdWidth" value="67" />
+                  <entry key="Table.Default.Date.ColumnIdWidth" value="77" />
+                  <entry key="Table.Space.CommitStatus.ColumnIdWidth" value="42" />
+                </map>
+              </option>
               <option name="FILTERS">
                 <map>
                   <entry key="branch">
@@ -169,17 +199,9 @@
     <MESSAGE value="[UPDATE] : deploy.yml location" />
     <MESSAGE value="[UPDATE] : deploy.yml restore" />
     <MESSAGE value="[UPDATE] : deploy.yml change" />
-    <option name="LAST_COMMIT_MESSAGE" value="[UPDATE] : deploy.yml change" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/PickplaceApplication.java</url>
-          <line>8</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="[BUGFIX] : deploy.yml gradle issue" />
+    <MESSAGE value="[BUGFIX] : build.gradle test part" />
+    <MESSAGE value="[BUGFIX] : build.gradle" />
+    <option name="LAST_COMMIT_MESSAGE" value="[BUGFIX] : build.gradle" />
   </component>
 </project>
