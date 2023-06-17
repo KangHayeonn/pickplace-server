@@ -34,7 +34,7 @@ class MemberRepositoryTest {
 	public void 멤버등록() {
 		// given
 		final Member member = Member.builder()
-			.userId("userId")
+			.email("email")
 			.name("김선웅")
 			.build();
 
@@ -42,7 +42,7 @@ class MemberRepositoryTest {
 		final Member memberResult = memberRepository.save(member);
 
 		// then
-		assertThat(member.getUserId()).isEqualTo(memberResult.getUserId());
+		assertThat(member.getEmail()).isEqualTo(memberResult.getEmail());
 		assertThat(member.getName()).isEqualTo(memberResult.getName());
 	}
 
@@ -50,16 +50,16 @@ class MemberRepositoryTest {
 	public void 유저아이디로조회() {
 		// given
 		final Member member = Member.builder()
-			.userId("userId")
+			.email("email")
 			.name("김선웅")
 			.build();
 
 		// when
 		memberRepository.save(member);
-		final Member memberResult = memberRepository.findByUserId("userId");
+		final Member memberResult = memberRepository.findByEmail("email");
 
 		// then
-		assertThat(memberResult.getUserId()).isEqualTo("userId");
+		assertThat(memberResult.getEmail()).isEqualTo("email");
 		assertThat(memberResult.getName()).isEqualTo(member.getName());
 	}
 
@@ -78,12 +78,12 @@ class MemberRepositoryTest {
 	public void 유저조회_사이즈2() {
 		// given
 		Member member = Member.builder()
-				.userId("userId")
+				.email("email")
 				.name("홍길동")
 				.build();
 
 		Member member2 = Member.builder()
-				.userId("userId2")
+				.email("email2")
 				.name("홍길동")
 				.build();
 		memberRepository.save(member);
@@ -100,7 +100,7 @@ class MemberRepositoryTest {
 	public void 유저추가후삭제() {
 		// given
 		Member memberSaveRequest = Member.builder()
-				.userId("userId")
+				.email("email")
 				.name("홍길동")
 				.build();
 		final Member member = memberRepository.save(memberSaveRequest);

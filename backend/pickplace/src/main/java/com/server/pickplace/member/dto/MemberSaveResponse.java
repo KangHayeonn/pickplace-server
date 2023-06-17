@@ -18,6 +18,6 @@ import lombok.Getter;
 @Builder
 public class MemberSaveResponse {
 	private Long id;
-	private String userId;
+	private String email;
 	private String name;
 }

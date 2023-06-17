@@ -38,7 +38,7 @@ import java.util.Optional;
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
 
-	private final String userId = "userId";
+	private final String email = "email";
 	private final String name = "김선웅";
 
 	@InjectMocks
@@ -49,7 +49,7 @@ public class MemberServiceTest {
 	@Test
 	public void 유저등록실패_이미존재함() {
 		// given
-		doReturn(Member.builder().build()).when(memberRepository).findByUserId(userId);
+		doReturn(Member.builder().build()).when(memberRepository).findByEmail(email);
 
 		// when
 		final MemberException result = assertThrows(MemberException.class,
@@ -63,7 +63,7 @@ public class MemberServiceTest {
 	@Test
 	public void 유저등록성공() {
 		// given
-		doReturn(null).when(memberRepository).findByUserId(userId);
+		doReturn(null).when(memberRepository).findByEmail(email);
 		doReturn(member()).when(memberRepository).save(any(Member.class));
 
 		// when
@@ -71,10 +71,10 @@ public class MemberServiceTest {
 
 		// then
 		assertThat(result.getId()).isNotNull();
-		assertThat(result.getUserId()).isEqualTo(userId);
+		assertThat(result.getEmail()).isEqualTo(email);
 
 		// verify
-		verify(memberRepository, times(1)).findByUserId(userId);
+		verify(memberRepository, times(1)).findByEmail(email);
 		verify(memberRepository, times(1)).save(any(Member.class));
 
 	}
@@ -149,14 +149,14 @@ public class MemberServiceTest {
 	private Member member() {
 		return Member.builder()
 			.id(-1L)
-			.userId(userId)
+			.email(email)
 			.name(name)
 			.build();
 	}
 
 	private MemberSaveRequest memberSaveRequest() {
 		return MemberSaveRequest.builder()
-			.userId(userId)
+			.email(email)
 			.name(name)
 			.build();
 	}

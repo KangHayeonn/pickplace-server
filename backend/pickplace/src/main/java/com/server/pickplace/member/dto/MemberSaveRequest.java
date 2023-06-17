@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor(force = true)
 public class MemberSaveRequest {
 	@NotNull
-	private final String userId;
+	private final String email;
 	@NotNull
 	private final String name;
 }

@@ -7,6 +7,6 @@ import lombok.Getter;
 @Builder
 public class MemberDetailResponse {
     private Long id;
-    private String userId;
+    private String email;
     private String name;
 }

@@ -38,7 +38,7 @@ public class MemberService {
 	private final MemberRepository memberRepository;
 
 	public MemberSaveResponse addMember(MemberSaveRequest memberSaveRequest) {
-		final Member findMember = memberRepository.findByUserId(memberSaveRequest.getUserId());
+		final Member findMember = memberRepository.findByEmail(memberSaveRequest.getEmail());
 
 		if (findMember != null) {
 			log.error(findMember.getName());
@@ -46,13 +46,13 @@ public class MemberService {
 		}
 
 		Member member = memberRepository.save(Member.builder()
-			.userId(memberSaveRequest.getUserId())
+			.email(memberSaveRequest.getEmail())
 			.name(memberSaveRequest.getName())
 			.build());
 
 		return MemberSaveResponse.builder()
 			.id(member.getId())
-			.userId(member.getUserId())
+			.email(member.getEmail())
 			.name(member.getName())
 			.build();
 	}
@@ -63,7 +63,7 @@ public class MemberService {
 		return memberList.stream()
 				.map(member -> MemberListResponse.builder()
 						.id(member.getId())
-						.userId(member.getUserId())
+						.email(member.getEmail())
 						.name(member.getName())
 						.build())
 				.collect(Collectors.toList());
@@ -74,7 +74,7 @@ public class MemberService {
 		return MemberDetailResponse.builder()
 				.id(member.getId())
 				.name(member.getName())
-				.userId(member.getUserId())
+				.email(member.getEmail())
 				.build();
 	}
 

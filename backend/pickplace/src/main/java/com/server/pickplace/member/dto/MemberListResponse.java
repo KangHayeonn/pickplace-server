@@ -8,6 +8,6 @@ import lombok.Setter;
 @Builder
 public class MemberListResponse {
     private Long id;
-    private String userId;
+    private String email;
     private String name;
 }
