@@ -4,26 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1fc5ed98-0298-40b3-b96d-642bb39bfdf1" name="Changes" comment="[BUGFIX] : workspace.xml">
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/pickplace-server.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/dto/CommonResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/dto/ErrorResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/dto/ListResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/dto/SingleResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/service/ResponseService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+    <list default="true" id="1fc5ed98-0298-40b3-b96d-642bb39bfdf1" name="Changes" comment="[ADD] : add entity">
+      <change afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/place/entity/Category.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/place/entity/CategoryPlace.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/place/entity/CategoryStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/place/entity/Tag.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/place/entity/TagPlace.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/docker-compose.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/BaseEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/common/BaseEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/handler/GlobalExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/MyPageable.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/common/common/MyPageable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/config/SwaggerConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/config/SwaggerConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/controller/MemberController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/controller/MemberController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/entity/Member.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pickplace/src/main/java/com/server/pickplace/member/entity/Member.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pickplace/src/test/java/com/server/pickplace/member/controller/MemberControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pickplace/src/test/java/com/server/pickplace/member/controller/MemberControllerTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,19 +27,121 @@
       <state>
         <projects_view>
           <tree_state>
-            <expand />
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="pickplace" type="f1a62948:ProjectNode" />
+              </path>
+            </expand>
             <select />
           </tree_state>
         </projects_view>
       </state>
     </system>
   </component>
-  <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="Class" />
+      </list>
+    </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="develop" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="SOFT" />
+  </component>
+  <component name="GithubDefaultAccount">
+    <option name="defaultAccountId" value="aa3702b2-e9e2-4179-abf0-2c3445143fe1" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2RKPfdGhXQRD075l8StKfQX7KaB" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager" selected="JUnit.All in pickplace.test">
+    <configuration name="Unnamed" type="Application" factoryName="Application" nameIsGenerated="true">
+      <module name="pickplace-server" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="All in pickplace.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="pickplace.test" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="PickplaceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="pickplace.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.server.pickplace.PickplaceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.All in pickplace.test" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1fc5ed98-0298-40b3-b96d-642bb39bfdf1" name="Changes" comment="[BUGFIX] : workspace.xml" />
+      <created>1686995904039</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1686995904039</updated>
+      <workItem from="1686995906279" duration="481000" />
+      <workItem from="1686996404214" duration="10358000" />
+    </task>
+    <task id="LOCAL-00001" summary="[ADD] : add entity">
+      <created>1687009561107</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1687009561107</updated>
+    </task>
+    <task id="LOCAL-00002" summary="[ADD] : add entity">
+      <created>1687010391212</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1687010391212</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -65,7 +154,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/release/setting" />
+                        <option value="feature/entity" />
                       </list>
                     </value>
                   </entry>
@@ -76,5 +165,13 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="[ADD] : add entity" />
+    <option name="LAST_COMMIT_MESSAGE" value="[ADD] : add entity" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

@@ -43,7 +43,7 @@ import com.server.pickplace.member.service.MemberService;
 @ExtendWith(MockitoExtension.class)
 public class MemberControllerTest {
 
-	private final static String userId = "userId";
+	private final static String email = "email";
 	private final static String name = "김선웅";
 
 	@InjectMocks
@@ -67,7 +67,7 @@ public class MemberControllerTest {
 		// given
 		final String url = "/api/v1/member";
 		final MemberSaveResponse memberSaveResponse = MemberSaveResponse.builder()
-			.id(-1L).userId(userId).name(name).build();
+			.id(-1L).email(email).name(name).build();
 		doReturn(memberSaveResponse).when(memberService).addMember(any(MemberSaveRequest.class));
 		//		given(memberService.addMember(any(MemberSaveRequest.class))).willReturn(memberSaveResponse);
 
@@ -85,7 +85,7 @@ public class MemberControllerTest {
 			.getResponse()
 			.getContentAsString(StandardCharsets.UTF_8), MemberSaveResponse.class);
 
-		assertThat(response.getUserId()).isEqualTo(userId);
+		assertThat(response.getEmail()).isEqualTo(email);
 		assertThat(response.getName()).isEqualTo(name);
 	}
 
@@ -197,7 +197,7 @@ public class MemberControllerTest {
 
 	private MemberSaveRequest memberSaveRequest() {
 		return MemberSaveRequest.builder()
-			.userId(userId)
+			.email(email)
 			.name(name)
 			.build();
 	}
