@@ -17,9 +17,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-        working-directory: ./backend/pickplace
-    
     
     steps:
 
@@ -33,12 +30,10 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-        working-directory: ${{ env.working-directory }}
         shell: bash
 
       - name: Build with Gradle
         run: ./gradlew build
-        working-directory: ${{ env.working-directory }}
         shell: bash
 
       - name: Make Zip File
