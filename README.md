@@ -106,7 +106,7 @@ SpringBoot, Spring Data JPA, JWT 를 이용해 Back-end 개발
 
 |  **항목**  |  **버전 정보**    |
 | ---------- | ------------------ |
-| JAVA       |  v11               |
+| JAVA       |  v17               |
 | SpringBoot |                    |
 | MySQL      |                    |
 | Swagger    |                    |
