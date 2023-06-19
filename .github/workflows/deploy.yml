@@ -4,13 +4,9 @@ name: Build and Deploy Spring Boot to AWS EC2
 on:
   push:
     branches: [ main ]
-    paths:
-      - "./backend/pickplace/**"
 
   pull_request:
     branches : [ develop ]
-    paths:
-      - "./backend/pickplace/**"
 
 env:
   PROJECT_NAME: pickplace
@@ -21,9 +17,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-        working-directory: ./backend/pickplace
-    
     
     steps:
 
@@ -37,12 +30,10 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-        working-directory: ${{ env.working-directory }}
         shell: bash
 
       - name: Build with Gradle
         run: ./gradlew build
-        working-directory: ${{ env.working-directory }}
         shell: bash
 
       - name: Make Zip File
