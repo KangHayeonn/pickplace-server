@@ -2,6 +2,7 @@ package com.server.pickplace.member.entity;
 
 import javax.persistence.*;
 
+import com.server.pickplace.auth.dto.MemberSignupRequestDto;
 import com.server.pickplace.common.common.BaseEntity;
 
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * description    :
@@ -20,6 +22,7 @@ import lombok.Setter;
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
  * 2023-05-28        tkfdk       최초 생성
+ * 2023-06-23		 sohyun		 비밀번호 암호화 추가 / dto 생성자 추가
  */
 @Getter
 @Setter
@@ -50,5 +53,19 @@ public class Member extends BaseEntity {
 	@Column(name = "MEMBER_ROLE", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private MemberRole role;
+
+
+	public Member(MemberSignupRequestDto request) {
+		email = request.getEmail();
+		password = request.getPassword();
+		number = request.getNumber();
+		name = request.getName();
+		role = role.USER; // 회원가입하는 사용자 권한 기본 USER (임시)
+	}
+
+	//비밀번호 암호화
+	public void encryptPassword(PasswordEncoder passwordEncoder) {
+		password = passwordEncoder.encode(password);
+	}
 
 }
