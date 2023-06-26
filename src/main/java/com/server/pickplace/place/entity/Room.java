@@ -16,7 +16,9 @@ public class Room extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "PLACE_ID", nullable = false)
+
+    //중복 place와 room -> IDD로 변경
+    @Column(name = "PLACE_IDD", nullable = false )
     private Long id;
 
     @Column(name = "ROOM_PRICE", nullable = false)
