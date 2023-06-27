@@ -3,6 +3,7 @@ package com.server.pickplace.place.entity;
 import com.server.pickplace.common.common.BaseEntity;
 import com.server.pickplace.member.entity.Member;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.geo.Point;
 
 import javax.persistence.*;
@@ -27,7 +28,11 @@ public class Place extends BaseEntity {
     @Column(name = "PLACE_PHONE", nullable = true, length = 13)
     private String number;
 
-    @Column(name = "PLACE_TOTAL_RATING", nullable = true)
+    @Column(name = "PLACE_NAME", nullable = false, length = 20)
+    private String name;
+
+    @Column(name = "PLACE_TOTAL_RATING", nullable = false)
+    @ColumnDefault(value = "0")
     private Float rating;
 
     @Column(name = "PLACE_REVIEW_CNT", nullable = false)
@@ -36,7 +41,10 @@ public class Place extends BaseEntity {
     @Column(name = "PLACE_POINT", nullable = false)
     private Point point;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
+
+
 }

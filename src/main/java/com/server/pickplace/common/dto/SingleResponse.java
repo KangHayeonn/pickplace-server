@@ -1,5 +1,6 @@
 package com.server.pickplace.common.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 
 /**
@@ -15,6 +16,8 @@ import lombok.Getter;
  */
 @Getter
 public class SingleResponse<T> extends CommonResponse {
+
+	@JsonInclude(JsonInclude.Include.ALWAYS)
 	private T data;
 
 	public SingleResponse(boolean success, int code, T data) {

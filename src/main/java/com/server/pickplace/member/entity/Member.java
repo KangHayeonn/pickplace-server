@@ -38,7 +38,7 @@ public class Member extends BaseEntity {
 	@Column(name = "MEMBER_EMAIL", nullable = false, length = 30)
 	private String email;
 
-	@Column(name = "MEMBER_PWD", nullable = true, length = 255)  // 일단 null 가능하게
+	@Column(name = "MEMBER_PWD", nullable = false, length = 255)  // 일단 null 가능하게
 	private String password;
 
 	@Column(name = "MEMBER_PHONE", nullable = false, length = 13)

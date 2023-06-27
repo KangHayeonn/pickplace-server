@@ -3,6 +3,10 @@ package com.server.pickplace.common.handler;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.server.pickplace.common.dto.ErrorResponse;
+import com.server.pickplace.common.service.ResponseService;
+import com.server.pickplace.host.error.HostException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -34,6 +38,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+	@Autowired ResponseService responseService;
+
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(
 		final MethodArgumentNotValidException ex,
@@ -53,29 +60,48 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	private ResponseEntity<Object> makeErrorResponseEntity(final String errorDescription) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-			.body(new ErrorResponse(HttpStatus.BAD_REQUEST.toString(), errorDescription));
+			.body(new staticErrorResponse(HttpStatus.BAD_REQUEST.toString(), errorDescription));
 	}
 
 	@ExceptionHandler({MemberException.class})
-	public ResponseEntity<ErrorResponse> handleRestApiException(final MemberException exception) {
+	public ResponseEntity<staticErrorResponse> handleRestApiException(final MemberException exception) {
 		log.warn("MemberException occur: ", exception);
 		return this.makeErrorResponseEntity(exception.getErrorResult());
 	}
 
 	@ExceptionHandler({Exception.class})
-	public ResponseEntity<ErrorResponse> handleException(final Exception exception) {
+	public ResponseEntity<staticErrorResponse> handleException(final Exception exception) {
 		log.warn("Exception occur: ", exception);
 		return this.makeErrorResponseEntity(MemberErrorResult.UNKNOWN_EXCEPTION);
 	}
 
-	private ResponseEntity<ErrorResponse> makeErrorResponseEntity(final MemberErrorResult errorResult) {
+	@ExceptionHandler({HostException.class})
+	public ResponseEntity<ErrorResponse> hostException(final HostException exception) {
+
+		ErrorResponse errorResponse = getErrorResponse(exception);
+
+		return ResponseEntity.ok(errorResponse);
+
+	}
+
+	private ErrorResponse getErrorResponse(HostException exception) {
+		int code = exception.getErrorResult().getHttpStatus().value();
+		String msg = exception.getErrorResult().getMessage();
+
+		ErrorResponse errorResponse = responseService.getErrorResponse(code, msg);
+
+		return errorResponse;
+	}
+
+
+	private ResponseEntity<staticErrorResponse> makeErrorResponseEntity(final MemberErrorResult errorResult) {
 		return ResponseEntity.status(errorResult.getHttpStatus())
-			.body(new ErrorResponse(errorResult.name(), errorResult.getMessage()));
+			.body(new staticErrorResponse(errorResult.name(), errorResult.getMessage()));
 	}
 
 	@Getter
 	@RequiredArgsConstructor
-	static class ErrorResponse {
+	static class staticErrorResponse {
 		private final String code;
 		private final String message;
 	}
