@@ -1,16 +1,16 @@
 package com.server.pickplace.auth.service;
 
 import com.server.pickplace.auth.dto.JwtRequestDto;
+import com.server.pickplace.auth.dto.JwtResponseDto;
 import com.server.pickplace.auth.dto.MemberSignupRequestDto;
+import com.server.pickplace.security.jwt.JwtTokenProvider;
 import com.server.pickplace.member.entity.Member;
 import com.server.pickplace.member.repository.MemberRepository;
-import com.server.pickplace.member.service.UserDetail;
+import com.server.pickplace.security.UserDetail;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,16 +24,25 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
 
     //login service
-    public String login(JwtRequestDto request) throws Exception {
+    public JwtResponseDto login(JwtRequestDto request) throws Exception {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+//
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//        UserDetail principal = (UserDetail) authentication.getPrincipal();
+//        return principal.getUsername();
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return createJwtToken(authentication);
+    }
 
+    private JwtResponseDto createJwtToken(Authentication authentication) {
         UserDetail principal = (UserDetail) authentication.getPrincipal();
-        return principal.getUsername();
+        String token = jwtTokenProvider.generateToken(principal);
+        return new JwtResponseDto(token);
     }
 
     //회원 가입 Service
@@ -49,4 +58,8 @@ public class AuthService {
         memberRepository.save(member);
         return member.getEmail();
     }
+
+
+
+
 }

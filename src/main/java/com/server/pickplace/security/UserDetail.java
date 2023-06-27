@@ -1,4 +1,4 @@
-package com.server.pickplace.member.service;
+package com.server.pickplace.security;
 
 import com.server.pickplace.member.entity.Member;
 import com.server.pickplace.member.entity.MemberRole;
