@@ -16,7 +16,7 @@ public class Room extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "PLACE_ID", nullable = false)
+    @Column(name = "ROOM_ID", nullable = false)
     private Long id;
 
     @Column(name = "ROOM_PRICE", nullable = false)
