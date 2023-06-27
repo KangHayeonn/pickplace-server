@@ -3,7 +3,7 @@ name: Build and Deploy Spring Boot to AWS EC2
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main , feature/cicd-re]
 
   pull_request:
     branches : [ develop ]
