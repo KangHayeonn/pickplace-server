@@ -24,6 +24,9 @@ public class Reservation extends BaseEntity {
     @Column(name = "RESERVATION_ID", nullable = false)
     private Long id;
 
+    @Column(name = "RESERVATION_NUMBER", nullable = false)
+    private String reservationNum;
+
     @Column(name = "RESERVATION_PEOPLE_NUM", nullable = false)
     private Integer peopleNum;
 

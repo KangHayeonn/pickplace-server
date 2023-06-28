@@ -7,10 +7,10 @@ import lombok.Getter;
 @Builder
 public class PlaceRequest {
 
-    private String name;
+    private String placeName;
 
-    private String number;
+    private String placePhone;
 
-    private String address;
+    private String placeAddress;
 
 }

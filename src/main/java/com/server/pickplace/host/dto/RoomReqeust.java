@@ -8,11 +8,11 @@ import lombok.Getter;
 @Builder
 public class RoomReqeust {
 
-    private String name;
+    private String roomName;
 
-    private Integer price;
+    private Integer roomPrice;
 
-    private Integer amount;  // 방 갯수
+    private Integer roomAmount;  // 방 갯수
 
-    private Integer maxNum;  // 최대 인원 수
+    private Integer roomMaxNum;  // 최대 인원 수
 }
