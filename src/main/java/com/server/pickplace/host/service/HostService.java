@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -29,19 +30,14 @@ public class HostService {
 
         Optional<List<Place>> optionalPlaces = hostRepository.findPlaceListByEmail(email);
 
-        List<PlaceResponse> placeDtos = new ArrayList<>();
-
         if (optionalPlaces.isPresent()) {
 
             List<Place> places = optionalPlaces.get();
 
-            for (Place place : places) {
+            List<PlaceResponse> placeDtos = places.stream()
+                    .map(place -> modelMapper.map(place, PlaceResponse.class))
+                    .collect(Collectors.toList());
 
-                placeDtos.add(
-                        modelMapper.map(place, PlaceResponse.class)
-                );
-
-            }
             return placeDtos;
 
         } else {
@@ -54,19 +50,12 @@ public class HostService {
 
         Optional<List<Room>> optionalRooms = hostRepository.findOptionalRoomListByPlaceId(placeId);
 
-        List<RoomResponse> roomDtos = new ArrayList<>();
-
         if (optionalRooms.isPresent()) {
 
             List<Room> rooms = optionalRooms.get();
 
-            for (Room room : rooms) {
-
-                roomDtos.add(
-                        modelMapper.map(room, RoomResponse.class)
-                );
-
-            }
+            List<RoomResponse> roomDtos = rooms.stream().map(room -> modelMapper.map(room, RoomResponse.class))
+                    .collect(Collectors.toList());
 
             return roomDtos;
 
@@ -80,17 +69,11 @@ public class HostService {
 
         Optional<Place> optionalPlace = hostRepository.findOptionalPlaceByPlaceId(placeId);
 
-        if (optionalPlace.isPresent()) {
+        Place place = optionalPlace.orElseThrow(() -> new HostException(HostErrorResult.NOT_EXIST_PLACE));
 
-            Place place = optionalPlace.get();
+        PlaceResponse placeResponse = modelMapper.map(place, PlaceResponse.class);
 
-            PlaceResponse placeResponse = modelMapper.map(place, PlaceResponse.class);
-
-            return placeResponse;
-        } else {
-            throw new HostException(HostErrorResult.NOT_EXIST_PLACE);
-        }
-
+        return placeResponse;
 
     }
 
@@ -98,16 +81,12 @@ public class HostService {
 
         Optional<List<Reservation>> optionalReservations = hostRepository.findOptionalReservationListByPlaceId(placeId, LocalDate.now());
 
-        List<ReservationResponse> reservationDtos = new ArrayList<>();
-
         if (optionalReservations.isPresent()) {
 
             List<Reservation> reservations = optionalReservations.get();
 
-            for (Reservation reservation : reservations) {
-
-                reservationToDtos(reservationDtos, reservation);
-            }
+            List<ReservationResponse> reservationDtos = reservations.stream().map(reservation -> modelMapper.map(reservation, ReservationResponse.class))
+                    .collect(Collectors.toList());
 
             return reservationDtos;
 
@@ -131,7 +110,7 @@ public class HostService {
 
                 Reservation reservation = (Reservation) reservationsAndName[0];
                 String key = (String) reservationsAndName[1];
-                ReservationResponse reservationResponse = reservationToDto(reservation);
+                ReservationResponse reservationResponse = modelMapper.map(reservation, ReservationResponse.class);
 
                 List<ReservationResponse> reservations = map.getOrDefault(key, new ArrayList<>());
                 reservations.add(reservationResponse);
@@ -164,9 +143,7 @@ public class HostService {
         MemberResponse MemberDto = MemberResponse.builder()
                 .name(member.getName()).build();
 
-        ReservationResponse reservationDto = reservationToDto(reservation);
-        reservationDto.setCreatedDate(reservation.getCreatedDate());
-        reservationDto.setPeopleNum(reservation.getPeopleNum());
+        ReservationResponse reservationDto = modelMapper.map(reservation, ReservationResponse.class);
 
         PlaceResponse placeDto = modelMapper.map(place, PlaceResponse.class);
 
@@ -178,36 +155,6 @@ public class HostService {
 
         return map;
 
-    }
-
-    private void reservationToDtos(List<ReservationResponse> reservationDtos, Reservation reservation) {
-        LocalDateTime checkIn = LocalDateTime.of(reservation.getStartDate(), reservation.getStartTime());
-        LocalDateTime checkOut = LocalDateTime.of(reservation.getEndDate(), reservation.getEndTime());
-
-        reservationDtos.add(
-                ReservationResponse.builder()
-                        .id(reservation.getId())
-                        .roomName(reservation.getRoom().getName())  // spring.jpa.properties.hibernate.default_batch_fetch_size 옵션으로 N + 1 방지
-                        .checkInTime(checkIn)
-                        .checkOutTime(checkOut)
-                        .status(reservation.getStatus())
-                        .build()
-        );
-    }
-
-    private ReservationResponse reservationToDto(Reservation reservation) {
-        LocalDateTime checkIn = LocalDateTime.of(reservation.getStartDate(), reservation.getStartTime());
-        LocalDateTime checkOut = LocalDateTime.of(reservation.getEndDate(), reservation.getEndTime());
-
-        ReservationResponse reservationResponse = ReservationResponse.builder()
-                .id(reservation.getId())
-                .roomName(reservation.getRoom().getName())  // spring.jpa.properties.hibernate.default_batch_fetch_size 옵션으로 N + 1 방지
-                .checkInTime(checkIn)
-                .checkOutTime(checkOut)
-                .status(reservation.getStatus())
-                .build();
-
-        return reservationResponse;
     }
 
     public void savePlaceByDto(PlaceRequest placeRequest) {

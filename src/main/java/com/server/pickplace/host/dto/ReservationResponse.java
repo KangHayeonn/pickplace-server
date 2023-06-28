@@ -8,27 +8,32 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
-@Setter
 @Builder
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ReservationResponse {
 
     private Long id; // 예약번호
 
-    private String roomName;
-
-    private LocalDateTime checkInTime;
-
-    private LocalDateTime checkOutTime;
+    private Integer peopleNum;
 
     private ReservationStatus status;
 
+    private LocalDate startDate;
+
+    private LocalTime startTime;
+
+    private LocalDate endDate;
+
+    private LocalTime endTime;
+
+    private String roomName;
+
     private LocalDateTime createdDate;
 
-    private Integer peopleNum;
 
 
 }
