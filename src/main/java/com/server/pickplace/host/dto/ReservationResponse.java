@@ -39,6 +39,8 @@ public class ReservationResponse {
 
     private LocalDateTime createdDate;
 
+    private LocalDateTime updatedDate;
+
 
 
 }
