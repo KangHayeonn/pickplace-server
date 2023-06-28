@@ -11,7 +11,7 @@ public class PlaceResponse {
 
     private String number;
 
-    private String name;    // -> 까지는 보여지는 정보
+    private String name;
 
     private Long id;
 

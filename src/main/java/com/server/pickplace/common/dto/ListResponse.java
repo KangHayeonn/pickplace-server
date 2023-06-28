@@ -19,7 +19,6 @@ import lombok.Getter;
 @Getter
 public class ListResponse<T> extends CommonResponse {
 
-	@JsonInclude(JsonInclude.Include.ALWAYS)
 	private List<T> data;
 
 	public ListResponse(boolean success, int code, List<T> data) {

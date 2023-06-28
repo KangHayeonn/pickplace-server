@@ -38,9 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-
-	@Autowired ResponseService responseService;
-
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(
 		final MethodArgumentNotValidException ex,
@@ -75,30 +72,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return this.makeErrorResponseEntity(MemberErrorResult.UNKNOWN_EXCEPTION);
 	}
 
-	@ExceptionHandler({HostException.class})
-	public ResponseEntity<ErrorResponse> hostException(final HostException exception) {
-
-		ErrorResponse errorResponse = getErrorResponse(exception);
-
-		return ResponseEntity.ok(errorResponse);
-
-	}
-
-	private ErrorResponse getErrorResponse(HostException exception) {
-		int code = exception.getErrorResult().getHttpStatus().value();
-		String msg = exception.getErrorResult().getMessage();
-
-		ErrorResponse errorResponse = responseService.getErrorResponse(code, msg);
-
-		return errorResponse;
-	}
-
-
 	private ResponseEntity<staticErrorResponse> makeErrorResponseEntity(final MemberErrorResult errorResult) {
 		return ResponseEntity.status(errorResult.getHttpStatus())
 			.body(new staticErrorResponse(errorResult.name(), errorResult.getMessage()));
 	}
-
 	@Getter
 	@RequiredArgsConstructor
 	static class staticErrorResponse {

@@ -20,15 +20,12 @@ public class ReservationResponse {
 
     private String roomName;
 
-    @JsonFormat(pattern = "yyyy년 MM월 dd일 HH:mm")
     private LocalDateTime checkInTime;
 
-    @JsonFormat(pattern = "yyyy년 MM월 dd일 HH:mm")
     private LocalDateTime checkOutTime;
 
     private ReservationStatus status;
 
-    @JsonFormat(pattern = "yyyy년 MM월 dd일")
     private LocalDateTime createdDate;
 
     private Integer peopleNum;

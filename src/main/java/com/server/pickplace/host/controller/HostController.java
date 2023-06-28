@@ -31,7 +31,7 @@ public class HostController {
     private final HostService hostService;
 
     @ApiOperation(tags = "2. Host", value = "공간 관리 페이지", notes = "DB상에 존재하는 플레이스들을 보여준다.")
-    @GetMapping("")
+    @GetMapping("/place")
     public ResponseEntity<ListResponse<PlaceResponse>> placePage(@RequestHeader("Authorization") String accessToken) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
@@ -49,9 +49,9 @@ public class HostController {
     public ResponseEntity<SingleResponse<Map>> roomPage(@RequestHeader("Authorization") String accessToken,
                                                                  @PathVariable Long placeId) {
 
-        PlaceResponse placeDto = hostService.findPlaceDtoByPlaceId(placeId);   // O(1) 이므로 그냥 쪼갬, null 불가
+        PlaceResponse placeDto = hostService.findPlaceDtoByPlaceId(placeId);
 
-        List<RoomResponse> roomDtos = hostService.findRoomDtoListByPlaceId(placeId); // O(1) 이므로 그냥 쪼갬, null 가능
+        List<RoomResponse> roomDtos = hostService.findRoomDtoListByPlaceId(placeId);
 
         Map<String, Object> roomPlaceDtos = new HashMap<>();
 
@@ -101,7 +101,7 @@ public class HostController {
     }
 
     @ApiOperation(tags = "2. Host", value = "공간 등록", notes = "신규 공간을 등록한다.") // 방만 추가하는 페이지도 필요할듯
-    @PostMapping("/")
+    @PostMapping("/place")
     public ResponseEntity<Void> placeRegister(@RequestHeader("Authorization") String accessToken,
                                               @RequestBody PlaceRoomReqeuest placeRoomReqeuest) {
 
