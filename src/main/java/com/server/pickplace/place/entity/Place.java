@@ -17,6 +17,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Table(name = "PLACE_TB")
 @DynamicInsert
+@ToString(exclude = "member")
 public class Place extends BaseEntity {
 
     @Id
@@ -43,7 +44,6 @@ public class Place extends BaseEntity {
 
     @Column(name = "PLACE_POINT", nullable = false)
     private Point point;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")

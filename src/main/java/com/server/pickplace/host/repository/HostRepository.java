@@ -32,6 +32,7 @@ public interface HostRepository extends JpaRepository<Member, Long>, HostReposit
 
     // 예약, 고객, 플레이스
     @Query(value = "select m, r, p from Reservation r join r.room rm join rm.place p join p.member m where r.id = :id")
-    Optional<Object[]> findOptionalMemberReservationPlaceListByReservationId(@Param("id") Long reservationId);
+    Optional<List<Object[]>> findOptionalMemberReservationPlaceListByReservationId(@Param("id") Long reservationId);
 
+    Member findByEmail(String email);
 }

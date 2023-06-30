@@ -1,6 +1,7 @@
 package com.server.pickplace.host.Integration;
 
 
+import com.server.pickplace.host.dto.ReservationResponse;
 import com.server.pickplace.member.entity.Member;
 import com.server.pickplace.member.entity.MemberRole;
 import com.server.pickplace.place.entity.Place;
@@ -9,20 +10,52 @@ import com.server.pickplace.reservation.entity.Reservation;
 import com.server.pickplace.reservation.entity.ReservationStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.geo.Point;
+import org.springframework.http.HttpHeaders;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @Transactional
+@AutoConfigureMockMvc
 public class IntegrationTest {
 
     @Autowired EntityManager em;
+    @Autowired MockMvc mvc;
+    @Autowired ModelMapper modelMapper;
+
+    private final String hostJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJlbWFpbCI6ImFiY0BuYXZlci5jb20ifQ.QptS0V6x0RPP-MgXqKSYMaK-vIq0FTAaLGxeWIkNvo4";
+    private final String userJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJlbWFpbCI6ImRjZUBuYXRlLmNvbSJ9.lX3cyoaLodRv0VOab5DWYB_UKYvgPfMaCFPRIHouqNo";
+
+    @Test
+    void 공간관리페이지() throws Exception {
+
+        //given
+
+
+        //when
+        ResultActions resultActions = mvc.perform(get("/api/v1/host/place"
+                ).header(HttpHeaders.AUTHORIZATION, hostJwt)
+        );
+
+        //then
+        resultActions
+                .andExpect(status().isOk());
+
+    }
 
     @BeforeEach
     @Test
@@ -132,6 +165,9 @@ public class IntegrationTest {
 
         em.persist(reservation1);
         em.persist(reservation2);
+
+        em.flush();
+        em.clear();
 
     }
 

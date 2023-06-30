@@ -11,7 +11,9 @@ import com.server.pickplace.reservation.entity.Reservation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class HostService {
 
     private final HostRepository hostRepository;
@@ -127,13 +130,13 @@ public class HostService {
 
     public Map<String, Object> getMemberReservationPlaceDtoMapByReservationId(Long reservationId) {
 
-        Optional<Object[]> optionalMemberReservationPlaceList = hostRepository.findOptionalMemberReservationPlaceListByReservationId(reservationId); // reservationId만 유효하다면, 셋 다 존재해야함
+        Optional<List<Object[]>> optionalMemberReservationPlaceList = hostRepository.findOptionalMemberReservationPlaceListByReservationId(reservationId); // reservationId만 유효하다면, 셋 다 존재해야함
 
-        if (optionalMemberReservationPlaceList.isEmpty()) {
+        if (!optionalMemberReservationPlaceList.isPresent()) {
             throw new HostException(HostErrorResult.NOT_EXIST_RESERVATION);
         }
 
-        Object[] memberReservationPlaceList = optionalMemberReservationPlaceList.get();
+        Object[] memberReservationPlaceList = optionalMemberReservationPlaceList.get().get(0);
 
         Member member = (Member) memberReservationPlaceList[0];
         Reservation reservation = (Reservation) memberReservationPlaceList[1];
@@ -156,20 +159,21 @@ public class HostService {
 
     }
 
-    public void savePlaceByDto(PlaceRequest placeRequest) {
+    public void savePlaceAndRoomsByDto(PlaceRequest placeRequest, Member host, List<RoomReqeust> roomReqeusts) {
+
+        // 같은 트랜잭션
 
         Place place = modelMapper.map(placeRequest, Place.class);
+        place.setPoint(new Point(127.011804, 38.478695));
+        place.setMember(host);
 
         hostRepository.savePlace(place);
-
-    }
-
-    public void saveRoomByDtos(List<RoomReqeust> roomReqeusts) {
 
         List<Room> rooms = new ArrayList<>();
 
         for (RoomReqeust roomReqeust : roomReqeusts) {
             Room room = modelMapper.map(roomReqeust, Room.class);
+            room.setPlace(place);
             rooms.add(room);
         }
 
@@ -177,6 +181,6 @@ public class HostService {
             hostRepository.saveRoom(room);
         }
 
-
     }
+
 }

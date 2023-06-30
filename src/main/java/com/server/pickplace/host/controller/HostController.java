@@ -5,14 +5,18 @@ import com.server.pickplace.common.dto.ListResponse;
 import com.server.pickplace.common.dto.SingleResponse;
 import com.server.pickplace.common.service.ResponseService;
 import com.server.pickplace.host.dto.*;
+import com.server.pickplace.host.repository.HostRepository;
 import com.server.pickplace.host.service.HostService;
+import com.server.pickplace.member.entity.Member;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.json.BasicJsonParser;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -25,10 +29,12 @@ import static java.util.Base64.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/host")
+@Slf4j
 public class HostController {
 
     private final ResponseService responseService;
     private final HostService hostService;
+    private final HostRepository hostRepository;
 
     @ApiOperation(tags = "2. Host", value = "공간 관리 페이지", notes = "DB상에 존재하는 플레이스들을 보여준다.")
     @GetMapping("/place")
@@ -103,14 +109,17 @@ public class HostController {
     @ApiOperation(tags = "2. Host", value = "공간 등록", notes = "신규 공간을 등록한다.") // 방만 추가하는 페이지도 필요할듯
     @PostMapping("/place")
     public ResponseEntity<Void> placeRegister(@RequestHeader("Authorization") String accessToken,
-                                              @RequestBody PlaceRoomReqeuest placeRoomReqeuest) {
+                                              @Validated @RequestBody PlaceRoomReqeuest placeRoomReqeuest) {
+
+        Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
+        String email = (String) payloadMap.get("email");
+
+        Member host = hostRepository.findByEmail(email);
 
         PlaceRequest placeRequest = placeRoomReqeuest.getPlace();
         List<RoomReqeust> roomReqeusts = placeRoomReqeuest.getRooms();
 
-        hostService.savePlaceByDto(placeRequest);
-
-        hostService.saveRoomByDtos(roomReqeusts);
+        hostService.savePlaceAndRoomsByDto(placeRequest, host, roomReqeusts);
 
         return ResponseEntity.ok(null);
     }
