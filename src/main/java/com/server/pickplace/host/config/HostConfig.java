@@ -11,27 +11,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.geo.Point;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Configuration
+@Component
+@Profile("!test")
+@Transactional
 public class HostConfig {
 
     @Autowired EntityManager em;
 
-    @Bean
-    public ModelMapper modelMapper(){
-        return new ModelMapper();
-    }
-
     @EventListener(ApplicationReadyEvent.class)
-    @Transactional
     public void initialize() {
+
         Member host1 = Member.builder()
                 .email("abc@naver.com")
                 .password("1q2w3e4r!")
@@ -55,7 +54,7 @@ public class HostConfig {
                 .address("서울특별시 동대문구 이문로 107")
                 .number(null)
                 .name("영화장")
-                .point(new Point(127.011803, 38.478694))
+                .point(new Point(127.011444, 38.478444))
                 .member(host1)
                 .build();
 
@@ -63,7 +62,7 @@ public class HostConfig {
                 .address("서울특별시 동대문구 경희대로 26")
                 .number(null)
                 .name("맥날")
-                .point(new Point(127.022303, 38.445694))
+                .point(new Point(127.022444, 38.445444))
                 .member(host1)
                 .build();
 
@@ -136,7 +135,7 @@ public class HostConfig {
 
         em.persist(reservation1);
         em.persist(reservation2);
-
     }
-
 }
+
+
