@@ -24,12 +24,15 @@ public class Reservation extends BaseEntity {
     @Column(name = "RESERVATION_ID", nullable = false)
     private Long id;
 
+    @Column(name = "RESERVATION_NUMBER", nullable = false)
+    private String reservationNum;
+
+    @Column(name = "RESERVATION_PEOPLE_NUM", nullable = false)
+    private Integer peopleNum;
+
     @Column(name = "RESERVATION_STATUS", nullable = false)
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
-
-    // https://m.blog.naver.com/nieah914/221810697040 -> MYSQL
-    // https://hianna.tistory.com/607  -> JAVA
 
     @Column(name = "START_DATE", nullable = false)
     private LocalDate startDate;

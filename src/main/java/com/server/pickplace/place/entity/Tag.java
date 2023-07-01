@@ -20,7 +20,8 @@ public class Tag extends BaseEntity {
     @Column(name = "TAG_ID", nullable = false)
     private Long id;
 
-    @Column(name = "TAG_NAME", nullable = false, length = 10)
-    private String name;
+    @Column(name = "TAG_NAME", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TagStatus tagStatus;
 
 }
