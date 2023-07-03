@@ -48,8 +48,11 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
             http
-                .csrf().disable() //postman test 위한 설정 변경
-                .authorizeRequests()
+                    .httpBasic().disable()
+                    .csrf().disable() //postman test 위한 설정 변경
+                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
+                    .authorizeRequests()
 //                    .anyRequest().authenticated() //어떤 url이든 접근 인증 필요
                     .antMatchers("/api/v1/**","/login","/signup").permitAll() // /user,no url은 인증 안함
                 .and()
