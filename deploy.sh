@@ -1,9 +1,9 @@
 #!/bin/bash
 
-REPOSITORY=/home/ubuntu/git-action-test
+REPOSITORY=/home/ec2-user/cicdproject
 cd $REPOSITORY
 
-APP_NAME=demo
+APP_NAME=pickplace
 JAR_NAME=$(ls $REPOSITORY/build/libs/ | grep '.jar' | tail -n 1)
 JAR_PATH=$REPOSITORY/build/libs/$JAR_NAME
 
