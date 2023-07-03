@@ -10,7 +10,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Collection;
 
 /**
  * description    :
@@ -31,7 +35,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "MEMBER_TB")
-public class Member extends BaseEntity {
+public class Member extends BaseEntity implements UserDetails {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,7 +45,7 @@ public class Member extends BaseEntity {
 	@Column(name = "MEMBER_EMAIL", nullable = false, length = 30)
 	private String email;
 
-	@Column(name = "MEMBER_PWD", nullable = true, length = 255)  // 일단 null 가능하게
+	@Column(name = "MEMBER_PWD", nullable = false, length = 255)  // 일단 null 가능하게
 	private String password;
 
 	@Column(name = "MEMBER_PHONE", nullable = false, length = 13)
@@ -68,4 +72,39 @@ public class Member extends BaseEntity {
 		password = passwordEncoder.encode(password);
 	}
 
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return null;
+	}
+
+	// 이메일과 비밀번호로 인증 진행 email , password
+	@Override
+	public String getUsername() {
+		return email;
+	}
+
+	@Override
+	public String getPassword() {
+		return password;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return false;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return false;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return false;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return false;
+	}
 }

@@ -6,18 +6,33 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.userdetails.User;
+
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class UserDetailService implements UserDetailsService {
     private final MemberRepository memberRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Member member = memberRepository.findByEmail(email);
-//                .orElseThrow(()-> new UsernameNotFoundException("등록되지 않은 사용자 입니다"));
+    private final PasswordEncoder passwordEncoder;
 
-        return new UserDetail(member);
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return memberRepository.findByEmail(username)
+                .map(this::createUserDetails)
+                .orElseThrow(() -> new UsernameNotFoundException("해당하는 유저를 찾을 수 없습니다."));
+    }
+
+    // 해당하는 User 의 데이터가 존재한다면 UserDetails 객체로 만들어서 리턴
+    private UserDetails createUserDetails(Member member) {
+        return User.builder()
+                .username(member.getUsername())
+                .password(passwordEncoder.encode(member.getPassword()))
+                .roles(String.valueOf(member.getRole()))
+                .build();
     }
 }
+

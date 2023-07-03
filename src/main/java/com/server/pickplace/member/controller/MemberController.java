@@ -45,14 +45,14 @@ public class MemberController {
 	private final ResponseService responseService;
 	private final MemberService memberService;
 
-	@ApiOperation(tags = "1. Member", value = "회원 생성", notes = "회원을 생성한다.")
-	@PostMapping("")
-	public ResponseEntity<SingleResponse<MemberSaveResponse>> createMember(
-		@Valid @RequestBody MemberSaveRequest memberSaveRequest) {
-		final MemberSaveResponse memberSaveResponse = memberService.addMember(memberSaveRequest);
-
-		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.CREATED.value(), memberSaveResponse));
-	}
+//	@ApiOperation(tags = "1. Member", value = "회원 생성", notes = "회원을 생성한다.")
+//	@PostMapping("")
+//	public ResponseEntity<SingleResponse<MemberSaveResponse>> createMember(
+//		@Valid @RequestBody MemberSaveRequest memberSaveRequest) {
+//		final MemberSaveResponse memberSaveResponse = memberService.addMember(memberSaveRequest);
+//
+//		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.CREATED.value(), memberSaveResponse));
+//	}
 
 	@ApiOperation(tags = "1. Member", value = "회원 리스트 조회", notes = "이름으로 회원들을 조회한다.")
 	@GetMapping("")

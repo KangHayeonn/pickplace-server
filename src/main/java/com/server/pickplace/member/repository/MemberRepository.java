@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.server.pickplace.member.entity.Member;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * description    :
@@ -20,7 +21,7 @@ import java.util.List;
  */
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
-	Member findByEmail(final String email);
+	Optional<Member> findByEmail(final String username);
 	List<Member> findByName(final String name);
 
 	Boolean existsByEmail(final String name);

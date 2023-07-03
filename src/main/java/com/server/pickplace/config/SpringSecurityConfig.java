@@ -36,11 +36,11 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+//    @Bean
+//    @Override
+//    public AuthenticationManager authenticationManagerBean() throws Exception {
+//        return super.authenticationManagerBean();
+//    }
 
     private static final String[] AUTH_WHITELIST = {
             //정적인 파일에 대한 요청들 작성 (추후)
@@ -51,7 +51,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable() //postman test 위한 설정 변경
                 .authorizeRequests()
 //                    .anyRequest().authenticated() //어떤 url이든 접근 인증 필요
-                    .antMatchers("/auth/**","/login","/signup").permitAll() // /user,no url은 인증 안함
+                    .antMatchers("/api/v1/**","/login","/signup").permitAll() // /user,no url은 인증 안함
                 .and()
                     .formLogin()
 //                    .loginPage("/view/login") //로그인 페이지 연결
@@ -68,6 +68,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                     .logout()
                     .logoutRequestMatcher(new AntPathRequestMatcher("/logoutProc")); //로그아웃조건 -> 다시 로그인 페이지로 자동 이동
+
  }
 
     //회원가입시 비밀번호 암호화에 사용할 인코더 빈 등록
