@@ -12,6 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "ROOM_TB")
+@ToString(exclude = "place")
 public class Room extends BaseEntity {
 
     @Id

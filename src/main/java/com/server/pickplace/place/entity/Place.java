@@ -4,6 +4,7 @@ import com.server.pickplace.common.common.BaseEntity;
 import com.server.pickplace.member.entity.Member;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.springframework.data.geo.Point;
 
 import javax.persistence.*;
@@ -15,6 +16,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "PLACE_TB")
+@DynamicInsert
+@ToString(exclude = "member")
 public class Place extends BaseEntity {
 
     @Id
@@ -36,11 +39,11 @@ public class Place extends BaseEntity {
     private Float rating;
 
     @Column(name = "PLACE_REVIEW_CNT", nullable = false)
+    @ColumnDefault(value = "0")
     private Integer reviewCount;
 
     @Column(name = "PLACE_POINT", nullable = false)
     private Point point;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")

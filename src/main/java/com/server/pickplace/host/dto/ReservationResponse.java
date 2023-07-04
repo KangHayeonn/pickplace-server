@@ -3,15 +3,16 @@ package com.server.pickplace.host.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.server.pickplace.reservation.entity.ReservationStatus;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-@Getter
+@AllArgsConstructor
 @Builder
+@NoArgsConstructor
+@Data
 public class ReservationResponse {
 
     @JsonProperty("reservationId")

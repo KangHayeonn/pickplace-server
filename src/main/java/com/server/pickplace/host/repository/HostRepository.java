@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface HostRepository extends JpaRepository<Member, Long> {
+public interface HostRepository extends JpaRepository<Member, Long>, HostRepositoryCustom {
 
     @Query(value = "select p from Place p join p.member m where m.email = :email")
     Optional<List<Place>> findPlaceListByEmail(@Param("email") String email);
@@ -32,9 +32,7 @@ public interface HostRepository extends JpaRepository<Member, Long> {
 
     // 예약, 고객, 플레이스
     @Query(value = "select m, r, p from Reservation r join r.room rm join rm.place p join p.member m where r.id = :id")
-    Optional<Object[]> findOptionalMemberReservationPlaceListByReservationId(@Param("id") Long reservationId);
+    Optional<List<Object[]>> findOptionalMemberReservationPlaceListByReservationId(@Param("id") Long reservationId);
 
-    Place savePlace(Place place);
-
-    Room saveRoom(Room room);
+    Member findByEmail(String email);
 }
