@@ -76,6 +76,10 @@ sourceSets {
     main.java.srcDir querydslDir
 }
 
+jar {
+    enabled = false
+}
+
 
 // querydsl 컴파일 시 사용할 옵션 설정
 compileQuerydsl {
