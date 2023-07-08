@@ -34,8 +34,8 @@ dependencies {
     //AppProperties
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
-    // swagger ui
-    implementation 'io.springfox:springfox-boot-starter:3.0.0'
+//    // swagger ui
+//    implementation 'io.springfox:springfox-boot-starter:3.0.0'
 
     // DB (mysql, h2)
     runtimeOnly 'com.mysql:mysql-connector-j'
