@@ -9,7 +9,6 @@ import com.server.pickplace.host.repository.HostRepository;
 import com.server.pickplace.host.service.HostService;
 import com.server.pickplace.member.entity.Member;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.json.BasicJsonParser;
@@ -25,7 +24,6 @@ import java.util.Map;
 
 import static java.util.Base64.*;
 
-@Tag(name = "2. Host", description = "Host API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/host")
