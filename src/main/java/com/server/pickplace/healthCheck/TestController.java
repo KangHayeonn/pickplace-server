@@ -15,7 +15,7 @@ public class TestController {
     public String test(){
         System.out.println("@@@ doTest로 이동!");
 
-        return  "test";
+        return  "test 변경";
     }
 
     @RequestMapping("/health")
