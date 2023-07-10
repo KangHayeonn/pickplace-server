@@ -1,12 +1,10 @@
 package com.server.pickplace.config;
 
-import com.server.pickplace.security.jwt.JwtAuthenticationFilter;
-import com.server.pickplace.security.jwt.JwtTokenProvider;
+import com.server.pickplace.member.service.jwt.JwtAuthenticationFilter;
+import com.server.pickplace.member.service.jwt.JwtTokenProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -71,6 +69,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                     .logout()
                     .logoutRequestMatcher(new AntPathRequestMatcher("/logoutProc")); //로그아웃조건 -> 다시 로그인 페이지로 자동 이동
+
 
  }
 

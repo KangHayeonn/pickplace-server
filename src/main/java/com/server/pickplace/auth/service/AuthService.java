@@ -1,15 +1,11 @@
 package com.server.pickplace.auth.service;
 
-import com.server.pickplace.auth.dto.JwtRequestDto;
-import com.server.pickplace.auth.dto.JwtResponseDto;
 import com.server.pickplace.auth.dto.MemberSignupRequestDto;
 import com.server.pickplace.auth.dto.TokenInfo;
-import com.server.pickplace.security.jwt.JwtTokenProvider;
+import com.server.pickplace.member.service.jwt.JwtTokenProvider;
 import com.server.pickplace.member.entity.Member;
 import com.server.pickplace.member.repository.MemberRepository;
-import com.server.pickplace.security.UserDetail;
 import lombok.AllArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
