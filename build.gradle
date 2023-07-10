@@ -45,6 +45,10 @@ dependencies {
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 
+//    //swagger
+//    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+//    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
@@ -74,6 +78,10 @@ querydsl {
 // build시 사용할 sourceSet 추가 설정
 sourceSets {
     main.java.srcDir querydslDir
+}
+
+jar {
+    enabled = false
 }
 
 
