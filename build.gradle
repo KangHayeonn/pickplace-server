@@ -36,6 +36,7 @@ dependencies {
 
     // swagger ui
     implementation 'io.springfox:springfox-boot-starter:3.0.0'
+    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
 
     // DB (mysql, h2)
     runtimeOnly 'com.mysql:mysql-connector-j'
@@ -44,10 +45,6 @@ dependencies {
     // querydsl
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
-
-//    //swagger
-//    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
-//    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
 
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
