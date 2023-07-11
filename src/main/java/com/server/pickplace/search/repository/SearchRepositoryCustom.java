@@ -4,7 +4,7 @@ import com.server.pickplace.search.dto.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
-import java.util.List;
+import java.util.Map;
 
 public interface SearchRepositoryCustom {
 
@@ -14,5 +14,7 @@ public interface SearchRepositoryCustom {
 
     Slice<PlaceResponse> findSliceByDto(DetailSearchRequest detailSearchRequest, Pageable pageable);
 
-    List<Long> getUnableRoomList(DetailPageRequest detailPageRequest, Long placeId);
+    Map<Long, Integer> getUnableRoomCountMap(DetailPageRequest detailPageRequest, Long placeId);
+
+    Map<Long, Integer> getRoomUnitCountMap(DetailPageRequest detailPageRequest, Long placeId);
 }

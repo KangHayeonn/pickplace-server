@@ -1,18 +1,18 @@
 package com.server.pickplace.search.service;
 
 import com.server.pickplace.place.entity.Place;
+import com.server.pickplace.place.entity.Room;
 import com.server.pickplace.search.dto.*;
 import com.server.pickplace.search.repository.SearchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -21,6 +21,7 @@ import java.util.Optional;
 public class SearchService {
 
     private final SearchRepository searchRepository;
+    private final ModelMapper modelMapper;
 
     public Map<String, Object> findPlaceListByDto(CategorySearchRequest categorySearchRequest) {
 
@@ -75,12 +76,45 @@ public class SearchService {
 
     }
 
-    public void getDetailPageMap(DetailPageRequest detailPageRequest, Long placeId) {
+    public Map<String, Object> getDetailPageMap(DetailPageRequest detailPageRequest, Long placeId) {
+
+        Map<String, Object> detailPageMap = new HashMap<>();
+        List<RoomResponse> roomResponseList = new ArrayList<>();
 
         Optional<Place> optionalPlace = searchRepository.findById(placeId);
         Place place = optionalPlace.get();  // 추후 수정
+        PlaceResponse placeResponse = modelMapper.map(place, PlaceResponse.class);
+        detailPageMap.put("place", placeResponse);
 
-        searchRepository.getUnableRoomList(detailPageRequest, placeId);
+        Map<Long, Integer> roomUnitCountMap = searchRepository.getRoomUnitCountMap(detailPageRequest, placeId);
+
+        Map<Long, Integer> unableRoomCountMap = searchRepository.getUnableRoomCountMap(detailPageRequest, placeId);
+
+        List<Long> roomIdList = new ArrayList<>(roomUnitCountMap.keySet());
+        List<Room> roomList = searchRepository.findRoomsByList(roomIdList, placeId);
+
+        for (Room room : roomList) {
+
+            RoomResponse roomResponse = modelMapper.map(room, RoomResponse.class);
+
+            Long roomId = room.getId();
+            Integer totalCount = roomUnitCountMap.get(roomId);
+            Integer unableCount = unableRoomCountMap.get(roomId);
+
+            if (totalCount > unableCount) {
+                roomResponse.setStatus("able");
+            } else {
+                roomResponse.setStatus("unable");
+            }
+
+            roomResponseList.add(roomResponse);
+
+        }
+
+        detailPageMap.put("rooms", roomResponseList);
+
+        return detailPageMap;
+
 
     }
 }

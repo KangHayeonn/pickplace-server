@@ -32,11 +32,13 @@ public class SearchController {
 
     @ApiOperation(tags = "3. Search", value = "상세페이지", notes = "상세페이지에서의 날짜/시간 조건에 따른 이용가능한 Room 검색")
     @PostMapping("/{placeId}")
-    public void detailPage(@Validated @RequestBody DetailPageRequest detailPageRequest,
+    public Map<String, Object> detailPage(@Validated @RequestBody DetailPageRequest detailPageRequest,
                                                           @PathVariable Long placeId) {
 
 
-        searchService.getDetailPageMap(detailPageRequest, placeId);
+        Map<String, Object> detailPageMap = searchService.getDetailPageMap(detailPageRequest, placeId);
+
+        return detailPageMap;
 
     }
 
@@ -65,6 +67,7 @@ public class SearchController {
     @ApiOperation(tags = "3. Search", value = "일반 검색", notes = "주소/날짜/기본거리(5km)/정렬순 을 활용한 기본 검색")
     @PostMapping("/basic")
     public ResponseEntity<SingleResponse<Map>> basicSearch(@Validated @RequestBody BasicSearchRequest basicSearchRequest) {
+
         Map<String, Object> placeDtoHasNextMap = searchService.findPlaceListByDto(basicSearchRequest);
 
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), placeDtoHasNextMap));

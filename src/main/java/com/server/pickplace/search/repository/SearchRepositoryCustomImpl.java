@@ -3,6 +3,7 @@ package com.server.pickplace.search.repository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.server.pickplace.place.entity.Place;
@@ -22,6 +23,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.server.pickplace.place.entity.QCategoryPlace.*;
 import static com.server.pickplace.place.entity.QPlace.*;
@@ -45,14 +47,59 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
     List<Long> placeBeforeList = new ArrayList<>();
 
     @Override
-    public List<Long> getUnableRoomList(DetailPageRequest detailPageRequest, Long placeId) {
-        queryFactory
-                .select(room)
-                .from(room)
-                .leftJoin(reservation)
-                .on(room.id.eq(reservation.room.id));
+    public Map<Long, Integer> getRoomUnitCountMap(DetailPageRequest detailPageRequest, Long placeId) {
 
-        return new ArrayList<>();  // [WIP]
+        Map<Long, Integer> roomUnitCountMap = new HashMap<>();
+
+        List<Tuple> roomUnitCountMapTupleList = queryFactory
+                .select(room.id, room.amount.sum())
+                .from(room)
+                .join(room.place, place)
+                .where(place.id.eq(placeId))
+                .groupBy(room.id)
+                .fetch();
+
+        for (Tuple tuple : roomUnitCountMapTupleList) {
+
+            Long roomId = tuple.get(0, Long.class);
+            Integer unitCount = tuple.get(1, Integer.class);
+
+            roomUnitCountMap.put(roomId, unitCount);
+        }
+
+        return roomUnitCountMap;
+    }
+
+    @Override
+    public Map<Long, Integer> getUnableRoomCountMap(DetailPageRequest detailPageRequest, Long placeId) {
+
+        Map<Long, Integer> unableRoomCountMap = new HashMap<>();
+
+        List<Tuple> unableRoomCountTupleList = queryFactory
+                .select(room.id, unit.id.countDistinct())
+                .from(room)
+                .join(room.place, place)
+                .join(reservation.room, room)
+                .join(reservation.unit, unit)
+                .where(
+
+                        dateCheckByRequest(detailPageRequest),
+
+                        timeCheckByRequest(detailPageRequest)
+                )
+                .groupBy(room.id)
+                .fetch();
+
+        for (Tuple tuple : unableRoomCountTupleList) {
+
+            Long roomId = tuple.get(0, Long.class);
+            Integer unitCount = tuple.get(1, Integer.class);
+
+            unableRoomCountMap.put(roomId, unitCount);
+
+        }
+
+        return unableRoomCountMap;
     }
 
     @Override
@@ -97,9 +144,7 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
                         place.id.in(placeBeforeList),
 
-                        reservation.startDate.after(categorySearchRequest.getStartDate()).or(reservation.startDate.eq(categorySearchRequest.getStartDate())),
-
-                        reservation.endDate.before(categorySearchRequest.getEndDate()).or(reservation.endDate.eq(categorySearchRequest.getEndDate()))
+                        dateCheckByRequest(categorySearchRequest)
 
 
                         )
@@ -180,9 +225,8 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
                         place.id.in(placeBeforeList),
 
-                        reservation.startDate.after(basicSearchRequest.getStartDate()).or(reservation.startDate.eq(basicSearchRequest.getStartDate())),
+                        dateCheckByRequest(basicSearchRequest)
 
-                        reservation.endDate.before(basicSearchRequest.getEndDate()).or(reservation.endDate.eq(basicSearchRequest.getEndDate()))
                 )
                 .groupBy(place.id)
                 .fetch();
@@ -283,11 +327,9 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
                 .where(
                         place.id.in(placeBeforeList),
 
-                        reservation.startDate.after(detailSearchRequest.getStartDate()).or(reservation.startDate.eq(detailSearchRequest.getStartDate())),
+                        dateCheckByRequest(detailSearchRequest)
 
-                        reservation.endDate.before(detailSearchRequest.getEndDate()).or(reservation.endDate.eq(detailSearchRequest.getEndDate()))
-
-                        )
+                )
                 .groupBy(place.id)
                 .fetch();
 
@@ -354,6 +396,27 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
                 .groupBy(place.id)
                 .fetch();
     }
+
+    private BooleanExpression dateCheckByRequest(SearchRequest request) {
+
+
+        BooleanExpression cond1 = reservation.startDate.goe(request.getStartDate()).and(reservation.startDate.lt(request.getEndDate()));
+        BooleanExpression cond2 = reservation.endDate.gt(request.getStartDate()).and(reservation.endDate.loe(request.getEndDate()));
+        BooleanExpression condition = cond1.or(cond2);
+
+        return condition;
+    }
+
+    private BooleanExpression timeCheckByRequest(DetailPageRequest request) {
+
+
+        BooleanExpression cond1 = reservation.startTime.goe(request.getStartTime()).and(reservation.startTime.lt(request.getEndTime()));
+        BooleanExpression cond2 = reservation.endTime.gt(request.getStartTime()).and(reservation.endTime.loe(request.getEndTime()));
+        BooleanExpression condition = cond1.or(cond2);
+
+        return condition;
+    }
+
 
     private Point extractPointByAddress(String address) {
 

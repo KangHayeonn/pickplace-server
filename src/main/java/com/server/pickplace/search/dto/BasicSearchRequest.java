@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BasicSearchRequest {
+public class BasicSearchRequest extends SearchRequest {
 
     private Integer distance = 5;
     private Integer countPerPage = 10;
@@ -21,12 +21,6 @@ public class BasicSearchRequest {
     @NotBlank  // Null, 빈 문자열, 스페이스만 있는 문자열 불가
     @Size(max = 255)
     private String address;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
-    private LocalDate startDate;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
-    private LocalDate endDate;
 
     @NotBlank
     private String searchType;
