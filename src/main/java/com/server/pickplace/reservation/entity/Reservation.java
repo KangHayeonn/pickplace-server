@@ -3,6 +3,7 @@ package com.server.pickplace.reservation.entity;
 import com.server.pickplace.common.common.BaseEntity;
 import com.server.pickplace.member.entity.Member;
 import com.server.pickplace.place.entity.Room;
+import com.server.pickplace.place.entity.Unit;
 import lombok.*;
 
 import javax.persistence.*;
@@ -53,4 +54,9 @@ public class Reservation extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ROOM_ID")
     private Room room;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UNIT_ID")
+    private Unit unit;
+
 }

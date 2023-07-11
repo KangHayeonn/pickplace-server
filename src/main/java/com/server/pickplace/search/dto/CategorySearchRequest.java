@@ -10,42 +10,29 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DetailSearchRequest {
+public class CategorySearchRequest {
 
+    private Integer distance = 5;
     private Integer countPerPage = 10;
 
-    @NotBlank  // Null, 빈 문자열, 스페이스만 있는 문자열 불가
-    @Size(max = 255)
-    private String address;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
-    private LocalDate startDate;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
-    private LocalDate endDate;
 
     @Positive
     private Long category;
 
     @Positive
-    private Integer userCnt;
-
-    @Positive
-    private Integer distance;
-
-    private List<Long> tagId;
+    private Integer pageNum;
 
     @NotBlank
     private String searchType;
 
-    @Positive
-    private Integer pageNum;
+
+    private String address;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
 }

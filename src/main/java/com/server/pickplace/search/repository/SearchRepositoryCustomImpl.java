@@ -6,9 +6,7 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.server.pickplace.place.entity.Place;
-import com.server.pickplace.search.dto.BasicSearchRequest;
-import com.server.pickplace.search.dto.DetailSearchRequest;
-import com.server.pickplace.search.dto.PlaceResponse;
+import com.server.pickplace.search.dto.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -29,6 +27,7 @@ import static com.server.pickplace.place.entity.QCategoryPlace.*;
 import static com.server.pickplace.place.entity.QPlace.*;
 import static com.server.pickplace.place.entity.QRoom.room;
 import static com.server.pickplace.place.entity.QTagPlace.*;
+import static com.server.pickplace.place.entity.QUnit.*;
 import static com.server.pickplace.reservation.entity.QReservation.*;
 
 
@@ -40,25 +39,41 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
         this.queryFactory = new JPAQueryFactory(em);
     }
 
+    HashMap<Long, Integer> roomCountMap = new HashMap<>();
+    List<Long> placeIdList = new ArrayList<>();
+    List<PlaceResponse> placeResponseList = new ArrayList<>();
+    List<Long> placeBeforeList = new ArrayList<>();
+
     @Override
-    public Slice<PlaceResponse> findSliceByDto(BasicSearchRequest basicSearchRequest, Pageable pageable) {
+    public List<Long> getUnableRoomList(DetailPageRequest detailPageRequest, Long placeId) {
+        queryFactory
+                .select(room)
+                .from(room)
+                .leftJoin(reservation)
+                .on(room.id.eq(reservation.room.id));
 
-        HashMap<Long, Integer> roomCountMap = new HashMap<>();
-        List<Long> placeIdList = new ArrayList<>();
-        List<PlaceResponse> placeResponseList = new ArrayList<>();
+        return new ArrayList<>();  // [WIP]
+    }
 
-        Point point = extractPointByAddress(basicSearchRequest.getAddress());
+    @Override
+    public Slice<PlaceResponse> findSliceByDto(CategorySearchRequest categorySearchRequest, Pageable pageable) {
+
+        Point point = extractPointByAddress(categorySearchRequest.getAddress());
 
         List<Tuple> roomCountTupleList = queryFactory
-                .select(place.id, room.count())
+                .select(place.id, room.amount.sum())
                 .from(room)
                 .join(room.place, place)
+                .join(place, categoryPlace.place)
                 .where(
                         Expressions.numberTemplate(Double.class,
                                         "ST_Distance_Sphere({0}, POINT({1}, {2}))",
                                         place.point, point.getX(), point.getY())
-                                .loe(basicSearchRequest.getDistance())
-                        )
+                                .loe(categorySearchRequest.getDistance()),
+
+                        categoryPlace.category.id.eq(categorySearchRequest.getCategory())
+
+                )
                 .groupBy(place.id)
                 .fetch();
 
@@ -67,19 +82,103 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
             Integer roomCount = tuple.get(1, Integer.class);
 
             roomCountMap.put(placeId, roomCount);
+            placeBeforeList.add(placeId);
         }
 
 
         List<Tuple> placeReservationCountTupleList = queryFactory
-                .select(place.id, room.id.countDistinct())
+                .select(place.id, unit.id.countDistinct())
                 .from(reservation)
                 .join(reservation.room, room)
                 .join(room.place, place)
+                .join(place, categoryPlace.place)
+                .join(reservation.unit, unit)
                 .where(
-                        Expressions.numberTemplate(Double.class,
-                                        "ST_Distance_Sphere({0}, POINT({1}, {2}))",
-                                        place.point, point.getX(), point.getY())
-                                .loe(basicSearchRequest.getDistance()),
+
+                        place.id.in(placeBeforeList),
+
+                        reservation.startDate.after(categorySearchRequest.getStartDate()).or(reservation.startDate.eq(categorySearchRequest.getStartDate())),
+
+                        reservation.endDate.before(categorySearchRequest.getEndDate()).or(reservation.endDate.eq(categorySearchRequest.getEndDate()))
+
+
+                        )
+                .groupBy(place.id)
+                .fetch();
+
+        for (Tuple tuple : placeReservationCountTupleList) {
+            Long placeId = tuple.get(0, Long.class);
+            Integer reservationRoomCount = tuple.get(1, Integer.class);
+            Integer totalRoomCount = roomCountMap.get(placeId);
+
+            if (reservationRoomCount < totalRoomCount) {
+                placeIdList.add(placeId);
+            }
+        }
+
+        List<Place> placeList = queryFactory
+                .selectFrom(place)
+                .where(place.id.in(placeIdList))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
+
+        for (Place place : placeList) {
+            PlaceResponse placeResponse = PlaceResponse.builder()
+                    .id(place.getId())
+                    .name(place.getName())
+                    .rating(place.getRating())
+                    .reviewCount(place.getReviewCount())
+                    .address(
+                            new HashMap<>() {
+                                {
+                                    put("address", place.getAddress());
+                                    put("latitude", place.getPoint().getX());
+                                    put("latitude", place.getPoint().getY());
+                                }
+                            }
+                    ).build();
+
+            placeResponseList.add(placeResponse);
+        }
+
+        boolean hasNext = false;
+        if (placeResponseList.size() > pageable.getPageSize()) {
+            placeResponseList.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+
+        return new SliceImpl<>(placeResponseList, pageable, hasNext);
+
+
+    }
+
+    @Override
+    public Slice<PlaceResponse> findSliceByDto(BasicSearchRequest basicSearchRequest, Pageable pageable) {
+
+
+        Point point = extractPointByAddress(basicSearchRequest.getAddress());
+
+        List<Tuple> roomCountTupleList = getRoomCountTupleListByBasicDto(basicSearchRequest, point);
+
+        for (Tuple tuple : roomCountTupleList) {
+            Long placeId = tuple.get(0, Long.class);
+            Integer roomCount = tuple.get(1, Integer.class);
+
+            roomCountMap.put(placeId, roomCount);
+            placeBeforeList.add(placeId);
+        }
+
+
+        List<Tuple> placeReservationCountTupleList = queryFactory
+                .select(place.id, unit.id.countDistinct())
+                .from(reservation)
+                .join(reservation.room, room)
+                .join(room.place, place)
+                .join(reservation.unit, unit)
+                .where(
+
+                        place.id.in(placeBeforeList),
 
                         reservation.startDate.after(basicSearchRequest.getStartDate()).or(reservation.startDate.eq(basicSearchRequest.getStartDate())),
 
@@ -133,23 +232,17 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
         return new SliceImpl<>(placeResponseList, pageable, hasNext);
 
     }
-
     @Override
     public Slice<PlaceResponse> findSliceByDto(DetailSearchRequest detailSearchRequest, Pageable pageable) {
-
-        HashMap<Long, Integer> roomCountMap = new HashMap<>();
-        List<Long> placeIdList = new ArrayList<>();
-        List<PlaceResponse> placeResponseList = new ArrayList<>();
 
         Point point = extractPointByAddress(detailSearchRequest.getAddress());
 
         List<Tuple> roomCountTupleList = queryFactory
-                .select(place.id, room.count())
-                .from(categoryPlace)
-                .join(tagPlace)
-                .on(categoryPlace.place.id.eq(tagPlace.place.id))
-                .join(room)
-                .on(categoryPlace.place.id.eq(room.place.id))
+                .select(place.id, tagPlace.tag.id.countDistinct(), room.amount.sum())
+                .from(room)
+                .join(room.place, place)
+                .join(place, categoryPlace.place)
+                .join(place, tagPlace.place)
                 .where(
                         Expressions.numberTemplate(Double.class,
                                         "ST_Distance_Sphere({0}, POINT({1}, {2}))",
@@ -158,7 +251,7 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
                         categoryPlace.category.id.eq(detailSearchRequest.getCategory()),
 
-                        room.peopleNum.loe(detailSearchRequest.getUserCnt()),
+                        room.peopleNum.goe(detailSearchRequest.getUserCnt()),
 
                         tagPlace.tag.id.in(detailSearchRequest.getTagId())
 
@@ -166,43 +259,35 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
                 .groupBy(place.id)
                 .fetch();
 
+        Integer tagAmount = detailSearchRequest.getTagId().size();
         for (Tuple tuple : roomCountTupleList) {
             Long placeId = tuple.get(0, Long.class);
-            Integer roomCount = tuple.get(1, Integer.class);
+            Integer tagCount = tuple.get(1, Integer.class);
+            Integer roomCount = tuple.get(2, Integer.class);
 
-            roomCountMap.put(placeId, roomCount);
+            if (tagCount == tagAmount) {
+                roomCountMap.put(placeId, roomCount / tagAmount);
+                placeBeforeList.add(placeId);
+            }
+
         }
 
         List<Tuple> placeReservationCountTupleList = queryFactory
-                .select(place.id, room.id.countDistinct())
-                .from(categoryPlace)
-                .join(tagPlace)
-                .on(categoryPlace.place.id.eq(tagPlace.place.id))
-                .join(room)
-                .on(categoryPlace.place.id.eq(room.place.id))
-                .join(reservation)
-                .on(room.id.eq(reservation.room.id))
+                .select(place.id, unit.id.countDistinct())
+                .from(room)
+                .join(room.place, place)
+                .join(place, categoryPlace.place)
+                .join(place, tagPlace.place)
+                .join(room, reservation.room)
+                .join(unit, reservation.unit)
                 .where(
-                        Expressions.numberTemplate(Double.class,
-                                        "ST_Distance_Sphere({0}, POINT({1}, {2}))",
-                                        place.point, point.getX(), point.getY())
-                                .loe(detailSearchRequest.getDistance()),
-
-                        categoryPlace.category.id.eq(detailSearchRequest.getCategory()),
-
-                        room.peopleNum.loe(detailSearchRequest.getUserCnt()),
-
-                        tagPlace.tag.id.in(detailSearchRequest.getTagId()),
+                        place.id.in(placeBeforeList),
 
                         reservation.startDate.after(detailSearchRequest.getStartDate()).or(reservation.startDate.eq(detailSearchRequest.getStartDate())),
 
-                        reservation.endDate.before(detailSearchRequest.getEndDate()).or(reservation.endDate.eq(detailSearchRequest.getEndDate())),
+                        reservation.endDate.before(detailSearchRequest.getEndDate()).or(reservation.endDate.eq(detailSearchRequest.getEndDate()))
 
-                        reservation.startTime.after(detailSearchRequest.getStartTime()).or(reservation.startTime.eq(detailSearchRequest.getStartTime())),
-
-                        reservation.endTime.before(detailSearchRequest.getEndTime()).or(reservation.endTime.eq(detailSearchRequest.getEndTime()))
-
-                )
+                        )
                 .groupBy(place.id)
                 .fetch();
 
@@ -251,6 +336,23 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
         return new SliceImpl<>(placeResponseList, pageable, hasNext);
 
+    }
+
+
+    private List<Tuple> getRoomCountTupleListByBasicDto(BasicSearchRequest basicSearchRequest, Point point) {
+        return queryFactory
+                .select(place.id, room.amount.sum())
+                .from(room)
+                .join(room.place, place)
+                .where(
+                        Expressions.numberTemplate(Double.class,
+                                        "ST_Distance_Sphere({0}, POINT({1}, {2}))",
+                                        place.point, point.getX(), point.getY())
+                                .loe(basicSearchRequest.getDistance())
+
+                )
+                .groupBy(place.id)
+                .fetch();
     }
 
     private Point extractPointByAddress(String address) {
