@@ -24,6 +24,6 @@ public class RoomResponse {
     @JsonProperty("roomMaxNum")
     private Integer peopleNum;
 
-
-    private String status;  // 예약 가능 vs 불가능
+    @JsonProperty("roomStatus")
+    private boolean status;  // 예약 가능 vs 불가능
 }

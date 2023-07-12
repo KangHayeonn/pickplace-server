@@ -492,7 +492,7 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Content-type", "application/json; charset=UTF-8");
-            conn.setRequestProperty("Authorization", "KakaoAK 280f805ef93902ffb1a8a38d6308a9e0");
+            conn.setRequestProperty("Authorization", "KakaoAK " + System.getenv("KakaoAK"));
 
 
 // API 응답메시지를 불러와서 문자열로 저장

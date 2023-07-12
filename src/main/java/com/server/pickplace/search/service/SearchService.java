@@ -83,7 +83,7 @@ public class SearchService {
 
         Optional<Place> optionalPlace = searchRepository.findById(placeId);
         Place place = optionalPlace.get();  // 추후 수정
-        PlaceResponse placeResponse = modelMapper.map(place, PlaceResponse.class);
+        PlaceResponse placeResponse = getPlaceResponseByPlace(place);
         detailPageMap.put("place", placeResponse);
 
         Map<Long, Integer> roomUnitCountMap = searchRepository.getRoomUnitCountMap(detailPageRequest, placeId);
@@ -102,19 +102,37 @@ public class SearchService {
             Integer unableCount = unableRoomCountMap.get(roomId);
 
             if (totalCount > unableCount) {
-                roomResponse.setStatus("able");
+                roomResponse.setStatus(true);
             } else {
-                roomResponse.setStatus("unable");
+                roomResponse.setStatus(false);
             }
 
             roomResponseList.add(roomResponse);
 
         }
 
-        detailPageMap.put("rooms", roomResponseList);
+        detailPageMap.put("roomList", roomResponseList);
 
         return detailPageMap;
 
 
+    }
+
+    private PlaceResponse getPlaceResponseByPlace(Place place) {
+        PlaceResponse placeResponse = PlaceResponse.builder()
+                .id(place.getId())
+                .name(place.getName())
+                .rating(place.getRating())
+                .reviewCount(place.getReviewCount())
+                .address(
+                        new HashMap<>() {
+                            {
+                                put("address", place.getAddress());
+                                put("latitude", place.getPoint().getX());
+                                put("latitude", place.getPoint().getY());
+                            }
+                        }
+                ).build();
+        return placeResponse;
     }
 }
