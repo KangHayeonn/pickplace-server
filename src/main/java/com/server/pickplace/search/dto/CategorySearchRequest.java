@@ -16,20 +16,13 @@ import java.time.LocalDate;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategorySearchRequest extends SearchRequest {
+public class CategorySearchRequest extends NormalSearchRequest {
 
-    private Integer distance = 5;
+    private Integer distance = 5000;
     private Integer countPerPage = 10;
-
 
     @Positive
     private Long category;
-
-    @Positive
-    private Integer pageNum;
-
-    @NotBlank
-    private String searchType;
 
     private String address;
 

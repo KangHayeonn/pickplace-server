@@ -17,7 +17,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DetailSearchRequest extends SearchRequest {
+public class DetailSearchRequest extends NormalSearchRequest {
 
     private Integer countPerPage = 10;
 
@@ -35,11 +35,5 @@ public class DetailSearchRequest extends SearchRequest {
     private Integer distance;
 
     private List<Long> tagId;
-
-    @NotBlank
-    private String searchType;
-
-    @Positive
-    private Integer pageNum;
 
 }

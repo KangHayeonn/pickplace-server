@@ -12,21 +12,15 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BasicSearchRequest extends SearchRequest {
+public class BasicSearchRequest extends NormalSearchRequest {
 
-    private Integer distance = 5;
+    private Integer distance = 5000;
     private Integer countPerPage = 10;
 
 
     @NotBlank  // Null, 빈 문자열, 스페이스만 있는 문자열 불가
     @Size(max = 255)
     private String address;
-
-    @NotBlank
-    private String searchType;
-
-    @Positive
-    private Integer pageNum;
 
     private Long category;
 

@@ -3,6 +3,7 @@ package com.server.pickplace.search.repository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -20,10 +21,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.server.pickplace.place.entity.QCategoryPlace.*;
 import static com.server.pickplace.place.entity.QPlace.*;
@@ -41,10 +39,6 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
         this.queryFactory = new JPAQueryFactory(em);
     }
 
-    HashMap<Long, Integer> roomCountMap = new HashMap<>();
-    List<Long> placeIdList = new ArrayList<>();
-    List<PlaceResponse> placeResponseList = new ArrayList<>();
-    List<Long> placeBeforeList = new ArrayList<>();
 
     @Override
     public Map<Long, Integer> getRoomUnitCountMap(DetailPageRequest detailPageRequest, Long placeId) {
@@ -107,180 +101,127 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
         Point point = extractPointByAddress(categorySearchRequest.getAddress());
 
-        List<Tuple> roomCountTupleList = queryFactory
-                .select(place.id, room.amount.sum())
-                .from(room)
-                .join(room.place, place)
-                .join(place, categoryPlace.place)
-                .where(
-                        Expressions.numberTemplate(Double.class,
-                                        "ST_Distance_Sphere({0}, POINT({1}, {2}))",
-                                        place.point, point.getX(), point.getY())
-                                .loe(categorySearchRequest.getDistance()),
+        List<Tuple> roomCountTupleList = getRoomCountTupleListByCategoryDto(categorySearchRequest, point);
 
-                        categoryPlace.category.id.eq(categorySearchRequest.getCategory())
+        HashMap<Long, Integer> roomCountMap = getRoomCountMapByRoomCountTupleList(roomCountTupleList);
 
-                )
-                .groupBy(place.id)
-                .fetch();
+        List<Long> placeBeforeList = getPlaceBeforeListByRoomCountTupleList(roomCountTupleList);
 
-        for (Tuple tuple : roomCountTupleList) {
-            Long placeId = tuple.get(0, Long.class);
-            Integer roomCount = tuple.get(1, Integer.class);
+        List<Tuple> placeReservationCountTupleList = getPlaceReservationCountTupleListByCategoryDto(categorySearchRequest, placeBeforeList);
 
-            roomCountMap.put(placeId, roomCount);
-            placeBeforeList.add(placeId);
-        }
+        List<Long> placeIdList = getPlaceIdListByRoomCountMapAndPlaceReservationCountTupleList(roomCountMap, placeReservationCountTupleList);
 
+        List<PlaceResponse> placeResponseList = getPlaceResponseListByPageableAndPlaceIdList(pageable, placeIdList, categorySearchRequest);
 
-        List<Tuple> placeReservationCountTupleList = queryFactory
-                .select(place.id, unit.id.countDistinct())
-                .from(reservation)
-                .join(reservation.room, room)
-                .join(room.place, place)
-                .join(place, categoryPlace.place)
-                .join(reservation.unit, unit)
-                .where(
-
-                        place.id.in(placeBeforeList),
-
-                        dateCheckByRequest(categorySearchRequest)
-
-
-                        )
-                .groupBy(place.id)
-                .fetch();
-
-        for (Tuple tuple : placeReservationCountTupleList) {
-            Long placeId = tuple.get(0, Long.class);
-            Integer reservationRoomCount = tuple.get(1, Integer.class);
-            Integer totalRoomCount = roomCountMap.get(placeId);
-
-            if (reservationRoomCount < totalRoomCount) {
-                placeIdList.add(placeId);
-            }
-        }
-
-        List<Place> placeList = queryFactory
-                .selectFrom(place)
-                .where(place.id.in(placeIdList))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize() + 1)
-                .fetch();
-
-        for (Place place : placeList) {
-            PlaceResponse placeResponse = PlaceResponse.builder()
-                    .id(place.getId())
-                    .name(place.getName())
-                    .rating(place.getRating())
-                    .reviewCount(place.getReviewCount())
-                    .address(
-                            new HashMap<>() {
-                                {
-                                    put("address", place.getAddress());
-                                    put("latitude", place.getPoint().getX());
-                                    put("latitude", place.getPoint().getY());
-                                }
-                            }
-                    ).build();
-
-            placeResponseList.add(placeResponse);
-        }
-
-        boolean hasNext = false;
-        if (placeResponseList.size() > pageable.getPageSize()) {
-            placeResponseList.remove(pageable.getPageSize());
-            hasNext = true;
-        }
+        boolean hasNext = getPageableByPlaceResponseList(pageable, placeResponseList);
 
         return new SliceImpl<>(placeResponseList, pageable, hasNext);
 
-
     }
+
 
     @Override
     public Slice<PlaceResponse> findSliceByDto(BasicSearchRequest basicSearchRequest, Pageable pageable) {
 
-
         Point point = extractPointByAddress(basicSearchRequest.getAddress());
 
-        List<Tuple> roomCountTupleList = getRoomCountTupleListByBasicDto(basicSearchRequest, point);
+        List<Tuple> roomCountTupleList = getRoomCountTupleListByBasicSearchDto(basicSearchRequest, point);
 
-        for (Tuple tuple : roomCountTupleList) {
-            Long placeId = tuple.get(0, Long.class);
-            Integer roomCount = tuple.get(1, Integer.class);
+        HashMap<Long, Integer> roomCountMap = getRoomCountMapByRoomCountTupleList(roomCountTupleList);
 
-            roomCountMap.put(placeId, roomCount);
-            placeBeforeList.add(placeId);
-        }
+        List<Long> placeBeforeList = getPlaceBeforeListByRoomCountTupleList(roomCountTupleList);
 
+        List<Tuple> placeReservationCountTupleList = getPlaceReservationCountTupleListByBasicSearchDto(basicSearchRequest, placeBeforeList);
 
-        List<Tuple> placeReservationCountTupleList = queryFactory
-                .select(place.id, unit.id.countDistinct())
-                .from(reservation)
-                .join(reservation.room, room)
-                .join(room.place, place)
-                .join(reservation.unit, unit)
-                .where(
+        List<Long> placeIdList = getPlaceIdListByRoomCountMapAndPlaceReservationCountTupleList(roomCountMap, placeReservationCountTupleList);
 
-                        place.id.in(placeBeforeList),
+        List<PlaceResponse> placeResponseList = getPlaceResponseListByPageableAndPlaceIdList(pageable, placeIdList, basicSearchRequest);
 
-                        dateCheckByRequest(basicSearchRequest)
-
-                )
-                .groupBy(place.id)
-                .fetch();
-
-        for (Tuple tuple : placeReservationCountTupleList) {
-            Long placeId = tuple.get(0, Long.class);
-            Integer reservationRoomCount = tuple.get(1, Integer.class);
-            Integer totalRoomCount = roomCountMap.get(placeId);
-
-            if (reservationRoomCount < totalRoomCount) {
-                placeIdList.add(placeId);
-            }
-        }
-
-        List<Place> placeList = queryFactory
-                .selectFrom(place)
-                .where(place.id.in(placeIdList))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize() + 1)
-                .fetch();
-
-        for (Place place : placeList) {
-            PlaceResponse placeResponse = PlaceResponse.builder()
-                    .id(place.getId())
-                    .name(place.getName())
-                    .rating(place.getRating())
-                    .reviewCount(place.getReviewCount())
-                    .address(
-                            new HashMap<>() {
-                                {
-                                    put("address", place.getAddress());
-                                    put("latitude", place.getPoint().getX());
-                                    put("latitude", place.getPoint().getY());
-                                }
-                            }
-                    ).build();
-
-            placeResponseList.add(placeResponse);
-        }
-
-        boolean hasNext = false;
-        if (placeResponseList.size() > pageable.getPageSize()) {
-            placeResponseList.remove(pageable.getPageSize());
-            hasNext = true;
-        }
+        boolean hasNext = getPageableByPlaceResponseList(pageable, placeResponseList);
 
         return new SliceImpl<>(placeResponseList, pageable, hasNext);
 
     }
+
+
     @Override
     public Slice<PlaceResponse> findSliceByDto(DetailSearchRequest detailSearchRequest, Pageable pageable) {
 
         Point point = extractPointByAddress(detailSearchRequest.getAddress());
 
+        List<Tuple> roomCountTupleList = getRoomCountTupleListByDetailSearchDto(detailSearchRequest, point);
+
+        Integer tagAmount = detailSearchRequest.getTagId().size();
+
+        HashMap<Long, Integer> roomCountMap = getRoomCountMapByRoomCountTupleListInDetail(roomCountTupleList, tagAmount);
+
+        List<Long> placeBeforeList = getPlaceBeforeListByRoomCountTupleListInDetail(roomCountTupleList, tagAmount);
+
+        List<Tuple> placeReservationCountTupleList = getPlaceReservationCountTupleListByDetailDto(detailSearchRequest, placeBeforeList);
+
+        List<Long> placeIdList = getPlaceIdListByRoomCountMapAndPlaceReservationCountTupleList(roomCountMap, placeReservationCountTupleList);
+
+        List<PlaceResponse> placeResponseList = getPlaceResponseListByPageableAndPlaceIdList(pageable, placeIdList, detailSearchRequest);
+
+        boolean hasNext = getPageableByPlaceResponseList(pageable, placeResponseList);
+
+        return new SliceImpl<>(placeResponseList, pageable, hasNext);
+
+    }
+
+    private List<Tuple> getPlaceReservationCountTupleListByDetailDto(DetailSearchRequest detailSearchRequest, List<Long> placeBeforeList) {
+        List<Tuple> placeReservationCountTupleList = queryFactory
+                .select(place.id, unit.id.countDistinct())
+                .from(room)
+                .join(room.place, place)
+                .join(place, categoryPlace.place)
+                .join(place, tagPlace.place)
+                .join(room, reservation.room)
+                .join(unit, reservation.unit)
+                .where(
+
+                        place.id.in(placeBeforeList),
+
+                        dateCheckByRequest(detailSearchRequest)
+
+                )
+                .groupBy(place.id)
+                .fetch();
+        return placeReservationCountTupleList;
+    }
+
+    private List<Long> getPlaceBeforeListByRoomCountTupleListInDetail(List<Tuple> roomCountTupleList, Integer tagAmount) {
+        List<Long> placeBeforeList = new ArrayList<>();
+
+        for (Tuple tuple : roomCountTupleList) {
+            Long placeId = tuple.get(0, Long.class);
+            Integer tagCount = tuple.get(1, Integer.class);
+
+            if (tagCount == tagAmount) {
+                placeBeforeList.add(placeId);
+            }
+
+        }
+        return placeBeforeList;
+    }
+
+    private HashMap<Long, Integer> getRoomCountMapByRoomCountTupleListInDetail(List<Tuple> roomCountTupleList, Integer tagAmount) {
+        HashMap<Long, Integer> roomCountMap = new HashMap<>();
+
+        for (Tuple tuple : roomCountTupleList) {
+            Long placeId = tuple.get(0, Long.class);
+            Integer tagCount = tuple.get(1, Integer.class);
+            Integer roomCount = tuple.get(2, Integer.class);
+
+            if (tagCount == tagAmount) {
+                roomCountMap.put(placeId, roomCount / tagAmount);
+            }
+
+        }
+        return roomCountMap;
+    }
+
+    private List<Tuple> getRoomCountTupleListByDetailSearchDto(DetailSearchRequest detailSearchRequest, Point point) {
         List<Tuple> roomCountTupleList = queryFactory
                 .select(place.id, tagPlace.tag.id.countDistinct(), room.amount.sum())
                 .from(room)
@@ -302,54 +243,74 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
                 )
                 .groupBy(place.id)
                 .fetch();
+        return roomCountTupleList;
+    }
 
-        Integer tagAmount = detailSearchRequest.getTagId().size();
-        for (Tuple tuple : roomCountTupleList) {
-            Long placeId = tuple.get(0, Long.class);
-            Integer tagCount = tuple.get(1, Integer.class);
-            Integer roomCount = tuple.get(2, Integer.class);
-
-            if (tagCount == tagAmount) {
-                roomCountMap.put(placeId, roomCount / tagAmount);
-                placeBeforeList.add(placeId);
-            }
-
-        }
-
+    private List<Tuple> getPlaceReservationCountTupleListByBasicSearchDto(BasicSearchRequest basicSearchRequest, List<Long> placeBeforeList) {
         List<Tuple> placeReservationCountTupleList = queryFactory
                 .select(place.id, unit.id.countDistinct())
-                .from(room)
+                .from(reservation)
+                .join(reservation.room, room)
                 .join(room.place, place)
-                .join(place, categoryPlace.place)
-                .join(place, tagPlace.place)
-                .join(room, reservation.room)
-                .join(unit, reservation.unit)
+                .join(reservation.unit, unit)
                 .where(
+
                         place.id.in(placeBeforeList),
 
-                        dateCheckByRequest(detailSearchRequest)
+                        dateCheckByRequest(basicSearchRequest)
 
                 )
                 .groupBy(place.id)
                 .fetch();
+        return placeReservationCountTupleList;
+    }
 
+    private List<Tuple> getRoomCountTupleListByBasicSearchDto(BasicSearchRequest basicSearchRequest, Point point) {
+        List<Tuple> roomCountTupleList = queryFactory
+                .select(place.id, room.amount.sum())
+                .from(room)
+                .join(room.place, place)
+                .where(
+                        Expressions.numberTemplate(Double.class,
+                                        "ST_Distance_Sphere({0}, POINT({1}, {2}))",
+                                        place.point, point.getX(), point.getY())
+                                .loe(basicSearchRequest.getDistance())
 
-        for (Tuple tuple : placeReservationCountTupleList) {
-            Long placeId = tuple.get(0, Long.class);
-            Integer reservationRoomCount = tuple.get(1, Integer.class);
-            Integer totalRoomCount = roomCountMap.get(placeId);
+                )
+                .groupBy(place.id)
+                .fetch();
+        return roomCountTupleList;
+    }
 
-            if (reservationRoomCount < totalRoomCount) {
-                placeIdList.add(placeId);
-            }
+    private boolean getPageableByPlaceResponseList(Pageable pageable, List<PlaceResponse> placeResponseList) {
+        boolean hasNext = false;
+        if (placeResponseList.size() > pageable.getPageSize()) {
+            placeResponseList.remove(pageable.getPageSize());
+            hasNext = true;
         }
+        return hasNext;
+    }
 
-        List<Place> placeList = queryFactory
-                .selectFrom(place)
+    private List<PlaceResponse> getPlaceResponseListByPageableAndPlaceIdList(Pageable pageable, List<Long> placeIdList, NormalSearchRequest request) {
+        List<Place> placeList = new ArrayList<>();
+        List<PlaceResponse> placeResponseList = new ArrayList<>();
+
+        List<Tuple> placeRoomPriceMinTuple = queryFactory
+                .select(place, room.price.min())
+                .from(place)
+                .join(room.place, place)
                 .where(place.id.in(placeIdList))
+                .groupBy(place.id)
+                .orderBy(eqRecommend(request), eqLowPrice(request), eqHighPrice(request))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
+
+
+        for (Tuple tuple : placeRoomPriceMinTuple) {
+            Place place = tuple.get(0, Place.class);
+            placeList.add(place);
+        }
 
         for (Place place : placeList) {
             PlaceResponse placeResponse = PlaceResponse.builder()
@@ -370,16 +331,116 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
             placeResponseList.add(placeResponse);
         }
 
-        boolean hasNext = false;
-        if (placeResponseList.size() > pageable.getPageSize()) {
-            placeResponseList.remove(pageable.getPageSize());
-            hasNext = true;
-        }
 
-        return new SliceImpl<>(placeResponseList, pageable, hasNext);
-
+        return placeResponseList;
     }
 
+    private OrderSpecifier<Float> eqRecommend(NormalSearchRequest request) {
+
+        if (request.getSearchType().equals("추천 순")) {
+            return place.rating.desc();
+        }
+
+        return null;
+    }
+
+    private OrderSpecifier<Integer> eqLowPrice(NormalSearchRequest request) {
+
+        if (request.getSearchType().equals("낮은 가격순")) {
+            return room.price.asc();
+        }
+
+        return null;
+    }
+
+    private OrderSpecifier<Integer> eqHighPrice(NormalSearchRequest request) {
+
+        if (request.getSearchType().equals("높은 가격순")) {
+            return room.price.desc();
+        }
+
+        return null;
+    }
+
+    private List<Long> getPlaceIdListByRoomCountMapAndPlaceReservationCountTupleList(HashMap<Long, Integer> roomCountMap, List<Tuple> placeReservationCountTupleList) {
+        List<Long> placeIdList = new ArrayList<>();
+
+        for (Tuple tuple : placeReservationCountTupleList) {
+            Long placeId = tuple.get(0, Long.class);
+            Integer reservationRoomCount = tuple.get(1, Integer.class);
+            Integer totalRoomCount = roomCountMap.get(placeId);
+
+            if (reservationRoomCount < totalRoomCount) {
+                placeIdList.add(placeId);
+            }
+        }
+        return placeIdList;
+    }
+
+    private List<Tuple> getPlaceReservationCountTupleListByCategoryDto(CategorySearchRequest categorySearchRequest, List<Long> placeBeforeList) {
+        List<Tuple> placeReservationCountTupleList = queryFactory
+                .select(place.id, unit.id.countDistinct())
+                .from(reservation)
+                .join(reservation.room, room)
+                .join(room.place, place)
+                .join(place, categoryPlace.place)
+                .join(reservation.unit, unit)
+                .where(
+
+                        place.id.in(placeBeforeList),
+
+                        dateCheckByRequest(categorySearchRequest)
+
+
+                )
+                .groupBy(place.id)
+                .fetch();
+        return placeReservationCountTupleList;
+    }
+
+    private List<Long> getPlaceBeforeListByRoomCountTupleList(List<Tuple> roomCountTupleList) {
+        List<Long> placeBeforeList = new ArrayList<>();
+
+        for (Tuple tuple : roomCountTupleList) {
+            Long placeId = tuple.get(0, Long.class);
+
+            placeBeforeList.add(placeId);
+
+        }
+        return placeBeforeList;
+    }
+
+    private HashMap<Long, Integer> getRoomCountMapByRoomCountTupleList(List<Tuple> roomCountTupleList) {
+        HashMap<Long, Integer> roomCountMap = new HashMap<>();
+
+        for (Tuple tuple : roomCountTupleList) {
+            Long placeId = tuple.get(0, Long.class);
+            Integer roomCount = tuple.get(1, Integer.class);
+
+            roomCountMap.put(placeId, roomCount);
+        }
+        return roomCountMap;
+    }
+
+    private List<Tuple> getRoomCountTupleListByCategoryDto(CategorySearchRequest categorySearchRequest, Point point) {
+        List<Tuple> roomCountTupleList = queryFactory
+                .select(place.id, room.amount.sum())
+                .from(room)
+                .join(room.place, place)
+                .join(place, categoryPlace.place)
+                .where(
+                        Expressions.numberTemplate(Double.class,
+                                        "ST_Distance_Sphere({0}, POINT({1}, {2}))",
+                                        place.point, point.getX(), point.getY())
+                                .loe(categorySearchRequest.getDistance()),
+
+                        categoryPlace.category.id.eq(categorySearchRequest.getCategory())
+
+                )
+                .groupBy(place.id)
+                .fetch();
+        return roomCountTupleList;
+    }
 
     private List<Tuple> getRoomCountTupleListByBasicDto(BasicSearchRequest basicSearchRequest, Point point) {
         return queryFactory
