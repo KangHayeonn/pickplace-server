@@ -23,7 +23,6 @@ import com.server.pickplace.member.dto.MemberSaveResponse;
 import com.server.pickplace.member.service.MemberService;
 
 import io.swagger.annotations.ApiOperation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -37,7 +36,6 @@ import lombok.RequiredArgsConstructor;
  * -----------------------------------------------------------
  * 2023-05-28        tkfdk       최초 생성
  */
-@Tag(name = "1. Member", description = "Member API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/member")
