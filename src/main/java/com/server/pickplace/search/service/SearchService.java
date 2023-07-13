@@ -3,6 +3,8 @@ package com.server.pickplace.search.service;
 import com.server.pickplace.place.entity.Place;
 import com.server.pickplace.place.entity.Room;
 import com.server.pickplace.search.dto.*;
+import com.server.pickplace.search.error.SearchErrorResult;
+import com.server.pickplace.search.error.SearchException;
 import com.server.pickplace.search.repository.SearchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,8 +84,11 @@ public class SearchService {
         List<RoomResponse> roomResponseList = new ArrayList<>();
 
         Optional<Place> optionalPlace = searchRepository.findById(placeId);
-        Place place = optionalPlace.get();  // 추후 수정
+
+        Place place = optionalPlace.orElseThrow(() -> new SearchException(SearchErrorResult.NOT_EXIST_PLACE));
+
         PlaceResponse placeResponse = getPlaceResponseByPlace(place);
+
         detailPageMap.put("place", placeResponse);
 
         Map<Long, Integer> roomUnitCountMap = searchRepository.getRoomUnitCountMap(detailPageRequest, placeId);

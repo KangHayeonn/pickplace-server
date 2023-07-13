@@ -9,12 +9,11 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.server.pickplace.place.entity.Place;
 import com.server.pickplace.search.dto.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.geo.Point;
-
-import javax.persistence.EntityManager;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -31,14 +30,10 @@ import static com.server.pickplace.place.entity.QUnit.*;
 import static com.server.pickplace.reservation.entity.QReservation.*;
 
 
+@RequiredArgsConstructor
 public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
-
-    public SearchRepositoryCustomImpl(EntityManager em) {
-        this.queryFactory = new JPAQueryFactory(em);
-    }
-
 
     @Override
     public Map<Long, Integer> getRoomUnitCountMap(DetailPageRequest detailPageRequest, Long placeId) {
@@ -73,7 +68,7 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
                 .select(room.id, unit.id.countDistinct())
                 .from(room)
                 .join(room.place, place)
-                .join(reservation.room, room)
+                .join(room.reservations, reservation)
                 .join(reservation.unit, unit)
                 .where(
 
@@ -118,7 +113,6 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
         return new SliceImpl<>(placeResponseList, pageable, hasNext);
 
     }
-
 
     @Override
     public Slice<PlaceResponse> findSliceByDto(BasicSearchRequest basicSearchRequest, Pageable pageable) {
@@ -174,10 +168,10 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
                 .select(place.id, unit.id.countDistinct())
                 .from(room)
                 .join(room.place, place)
-                .join(place, categoryPlace.place)
-                .join(place, tagPlace.place)
-                .join(room, reservation.room)
-                .join(unit, reservation.unit)
+                .join(place.categories, categoryPlace)
+                .join(place.tags, tagPlace)
+                .join(room.reservations, reservation)
+                .join(reservation.unit, unit)
                 .where(
 
                         place.id.in(placeBeforeList),
@@ -226,8 +220,8 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
                 .select(place.id, tagPlace.tag.id.countDistinct(), room.amount.sum())
                 .from(room)
                 .join(room.place, place)
-                .join(place, categoryPlace.place)
-                .join(place, tagPlace.place)
+                .join(place.categories, categoryPlace)
+                .join(place.tags, tagPlace)
                 .where(
                         Expressions.numberTemplate(Double.class,
                                         "ST_Distance_Sphere({0}, POINT({1}, {2}))",
@@ -298,7 +292,7 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
         List<Tuple> placeRoomPriceMinTuple = queryFactory
                 .select(place, room.price.min())
                 .from(place)
-                .join(room.place, place)
+                .join(place.rooms, room)
                 .where(place.id.in(placeIdList))
                 .groupBy(place.id)
                 .orderBy(eqRecommend(request), eqLowPrice(request), eqHighPrice(request))
@@ -383,7 +377,7 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
                 .from(reservation)
                 .join(reservation.room, room)
                 .join(room.place, place)
-                .join(place, categoryPlace.place)
+                .join(place.categories, categoryPlace)
                 .join(reservation.unit, unit)
                 .where(
 
@@ -427,7 +421,7 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
                 .select(place.id, room.amount.sum())
                 .from(room)
                 .join(room.place, place)
-                .join(place, categoryPlace.place)
+                .join(place.categories, categoryPlace)
                 .where(
                         Expressions.numberTemplate(Double.class,
                                         "ST_Distance_Sphere({0}, POINT({1}, {2}))",

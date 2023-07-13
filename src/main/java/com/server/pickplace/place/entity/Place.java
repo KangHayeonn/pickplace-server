@@ -8,6 +8,8 @@ import org.hibernate.annotations.DynamicInsert;
 import org.springframework.data.geo.Point;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -48,6 +50,17 @@ public class Place extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
+
+    @OneToMany(mappedBy = "place")
+    private List<CategoryPlace> categories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "place")
+    private List<TagPlace> tags = new ArrayList<>();
+
+    @OneToMany(mappedBy = "place")
+    private List<Room> rooms = new ArrayList<>();
+
+
 
 
 }

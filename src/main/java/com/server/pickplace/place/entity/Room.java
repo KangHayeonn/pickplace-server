@@ -1,9 +1,11 @@
 package com.server.pickplace.place.entity;
 
 import com.server.pickplace.common.common.BaseEntity;
+import com.server.pickplace.reservation.entity.Reservation;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -36,4 +38,6 @@ public class Room extends BaseEntity {
     @JoinColumn(name = "PLACE_ID")
     private Place place;
 
+    @OneToMany(mappedBy = "room")
+    private List<Reservation> reservations;
 }
