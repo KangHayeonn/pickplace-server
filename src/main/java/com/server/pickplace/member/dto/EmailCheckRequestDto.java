@@ -3,10 +3,13 @@ package com.server.pickplace.member.dto;
 import lombok.*;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 
 @Getter
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class EmailCheckRequestDto {
-    @Email(message = "email 형식을 지켜주세요.")
+
+    @NotBlank(message = "공백")
+    @Email(message = "형식")
     String email;
 }

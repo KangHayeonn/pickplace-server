@@ -71,16 +71,13 @@ public class MemberController {
 
 		if(errors.hasErrors()) {
 			String errorDetail = errors.getFieldErrors().toString();
-			System.out.println(errorDetail);
 
-//			//회원가입 오류 발생했을 때 dto 값 가져올 경우 <- 프론트에서 필요한건지 여쭤보기 / 쓰는거면 모델 추가
 			Map<String, String> validateMap = new HashMap<>();
 
 			/* 회원가입 실패시 message 값들을 매핑*/
 			for (FieldError error : errors.getFieldErrors()) {
 				String validKeyName = error.getField();
 				validateMap.put(validKeyName, error.getDefaultMessage());
-				System.out.println(validKeyName);
 				if (validKeyName.equals("email")){
 					throw new MemberException(MemberErrorResult.NOT_EMAIL);
 				}
@@ -94,13 +91,34 @@ public class MemberController {
 
 	@ApiOperation(tags = "1. Member", value = "이메일 중복 체크", notes = "이메일 충복 체크 한다")
 	@PostMapping(value = "emailCheck", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity emailCheck(@RequestBody EmailCheckRequestDto email) {
+	public ResponseEntity emailCheck(@RequestBody @Valid EmailCheckRequestDto email, Errors errors) {
 		Boolean emailCheckResponse = memberService.emailCheck(email);
 
-		System.out.println(emailCheckResponse);
-		if (emailCheckResponse==true)  return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"이메일 사용 가능"));
+		if(errors.hasErrors()) {
+			String errorDetail = errors.getFieldErrors().toString();
 
-		return ResponseEntity.ok(responseService.getErrorResponse(HttpStatus.OK.value(),"이메일 사용 불가능")); // 예외 여러 종류로 ?
+			Map<String, String> validateMap = new HashMap<>();
+
+			for (FieldError error : errors.getFieldErrors()) {
+				String validKeyName = error.getField();
+				validateMap.put(validKeyName, error.getDefaultMessage());
+				System.out.println(validateMap);
+				if (error.getDefaultMessage().equals("공백")){
+					throw new MemberException(MemberErrorResult.HAS_NULL); //공백
+				}
+				else {
+					throw new MemberException(MemberErrorResult.NOT_EMAIL); // 형식
+				}
+			}
+		}
+
+		System.out.println(emailCheckResponse);
+		if (emailCheckResponse==true)
+			return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"이메일 사용 가능"));
+		else {
+			throw new MemberException(MemberErrorResult.DUPLICATED_EMAIL); // 중복
+		}
+
 	}
 
 	@ApiOperation(tags = "1. Member", value = "토큰 재발급", notes = "토큰을 재발급한다")

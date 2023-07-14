@@ -24,8 +24,9 @@ import org.springframework.http.ResponseEntity;
 public enum MemberErrorResult {
 	DUPLICATED_MEMBER_REGISTER(HttpStatus.BAD_REQUEST, "Duplicated Member Register Request"),
 	UNKNOWN_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown Exception1111"),
-	HAS_NULL(HttpStatus.BAD_REQUEST, "값을 입력해주세요 or 닉네임 길이제한 지켜주세요"),
+	HAS_NULL(HttpStatus.BAD_REQUEST, "올바른 값을 입력해주세요"),
 	NOT_EMAIL(HttpStatus.BAD_REQUEST, "이메일 형식이 지켜지지 않았습니다."),
+	DUPLICATED_EMAIL(HttpStatus.BAD_REQUEST, "이메일 중복입니다"),
 	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND,"Member Not Found1111");
 
 	private final HttpStatus httpStatus;
