@@ -1,6 +1,9 @@
 package com.server.pickplace.search.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.server.pickplace.place.entity.CategoryStatus;
+import com.server.pickplace.place.entity.Tag;
+import com.server.pickplace.place.entity.TagStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,9 +28,10 @@ public class DetailSearchRequest extends NormalSearchRequest {
     @NotBlank  // Null, 빈 문자열, 스페이스만 있는 문자열 불가
     @Size(max = 255)
     private String address;
+    private Double x;
+    private Double y;
 
-    @Positive
-    private Long category;
+    private CategoryStatus category;
 
     @Positive
     private Integer userCnt;
@@ -35,6 +39,7 @@ public class DetailSearchRequest extends NormalSearchRequest {
     @Positive
     private Integer distance;
 
-    private List<Long> tagId;
+    private List<TagStatus> tagList;
+
 
 }

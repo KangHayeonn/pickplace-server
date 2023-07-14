@@ -3,6 +3,8 @@ package com.server.pickplace.search.repository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.NullExpression;
+import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
@@ -10,6 +12,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.server.pickplace.place.entity.Place;
 import com.server.pickplace.search.dto.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -22,6 +25,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.*;
 
+import static com.server.pickplace.place.entity.QCategory.*;
 import static com.server.pickplace.place.entity.QCategoryPlace.*;
 import static com.server.pickplace.place.entity.QPlace.*;
 import static com.server.pickplace.place.entity.QRoom.room;
@@ -31,6 +35,7 @@ import static com.server.pickplace.reservation.entity.QReservation.*;
 
 
 @RequiredArgsConstructor
+@Slf4j
 public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
@@ -41,7 +46,7 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
         Map<Long, Integer> roomUnitCountMap = new HashMap<>();
 
         List<Tuple> roomUnitCountMapTupleList = queryFactory
-                .select(room.id, room.amount.sum())
+                .select(room.id, room.amount.sum().intValue())
                 .from(room)
                 .join(room.place, place)
                 .where(place.id.eq(placeId))
@@ -60,12 +65,13 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
     }
 
     @Override
-    public Map<Long, Integer> getUnableRoomCountMap(DetailPageRequest detailPageRequest, Long placeId) {
+    public Map<Long, Integer> getUnableRoomCountMap(DetailPageRequest detailPageRequest, Long placeId, List<Long> roomIdList) {
 
         Map<Long, Integer> unableRoomCountMap = new HashMap<>();
+        roomIdList.stream().forEach(roomId -> unableRoomCountMap.put(roomId, 0));
 
         List<Tuple> unableRoomCountTupleList = queryFactory
-                .select(room.id, unit.id.countDistinct())
+                .select(room.id, unit.id.countDistinct().intValue())
                 .from(room)
                 .join(room.place, place)
                 .join(room.reservations, reservation)
@@ -97,16 +103,22 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
         Point point = extractPointByAddress(categorySearchRequest.getAddress());
 
         List<Tuple> roomCountTupleList = getRoomCountTupleListByCategoryDto(categorySearchRequest, point);
+        log.info("roomCountTupleList = {}", roomCountTupleList);
 
         HashMap<Long, Integer> roomCountMap = getRoomCountMapByRoomCountTupleList(roomCountTupleList);
+        log.info("roomCountMap = {}", roomCountMap);
 
         List<Long> placeBeforeList = getPlaceBeforeListByRoomCountTupleList(roomCountTupleList);
+        log.info("placeBeforeList = {}", placeBeforeList);
 
-        List<Tuple> placeReservationCountTupleList = getPlaceReservationCountTupleListByCategoryDto(categorySearchRequest, placeBeforeList);
+        Map<Long, Integer> placeReservationCountMap = getPlaceReservationCountMapByCategoryDto(categorySearchRequest, placeBeforeList);
+        log.info("placeReservationCountMap = {}", placeReservationCountMap);
 
-        List<Long> placeIdList = getPlaceIdListByRoomCountMapAndPlaceReservationCountTupleList(roomCountMap, placeReservationCountTupleList);
+        List<Long> placeIdList = getPlaceIdListByRoomCountMapAndPlaceReservationCountMap(roomCountMap, placeReservationCountMap);
+        log.info("placeIdList = {}", placeIdList);
 
         List<PlaceResponse> placeResponseList = getPlaceResponseListByPageableAndPlaceIdList(pageable, placeIdList, categorySearchRequest);
+        log.info("placeResponseList = {}", placeResponseList);
 
         boolean hasNext = getPageableByPlaceResponseList(pageable, placeResponseList);
 
@@ -125,9 +137,9 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
         List<Long> placeBeforeList = getPlaceBeforeListByRoomCountTupleList(roomCountTupleList);
 
-        List<Tuple> placeReservationCountTupleList = getPlaceReservationCountTupleListByBasicSearchDto(basicSearchRequest, placeBeforeList);
+        Map<Long, Integer> placeReservationCountMap = getPlaceReservationCountMapByBasicSearchDto(basicSearchRequest, placeBeforeList);
 
-        List<Long> placeIdList = getPlaceIdListByRoomCountMapAndPlaceReservationCountTupleList(roomCountMap, placeReservationCountTupleList);
+        List<Long> placeIdList = getPlaceIdListByRoomCountMapAndPlaceReservationCountMap(roomCountMap, placeReservationCountMap);
 
         List<PlaceResponse> placeResponseList = getPlaceResponseListByPageableAndPlaceIdList(pageable, placeIdList, basicSearchRequest);
 
@@ -144,18 +156,25 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
         Point point = extractPointByAddress(detailSearchRequest.getAddress());
 
         List<Tuple> roomCountTupleList = getRoomCountTupleListByDetailSearchDto(detailSearchRequest, point);
+        log.info("roomCountTupleList = {}", roomCountTupleList);
 
-        Integer tagAmount = detailSearchRequest.getTagId().size();
+        Integer tagAmount = detailSearchRequest.getTagList().size();
+        log.info("tagAmount = {}", tagAmount);
 
         HashMap<Long, Integer> roomCountMap = getRoomCountMapByRoomCountTupleListInDetail(roomCountTupleList, tagAmount);
+        log.info("roomCountMap = {}", roomCountMap);
 
         List<Long> placeBeforeList = getPlaceBeforeListByRoomCountTupleListInDetail(roomCountTupleList, tagAmount);
+        log.info("placeBeforeList = {}", placeBeforeList);
 
-        List<Tuple> placeReservationCountTupleList = getPlaceReservationCountTupleListByDetailDto(detailSearchRequest, placeBeforeList);
+        Map<Long, Integer> placeReservationCountMap = getPlaceReservationCountMapByDetailDto(detailSearchRequest, placeBeforeList);
+        log.info("placeReservationCountMap= {}", placeReservationCountMap);
 
-        List<Long> placeIdList = getPlaceIdListByRoomCountMapAndPlaceReservationCountTupleList(roomCountMap, placeReservationCountTupleList);
+        List<Long> placeIdList = getPlaceIdListByRoomCountMapAndPlaceReservationCountMap(roomCountMap, placeReservationCountMap);
+        log.info("placeIdList= {}", placeIdList);
 
         List<PlaceResponse> placeResponseList = getPlaceResponseListByPageableAndPlaceIdList(pageable, placeIdList, detailSearchRequest);
+        log.info("placeResponseList= {}", placeResponseList);
 
         boolean hasNext = getPageableByPlaceResponseList(pageable, placeResponseList);
 
@@ -163,9 +182,13 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
     }
 
-    private List<Tuple> getPlaceReservationCountTupleListByDetailDto(DetailSearchRequest detailSearchRequest, List<Long> placeBeforeList) {
+    private Map<Long, Integer> getPlaceReservationCountMapByDetailDto(DetailSearchRequest detailSearchRequest, List<Long> placeBeforeList) {
+
+        Map<Long, Integer> placeReservationCountMap = new HashMap<>();
+        placeBeforeList.stream().forEach(id -> placeReservationCountMap.put(id, 0));
+
         List<Tuple> placeReservationCountTupleList = queryFactory
-                .select(place.id, unit.id.countDistinct())
+                .select(place.id, unit.id.countDistinct().intValue())
                 .from(room)
                 .join(room.place, place)
                 .join(place.categories, categoryPlace)
@@ -181,7 +204,16 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
                 )
                 .groupBy(place.id)
                 .fetch();
-        return placeReservationCountTupleList;
+
+        for (Tuple tuple : placeReservationCountTupleList) {
+            Long placeId = tuple.get(0, Long.class);
+            Integer count = tuple.get(1, Integer.class);
+
+
+            placeReservationCountMap.put(placeId, count);
+        }
+
+        return placeReservationCountMap;
     }
 
     private List<Long> getPlaceBeforeListByRoomCountTupleListInDetail(List<Tuple> roomCountTupleList, Integer tagAmount) {
@@ -191,7 +223,7 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
             Long placeId = tuple.get(0, Long.class);
             Integer tagCount = tuple.get(1, Integer.class);
 
-            if (tagCount == tagAmount) {
+            if ((tagCount == tagAmount) || (tagAmount == 0)) {
                 placeBeforeList.add(placeId);
             }
 
@@ -209,6 +241,8 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
             if (tagCount == tagAmount) {
                 roomCountMap.put(placeId, roomCount / tagAmount);
+            } else if (tagAmount == 0) {
+                roomCountMap.put(placeId, roomCount / tagCount);
             }
 
         }
@@ -217,22 +251,24 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
     private List<Tuple> getRoomCountTupleListByDetailSearchDto(DetailSearchRequest detailSearchRequest, Point point) {
         List<Tuple> roomCountTupleList = queryFactory
-                .select(place.id, tagPlace.tag.id.countDistinct(), room.amount.sum())
+                .select(place.id, tagPlace.tag.id.countDistinct().intValue(), room.amount.sum().intValue())
                 .from(room)
                 .join(room.place, place)
                 .join(place.categories, categoryPlace)
                 .join(place.tags, tagPlace)
+                .join(categoryPlace.category, category)
                 .where(
+
                         Expressions.numberTemplate(Double.class,
-                                        "ST_Distance_Sphere({0}, POINT({1}, {2}))",
-                                        place.point, point.getX(), point.getY())
+                                        "ST_Distance_Sphere(POINT({0}, {1}), POINT({2}, {3}))",
+                                        place.x, place.y, point.getX(), point.getY())
                                 .loe(detailSearchRequest.getDistance()),
 
-                        categoryPlace.category.id.eq(detailSearchRequest.getCategory()),
+                            category.status.eq(detailSearchRequest.getCategory()),
 
-                        room.peopleNum.goe(detailSearchRequest.getUserCnt()),
+                            room.peopleNum.goe(detailSearchRequest.getUserCnt()),
 
-                        tagPlace.tag.id.in(detailSearchRequest.getTagId())
+                            tagCheck(detailSearchRequest)
 
                 )
                 .groupBy(place.id)
@@ -240,9 +276,18 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
         return roomCountTupleList;
     }
 
-    private List<Tuple> getPlaceReservationCountTupleListByBasicSearchDto(BasicSearchRequest basicSearchRequest, List<Long> placeBeforeList) {
+    private BooleanExpression tagCheck(DetailSearchRequest detailSearchRequest) {
+        return detailSearchRequest.getTagList().isEmpty() ? null : tagPlace.tag.tagStatus.in(detailSearchRequest.getTagList());
+    }
+
+    private Map<Long, Integer> getPlaceReservationCountMapByBasicSearchDto(BasicSearchRequest basicSearchRequest, List<Long> placeBeforeList) {
+
+        Map<Long, Integer> placeReservationCountMap = new HashMap<>();
+        placeBeforeList.stream().forEach(id -> placeReservationCountMap.put(id, 0));
+
+
         List<Tuple> placeReservationCountTupleList = queryFactory
-                .select(place.id, unit.id.countDistinct())
+                .select(place.id, unit.id.countDistinct().intValue())
                 .from(reservation)
                 .join(reservation.room, room)
                 .join(room.place, place)
@@ -256,7 +301,17 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
                 )
                 .groupBy(place.id)
                 .fetch();
-        return placeReservationCountTupleList;
+
+        for (Tuple tuple : placeReservationCountTupleList) {
+
+            Long placeId = tuple.get(0, Long.class);
+            Integer count = tuple.get(1, Integer.class);
+
+            placeReservationCountMap.put(placeId, count);
+        }
+
+
+        return placeReservationCountMap;
     }
 
     private List<Tuple> getRoomCountTupleListByBasicSearchDto(BasicSearchRequest basicSearchRequest, Point point) {
@@ -266,8 +321,8 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
                 .join(room.place, place)
                 .where(
                         Expressions.numberTemplate(Double.class,
-                                        "ST_Distance_Sphere({0}, POINT({1}, {2}))",
-                                        place.point, point.getX(), point.getY())
+                                        "ST_Distance_Sphere(POINT({0}, {1}), POINT({2}, {3}))",
+                                        place.x, place.y, point.getX(), point.getY())
                                 .loe(basicSearchRequest.getDistance())
 
                 )
@@ -310,14 +365,14 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
             PlaceResponse placeResponse = PlaceResponse.builder()
                     .id(place.getId())
                     .name(place.getName())
-                    .rating(place.getRating())
+                    .rating(place.getRating() / place.getReviewCount())
                     .reviewCount(place.getReviewCount())
                     .address(
                             new HashMap<>() {
                                 {
                                     put("address", place.getAddress());
                                     put("latitude", place.getPoint().getX());
-                                    put("latitude", place.getPoint().getY());
+                                    put("longitude", place.getPoint().getY());
                                 }
                             }
                     ).build();
@@ -335,7 +390,8 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
             return place.rating.desc();
         }
 
-        return null;
+
+        return new OrderSpecifier(Order.ASC, NullExpression.DEFAULT, OrderSpecifier.NullHandling.Default);
     }
 
     private OrderSpecifier<Integer> eqLowPrice(NormalSearchRequest request) {
@@ -344,7 +400,7 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
             return room.price.asc();
         }
 
-        return null;
+        return new OrderSpecifier(Order.ASC, NullExpression.DEFAULT, OrderSpecifier.NullHandling.Default);
     }
 
     private OrderSpecifier<Integer> eqHighPrice(NormalSearchRequest request) {
@@ -353,27 +409,35 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
             return room.price.desc();
         }
 
-        return null;
+        return new OrderSpecifier(Order.ASC, NullExpression.DEFAULT, OrderSpecifier.NullHandling.Default);
     }
 
-    private List<Long> getPlaceIdListByRoomCountMapAndPlaceReservationCountTupleList(HashMap<Long, Integer> roomCountMap, List<Tuple> placeReservationCountTupleList) {
+    private List<Long> getPlaceIdListByRoomCountMapAndPlaceReservationCountMap(HashMap<Long, Integer> roomCountMap, Map<Long, Integer> placeReservationCountMap) {
         List<Long> placeIdList = new ArrayList<>();
 
-        for (Tuple tuple : placeReservationCountTupleList) {
-            Long placeId = tuple.get(0, Long.class);
-            Integer reservationRoomCount = tuple.get(1, Integer.class);
+        for (Map.Entry<Long, Integer> longIntegerEntry : placeReservationCountMap.entrySet()) {
+
+            Long placeId = longIntegerEntry.getKey();
+            Integer reservationRoomCount = longIntegerEntry.getValue();
             Integer totalRoomCount = roomCountMap.get(placeId);
 
             if (reservationRoomCount < totalRoomCount) {
                 placeIdList.add(placeId);
             }
+
         }
+
         return placeIdList;
+
     }
 
-    private List<Tuple> getPlaceReservationCountTupleListByCategoryDto(CategorySearchRequest categorySearchRequest, List<Long> placeBeforeList) {
+    private Map<Long, Integer> getPlaceReservationCountMapByCategoryDto(CategorySearchRequest categorySearchRequest, List<Long> placeBeforeList) {
+
+        Map<Long, Integer> placeReservationCountMap = new HashMap<>();
+        placeBeforeList.stream().forEach(id -> placeReservationCountMap.put(id, 0));
+
         List<Tuple> placeReservationCountTupleList = queryFactory
-                .select(place.id, unit.id.countDistinct())
+                .select(place.id, unit.id.countDistinct().intValue())
                 .from(reservation)
                 .join(reservation.room, room)
                 .join(room.place, place)
@@ -389,7 +453,16 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
                 )
                 .groupBy(place.id)
                 .fetch();
-        return placeReservationCountTupleList;
+
+        for (Tuple tuple : placeReservationCountTupleList) {
+            Long placeId = tuple.get(0, Long.class);
+            Integer count = tuple.get(1, Integer.class);
+
+
+            placeReservationCountMap.put(placeId, count);
+        }
+
+        return placeReservationCountMap;
     }
 
     private List<Long> getPlaceBeforeListByRoomCountTupleList(List<Tuple> roomCountTupleList) {
@@ -424,32 +497,17 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
                 .join(place.categories, categoryPlace)
                 .where(
                         Expressions.numberTemplate(Double.class,
-                                        "ST_Distance_Sphere({0}, POINT({1}, {2}))",
-                                        place.point, point.getX(), point.getY())
+                                        "ST_Distance_Sphere(POINT({0}, {1}), POINT({2}, {3}))",
+                                        place.x, place.y, point.getX(), point.getY())
                                 .loe(categorySearchRequest.getDistance()),
 
-                        categoryPlace.category.id.eq(categorySearchRequest.getCategory())
+                        categoryPlace.category.status.eq(categorySearchRequest.getCategory())
 
                 )
                 .groupBy(place.id)
                 .fetch();
+
         return roomCountTupleList;
-    }
-
-    private List<Tuple> getRoomCountTupleListByBasicDto(BasicSearchRequest basicSearchRequest, Point point) {
-        return queryFactory
-                .select(place.id, room.amount.sum())
-                .from(room)
-                .join(room.place, place)
-                .where(
-                        Expressions.numberTemplate(Double.class,
-                                        "ST_Distance_Sphere({0}, POINT({1}, {2}))",
-                                        place.point, point.getX(), point.getY())
-                                .loe(basicSearchRequest.getDistance())
-
-                )
-                .groupBy(place.id)
-                .fetch();
     }
 
     private BooleanExpression dateCheckByRequest(SearchRequest request) {
@@ -464,6 +522,11 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
     private BooleanExpression timeCheckByRequest(DetailPageRequest request) {
 
+        if ((request.getStartTime() == null) || (request.getEndTime() == null)) {
+            return null;
+        }
+
+        log.info("request.getstartTime = {}", request.getStartTime());
 
         BooleanExpression cond1 = reservation.startTime.goe(request.getStartTime()).and(reservation.startTime.lt(request.getEndTime()));
         BooleanExpression cond2 = reservation.endTime.gt(request.getStartTime()).and(reservation.endTime.loe(request.getEndTime()));
@@ -512,9 +575,6 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
                 if (documentNode != null) {
                     Float xValue = (float) documentNode.get("x").asDouble();
                     Float yValue = (float) documentNode.get("y").asDouble();
-
-                    System.out.println("x: " + xValue);
-                    System.out.println("y: " + yValue);
 
                     Point point = new Point(xValue, yValue);
 

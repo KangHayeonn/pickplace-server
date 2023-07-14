@@ -47,6 +47,13 @@ public class Place extends BaseEntity {
     @Column(name = "PLACE_POINT", nullable = false)
     private Point point;
 
+    @Column(name = "PLACE_X", nullable = true)
+    private Double x;
+
+    @Column(name = "PLACE_Y", nullable = true)
+    private Double y;
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;

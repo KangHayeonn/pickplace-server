@@ -2,68 +2,48 @@ package com.server.pickplace.search.Integration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.server.pickplace.member.entity.Member;
+import com.server.pickplace.member.entity.MemberRole;
+import com.server.pickplace.place.entity.*;
+import com.server.pickplace.reservation.entity.Reservation;
+import com.server.pickplace.reservation.entity.ReservationStatus;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.event.EventListener;
+import org.springframework.data.geo.Point;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.*;
 
+import static com.server.pickplace.place.entity.QCategoryPlace.categoryPlace;
+import static com.server.pickplace.place.entity.QPlace.place;
+import static com.server.pickplace.place.entity.QRoom.room;
+import static com.server.pickplace.place.entity.QUnit.unit;
+import static com.server.pickplace.reservation.entity.QReservation.reservation;
+
+
+@Transactional
+@SpringBootTest
+@Rollback
 public class BasicTest {
 
-    @Test
-    void 환경변수꺼내기() throws Exception {
-        String kakaoAK = System.getenv("KakaoAK");
-        System.out.println("kakaoAK = " + kakaoAK);
-    }
-
-
-    @Test
-    void api통신테스트() throws Exception {
-
-        String position = URLEncoder.encode("서울특별시 동대문구 이문로 107");
-
-        String stringURL = "https://dapi.kakao.com/v2/local/search/address?query=" + position;
-
-        URL url = new URL(stringURL);
-        String line;
-        StringBuilder sb = new StringBuilder();
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        conn.setRequestProperty("Content-type", "application/json; charset=UTF-8");
-        conn.setRequestProperty("Authorization", "KakaoAK " + System.getenv("KakaoAK"));
-
-
-// API 응답메시지를 불러와서 문자열로 저장
-        BufferedReader rd;
-        if (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
-            rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-        } else {
-            rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(), "UTF-8"));
-        }
-        while ((line = rd.readLine()) != null) {
-            sb.append(line);
-        }
-        rd.close();
-        conn.disconnect();
-        String text = sb.toString();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(text);
-
-        JsonNode documentsNode = jsonNode.get("documents");
-        if (documentsNode != null && documentsNode.isArray()) {
-            JsonNode documentNode = documentsNode.get(0);
-            if (documentNode != null) {
-                Float xValue = (float) documentNode.get("x").asDouble();
-                Float yValue = (float) documentNode.get("y").asDouble();
-
-                System.out.println("x: " + xValue);
-                System.out.println("y: " + yValue);
-
-            }
-        }
-    }
 }
+
+

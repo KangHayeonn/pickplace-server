@@ -1,6 +1,7 @@
 package com.server.pickplace.search.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.server.pickplace.place.entity.CategoryStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,11 +19,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class CategorySearchRequest extends NormalSearchRequest {
 
-    private Integer distance = 5000;
-    private Integer countPerPage = 10;
+    private final Integer distance = 5000;
+    private final Integer countPerPage = 10;
 
-    @Positive
-    private Long category;
+    private CategoryStatus category;
 
     private String address;
 

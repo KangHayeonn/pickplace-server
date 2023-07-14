@@ -11,5 +11,5 @@ import java.util.List;
 public interface SearchRepository extends JpaRepository<Place, Long>, SearchRepositoryCustom {
 
     @Query("select r from Room r join r.place p where p.id = :placeId and r.id in :roomIdList")
-    List<Room> findRoomsByList(@Param("roomList") List<Long> roomIdList, @Param("placeId") Long placeId);
+    List<Room> findRoomsByList(@Param("roomIdList") List<Long> roomIdList, @Param("placeId") Long placeId);
 }

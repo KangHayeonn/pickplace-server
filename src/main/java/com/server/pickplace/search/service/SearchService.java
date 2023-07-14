@@ -93,7 +93,7 @@ public class SearchService {
 
         Map<Long, Integer> roomUnitCountMap = searchRepository.getRoomUnitCountMap(detailPageRequest, placeId);
 
-        Map<Long, Integer> unableRoomCountMap = searchRepository.getUnableRoomCountMap(detailPageRequest, placeId);
+        Map<Long, Integer> unableRoomCountMap = searchRepository.getUnableRoomCountMap(detailPageRequest, placeId, new ArrayList<>(roomUnitCountMap.keySet()));
 
         List<Long> roomIdList = new ArrayList<>(roomUnitCountMap.keySet());
         List<Room> roomList = searchRepository.findRoomsByList(roomIdList, placeId);
@@ -105,6 +105,7 @@ public class SearchService {
             Long roomId = room.getId();
             Integer totalCount = roomUnitCountMap.get(roomId);
             Integer unableCount = unableRoomCountMap.get(roomId);
+
 
             if (totalCount > unableCount) {
                 roomResponse.setStatus(true);
@@ -134,7 +135,7 @@ public class SearchService {
                             {
                                 put("address", place.getAddress());
                                 put("latitude", place.getPoint().getX());
-                                put("latitude", place.getPoint().getY());
+                                put("longitude", place.getPoint().getY());
                             }
                         }
                 ).build();

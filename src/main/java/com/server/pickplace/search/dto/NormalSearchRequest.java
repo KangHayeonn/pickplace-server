@@ -6,6 +6,7 @@ import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 @Getter
 @SuperBuilder
@@ -15,7 +16,7 @@ public class NormalSearchRequest extends SearchRequest {
     @NotBlank
     private String searchType;
 
-    @Positive
+    @PositiveOrZero
     private Integer pageNum;
 
 }
