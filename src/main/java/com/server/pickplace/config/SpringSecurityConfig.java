@@ -5,6 +5,7 @@ import com.server.pickplace.member.service.jwt.JwtTokenProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -13,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
  * description    :
@@ -52,7 +54,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     .and()
                     .authorizeRequests()
 //                    .anyRequest().authenticated() //어떤 url이든 접근 인증 필요
-                    .antMatchers("/api/v1/**","/login","/signup").permitAll() // /user,no url은 인증 안함
+                    .antMatchers("/api/v1/members/**").permitAll() // /members 관련 api 허락
                 .and()
                     .formLogin()
 //                    .loginPage("/view/login") //로그인 페이지 연결

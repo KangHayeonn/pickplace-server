@@ -1,31 +1,35 @@
 package com.server.pickplace.member.controller;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import com.server.pickplace.auth.dto.JwtRequestDto;
-import com.server.pickplace.auth.dto.TokenInfo;
+import com.server.pickplace.member.dto.MemberSignupRequestDto;
 import com.server.pickplace.member.dto.*;
-import lombok.AllArgsConstructor;
+import com.server.pickplace.member.error.MemberErrorResult;
+import com.server.pickplace.member.error.MemberException;
+import com.server.pickplace.member.repository.MemberRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.server.pickplace.common.dto.ListResponse;
-import com.server.pickplace.common.dto.SingleResponse;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
+import org.springframework.ui.Model;
 import com.server.pickplace.common.service.ResponseService;
 import com.server.pickplace.member.service.MemberService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * description    :
@@ -39,7 +43,7 @@ import lombok.RequiredArgsConstructor;
  * 2023-05-28        tkfdk       최초 생성
  */
 @Tag(name = "1. Member", description = "Member API")
-@RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/members")
 //@AllArgsConstructor
@@ -47,20 +51,62 @@ public class MemberController {
 //	private final ResponseService responseService;
 	private final MemberService memberService;
 	private final ResponseService responseService;
+	private final MemberRepository memberRepository;;
 
-	@GetMapping(value = "login")
-	public String signup() {
-		return "login";
-	}
-
-	@ApiOperation(tags = "1. Member", value = "로그인", notes = "로그인 성공")
+	@ApiOperation(tags = "1. Member", value = "로그인", notes = "로그인 시도한다")
 	@PostMapping(value = "login", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity login(@RequestBody JwtRequestDto jwtRequestDto) throws Exception {
+	public ResponseEntity login(HttpServletRequest httpServletRequest, @RequestBody JwtRequestDto jwtRequestDto) throws Exception {
 //		String email = jwtRequestDto.getEmail();
 //		String password = jwtRequestDto.getPassword();
-		LoginResponseDto loginResponseDto = memberService.login(jwtRequestDto);
-		return 		ResponseEntity.ok(responseService.getListResponse(HttpStatus.OK.value(), loginResponseDto))
-		;
+		Map<String, Object> loginResponseDto = memberService.login(httpServletRequest,jwtRequestDto);
+		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), loginResponseDto));
+	}
+
+	@ApiOperation(tags = "1. Member", value = "회원가입", notes = "회원가입 시도한다")
+	@PostMapping(value = "signup", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity signUp(@RequestBody @Valid MemberSignupRequestDto request , Errors errors) throws Exception{
+
+		String signUpResponse = memberService.signup(request);
+
+
+		if(errors.hasErrors()) {
+			String errorDetail = errors.getFieldErrors().toString();
+			System.out.println(errorDetail);
+
+//			//회원가입 오류 발생했을 때 dto 값 가져올 경우 <- 프론트에서 필요한건지 여쭤보기 / 쓰는거면 모델 추가
+			Map<String, String> validateMap = new HashMap<>();
+
+			/* 회원가입 실패시 message 값들을 매핑*/
+			for (FieldError error : errors.getFieldErrors()) {
+				String validKeyName = error.getField();
+				validateMap.put(validKeyName, error.getDefaultMessage());
+				System.out.println(validKeyName);
+				if (validKeyName.equals("email")){
+					throw new MemberException(MemberErrorResult.NOT_EMAIL);
+				}
+				else {
+					throw new MemberException(MemberErrorResult.HAS_NULL);
+				}
+			}
+		}
+		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"회원가입 성공"));
+	}
+
+	@ApiOperation(tags = "1. Member", value = "이메일 중복 체크", notes = "이메일 충복 체크 한다")
+	@PostMapping(value = "emailCheck", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity emailCheck(@RequestBody EmailCheckRequestDto email) {
+		Boolean emailCheckResponse = memberService.emailCheck(email);
+
+		System.out.println(emailCheckResponse);
+		if (emailCheckResponse==true)  return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"이메일 사용 가능"));
+
+		return ResponseEntity.ok(responseService.getErrorResponse(HttpStatus.OK.value(),"이메일 사용 불가능")); // 예외 여러 종류로 ?
+	}
+
+	@ApiOperation(tags = "1. Member", value = "토큰 재발급", notes = "토큰을 재발급한다")
+	@PostMapping(value = "reissue", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity reissue(HttpServletRequest httpServletRequest) {
+		return memberService.reissue(httpServletRequest);
 	}
 
 

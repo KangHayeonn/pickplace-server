@@ -2,7 +2,7 @@ package com.server.pickplace.member.entity;
 
 import javax.persistence.*;
 
-import com.server.pickplace.auth.dto.MemberSignupRequestDto;
+import com.server.pickplace.member.dto.MemberSignupRequestDto;
 import com.server.pickplace.common.common.BaseEntity;
 
 import lombok.AllArgsConstructor;
@@ -62,8 +62,8 @@ public class Member extends BaseEntity implements UserDetails {
 	public Member(MemberSignupRequestDto request) {
 		email = request.getEmail();
 		password = request.getPassword();
-		number = request.getNumber();
-		name = request.getName();
+		number = request.getPhone();
+		name = request.getNickname();
 		role = role.USER; // 회원가입하는 사용자 권한 기본 USER (임시)
 	}
 

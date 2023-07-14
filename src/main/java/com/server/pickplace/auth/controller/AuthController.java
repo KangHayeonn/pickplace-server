@@ -1,7 +1,7 @@
 //package com.server.pickplace.auth.controller;
 //
 //import com.server.pickplace.auth.dto.JwtRequestDto;
-//import com.server.pickplace.auth.dto.MemberSignupRequestDto;
+//import com.server.pickplace.member.dto.MemberSignupRequestDto;
 //import org.springframework.http.MediaType;
 //import org.springframework.web.bind.annotation.PostMapping;
 //import org.springframework.web.bind.annotation.RequestBody;

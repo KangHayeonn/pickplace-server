@@ -25,6 +25,11 @@ public class UserDetail implements UserDetails {
         return authorities;
     }
 
+    public Long getMemberId() {
+        return member.getId();
+    }
+
+
     @Override
     public String getPassword() {
         return member.getPassword();
