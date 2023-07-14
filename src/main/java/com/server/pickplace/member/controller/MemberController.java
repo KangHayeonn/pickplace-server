@@ -3,7 +3,7 @@ package com.server.pickplace.member.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import com.server.pickplace.auth.dto.JwtRequestDto;
+import com.server.pickplace.member.dto.JwtRequestDto;
 import com.server.pickplace.member.dto.MemberSignupRequestDto;
 import com.server.pickplace.member.dto.*;
 import com.server.pickplace.member.error.MemberErrorResult;
@@ -17,10 +17,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
-import org.springframework.ui.Model;
 import com.server.pickplace.common.service.ResponseService;
 import com.server.pickplace.member.service.MemberService;
 
@@ -55,9 +52,14 @@ public class MemberController {
 
 	@ApiOperation(tags = "1. Member", value = "로그인", notes = "로그인 시도한다")
 	@PostMapping(value = "login", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity login(HttpServletRequest httpServletRequest, @RequestBody JwtRequestDto jwtRequestDto) throws Exception {
+	public ResponseEntity login(HttpServletRequest httpServletRequest, @RequestBody @Valid JwtRequestDto jwtRequestDto, Errors errors) throws Exception {
 //		String email = jwtRequestDto.getEmail();
 //		String password = jwtRequestDto.getPassword();
+
+		if(errors.hasErrors()){
+			throw new MemberException(MemberErrorResult.HAS_NULL);
+		}
+
 		Map<String, Object> loginResponseDto = memberService.login(httpServletRequest,jwtRequestDto);
 		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), loginResponseDto));
 	}

@@ -1,6 +1,6 @@
 package com.server.pickplace.member.service;
 
-import com.server.pickplace.auth.dto.JwtRequestDto;
+import com.server.pickplace.member.dto.JwtRequestDto;
 import com.server.pickplace.member.dto.MemberSignupRequestDto;
 import com.server.pickplace.auth.dto.TokenInfo;
 import com.server.pickplace.common.service.ResponseService;
@@ -31,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -63,25 +64,18 @@ public class MemberService {
 
 	@Transactional
 	//login service
-	public Map<String, Object> login(HttpServletRequest request, JwtRequestDto jwtRequestDto) throws Exception {
-
-
-		long a = loginFindByEmail(jwtRequestDto.getEmail()).getId();
-		System.out.println(memberRepository.findByEmail(jwtRequestDto.getEmail()).get().getPassword());
-		System.out.println(jwtRequestDto.getPassword());
-//		UsernamePasswordAuthenticationToken authenticationToken = jwtRequestDto.toAuthentication();
+	public Map<String, Object> login(HttpServletRequest request,  JwtRequestDto jwtRequestDto) throws Exception {
 
 		if (memberRepository.findByEmail(jwtRequestDto.getEmail()).orElse(null)==null)
-			throw new MemberException(MemberErrorResult.UNKNOWN_EXCEPTION); //없는 아이디
+			throw new MemberException(MemberErrorResult.MEMBER_NOT_ID); //없는 아이디
 
-		if (passwordEncoder.encode(memberRepository.findByEmail(jwtRequestDto.getEmail()).get().getPassword()).equals(jwtRequestDto.getPassword())) {
-				throw new MemberException(MemberErrorResult.MEMBER_NOT_FOUND);
+		if (!memberRepository.findByEmail(jwtRequestDto.getEmail()).get().getPassword().equals(jwtRequestDto.getPassword())) {
+				throw new MemberException(MemberErrorResult.MEMBER_NOT_PW); // 비밀번호 틀린 경우
 		}
-
 
 		//email 과 password를 기반으로하는 Authentication 객체 생성
 		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(jwtRequestDto.getEmail(),jwtRequestDto.getPassword());
-//		// 실제 검증 -> loadUserByUsername 메서드 실행
+		// 실제 검증 -> loadUserByUsername 메서드 실행
 		Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 		// 3. 인증 정보를 기반으로 JWT 토큰 생성
 		TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
@@ -158,8 +152,6 @@ public class MemberService {
 				.name(request.getNickname())
 				.role(MemberRole.valueOf(request.getMemberRole()))
 				.build();
-
-
 
 		return memberRepository.save(member).getEmail(); //예외 처리 메시지 추가 예정----------->
 	}

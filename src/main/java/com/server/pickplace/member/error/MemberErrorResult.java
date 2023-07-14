@@ -27,7 +27,10 @@ public enum MemberErrorResult {
 	HAS_NULL(HttpStatus.BAD_REQUEST, "올바른 값을 입력해주세요"),
 	NOT_EMAIL(HttpStatus.BAD_REQUEST, "이메일 형식이 지켜지지 않았습니다."),
 	DUPLICATED_EMAIL(HttpStatus.BAD_REQUEST, "이메일 중복입니다"),
-	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND,"Member Not Found1111");
+	MEMBER_NOT_ID(HttpStatus.NOT_FOUND,"존재하지 않는 아이디 입니다"),
+	MEMBER_NOT_PW(HttpStatus.NOT_FOUND,"비밀번호가 틀렸습니다"),
+	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND,"member not found");
+
 
 	private final HttpStatus httpStatus;
 	private final String message;

@@ -1,6 +1,6 @@
 //package com.server.pickplace.auth.controller;
 //
-//import com.server.pickplace.auth.dto.JwtRequestDto;
+//import com.server.pickplace.member.dto.JwtRequestDto;
 //import com.server.pickplace.auth.dto.JwtResponseDto;
 //import com.server.pickplace.auth.dto.TokenInfo;
 //import com.server.pickplace.auth.service.AuthService;
