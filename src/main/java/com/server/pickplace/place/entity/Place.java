@@ -53,18 +53,20 @@ public class Place extends BaseEntity {
     @Column(name = "PLACE_Y", nullable = true)
     private Double y;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
     @OneToMany(mappedBy = "place")
+    @Builder.Default
     private List<CategoryPlace> categories = new ArrayList<>();
 
     @OneToMany(mappedBy = "place")
+    @Builder.Default
     private List<TagPlace> tags = new ArrayList<>();
 
     @OneToMany(mappedBy = "place")
+    @Builder.Default
     private List<Room> rooms = new ArrayList<>();
 
 

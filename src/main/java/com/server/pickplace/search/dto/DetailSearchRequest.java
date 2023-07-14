@@ -23,7 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 public class DetailSearchRequest extends NormalSearchRequest {
 
-    private Integer countPerPage = 10;
+    private final Integer countPerPage = 10;
 
     @NotBlank  // Null, 빈 문자열, 스페이스만 있는 문자열 불가
     @Size(max = 255)

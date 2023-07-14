@@ -129,7 +129,7 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
     @Override
     public Slice<PlaceResponse> findSliceByDto(BasicSearchRequest basicSearchRequest, Pageable pageable) {
 
-        Point point = extractPointByAddress(basicSearchRequest.getAddress());
+        Point point = new Point(basicSearchRequest.getX(), basicSearchRequest.getY());
 
         List<Tuple> roomCountTupleList = getRoomCountTupleListByBasicSearchDto(basicSearchRequest, point);
 
@@ -153,7 +153,7 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
     @Override
     public Slice<PlaceResponse> findSliceByDto(DetailSearchRequest detailSearchRequest, Pageable pageable) {
 
-        Point point = extractPointByAddress(detailSearchRequest.getAddress());
+        Point point = new Point(detailSearchRequest.getX(), detailSearchRequest.getY());
 
         List<Tuple> roomCountTupleList = getRoomCountTupleListByDetailSearchDto(detailSearchRequest, point);
         log.info("roomCountTupleList = {}", roomCountTupleList);

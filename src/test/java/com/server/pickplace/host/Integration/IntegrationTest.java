@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -37,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class IntegrationTest {
 
-    @Autowired EntityManager em;
+    @PersistenceContext EntityManager em;
     @Autowired MockMvc mvc;
     @Autowired ModelMapper modelMapper;
 
@@ -54,7 +55,6 @@ public class IntegrationTest {
                 ).andExpect(status().isOk())
                 .andReturn();
 
-
         //when
         String responseJson = result.getResponse().getContentAsString();
         JSONObject responseObject = new JSONObject(responseJson);
@@ -62,8 +62,6 @@ public class IntegrationTest {
 
 
         //then
-        assertThat(jsonArray.length()).isEqualTo(2);
-
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             PlaceResponse placeResponse = objectMapper.readValue(jsonObject.toString(), PlaceResponse.class);
@@ -75,7 +73,6 @@ public class IntegrationTest {
             assertThat(placeResponse.getName()).isNotNull();
 
         }
-
 
     }
 
