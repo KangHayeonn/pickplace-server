@@ -23,8 +23,8 @@ public enum CategoryStatus {
     private final String value;
 
     @JsonCreator
-    public static ReservationStatus from(String value) {
-        for (ReservationStatus status : ReservationStatus.values()) {
+    public static CategoryStatus from(String value) {
+        for (CategoryStatus status : CategoryStatus.values()) {
             if (status.getValue().equals(value)) {
                 return status;
             }

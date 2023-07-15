@@ -30,8 +30,8 @@ public enum TagStatus {
     private final String value;
 
     @JsonCreator
-    public static ReservationStatus from(String value) {
-        for (ReservationStatus status : ReservationStatus.values()) {
+    public static TagStatus from(String value) {
+        for (TagStatus status : TagStatus.values()) {
             if (status.getValue().equals(value)) {
                 return status;
             }
