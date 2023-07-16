@@ -28,7 +28,6 @@ import com.server.pickplace.common.service.ResponseService;
 import com.server.pickplace.member.service.MemberService;
 
 import io.swagger.annotations.ApiOperation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import java.nio.charset.StandardCharsets;
@@ -49,6 +48,7 @@ import static java.util.Base64.getUrlDecoder;
  * -----------------------------------------------------------
  * 2023-05-28        tkfdk       최초 생성
  */
+
 @Tag(name = "1. Member", description = "Member API")
 @RestController
 @RequiredArgsConstructor
