@@ -57,6 +57,8 @@ public class SearchController {
 
 
         Map<String, Object> placeDtoHasNextMap = searchService.findPlaceListByDto(categorySearchRequest);
+        placeDtoHasNextMap.put("countPerPage", request.getCountPerPage());
+
 
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), placeDtoHasNextMap));
 
@@ -68,6 +70,8 @@ public class SearchController {
     public ResponseEntity<SingleResponse<Map>> basicSearch(@Validated @RequestBody BasicSearchRequest basicSearchRequest) {
 
         Map<String, Object> placeDtoHasNextMap = searchService.findPlaceListByDto(basicSearchRequest);
+        placeDtoHasNextMap.put("countPerPage", basicSearchRequest.getCountPerPage());
+
 
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), placeDtoHasNextMap));
 
@@ -78,6 +82,7 @@ public class SearchController {
     public ResponseEntity<SingleResponse<Map>> placePage(@Validated @RequestBody DetailSearchRequest detailSearchRequest) {
 
         Map<String, Object> placeDtoHasNextMap = searchService.findPlaceListByDto(detailSearchRequest);
+        placeDtoHasNextMap.put("countPerPage", detailSearchRequest.getCountPerPage());
 
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), placeDtoHasNextMap));
 
