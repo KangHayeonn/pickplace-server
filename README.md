@@ -8,6 +8,8 @@
 사용자의 취향에 맞게 장소/공간을 예약, 추천해주는 웹사이트
 
 - 최소 기능 (MVP)
+  - 인증 권한 : 로그인, 회원가입, 토큰재발급(JWT)
+   
   - 태그를 이용해서 내가 관심있는 공간에 대해 한눈에 볼 수 있게 표시 & 추천
     - `애견동반` `한적함` `익사이팅` `연인추천` `오션뷰`
 
@@ -18,14 +20,14 @@
   - 평점 및 리뷰 기능
 
   - 현재 위치, 지정 위치 기준 장소 추천 서비스 + 맵 연동
-  
 
-- 추가 기능
   - 사장님 공간 등록/수정/변경 조회
+
   - 공간별 예약 조회/수락/거절
 
+  - 예약/결제 기능
+
 - OUT OF SCOPE
-  - 결제 기능
   - SNS 장소 공유
   - 예약 변경
 
@@ -87,7 +89,7 @@ SpringBoot, Spring Data JPA, JWT 를 이용해 Back-end 개발
 |  **항목**  |  **기술 스택**                          |
 | ---------- | --------------------------------------- |
 | 사용언어   | JAVA, SpringBoot                         |
-| DB         | Redis, Amazon RDS(MySQL)                 |
+| DB         | Amazon RDS(MySQL), QueryDSL              |
 | API 명세   | Swagger                                  |
 | 보안       | JWT, Spring Security                     |
 | CI/CD      | AWS EC2, AWS S3, AWS RDS, Github Actions |
@@ -106,10 +108,18 @@ SpringBoot, Spring Data JPA, JWT 를 이용해 Back-end 개발
 
 |  **항목**  |  **버전 정보**    |
 | ---------- | ------------------ |
-| JAVA       |  v11               |
-| SpringBoot |                    |
-| MySQL      |                    |
-| Swagger    |                    |
+| JAVA       |  v17               |
+| SpringBoot |  v2.7.12           |
+| Swagger    |  v2.9.2            |
 
 
 <br>
+
+## ERD
+![erd](./pickplace_ERD.png)
+
+---
+
+![pickplace](./pickplace.png)
+
+🔗 [PICK-PLACE(픽플)](https://pickplace.site/)
