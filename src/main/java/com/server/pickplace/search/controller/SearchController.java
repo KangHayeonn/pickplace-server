@@ -45,7 +45,9 @@ public class SearchController {
     public ResponseEntity<SingleResponse<Map>> categorySearch(@Validated @RequestBody CategorySearchRequest request) {
 
         CategorySearchRequest categorySearchRequest = CategorySearchRequest.builder()
-                .address("서울특별시 종로구 세종대로 172")
+                .address(request.getAddress())
+                .x(request.getX())
+                .y(request.getY())
                 .startDate(LocalDate.now())
                 .endDate(LocalDate.now().plusDays(1))
                 .searchType(request.getSearchType())

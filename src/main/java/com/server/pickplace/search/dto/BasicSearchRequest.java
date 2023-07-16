@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 
 @Getter
@@ -19,7 +20,9 @@ public class BasicSearchRequest extends NormalSearchRequest {
     @NotBlank  // Null, 빈 문자열, 스페이스만 있는 문자열 불가
     @Size(max = 255)
     private String address;
+    @Positive
     private Double x;
+    @Positive
     private Double y;
 
     private CategoryStatus category;

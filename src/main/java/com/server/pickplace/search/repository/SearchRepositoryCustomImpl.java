@@ -100,25 +100,19 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
     @Override
     public Slice<PlaceResponse> findSliceByDto(CategorySearchRequest categorySearchRequest, Pageable pageable) {
 
-        Point point = extractPointByAddress(categorySearchRequest.getAddress());
+        Point point = new Point(categorySearchRequest.getX(), categorySearchRequest.getY());
 
         List<Tuple> roomCountTupleList = getRoomCountTupleListByCategoryDto(categorySearchRequest, point);
-        log.info("roomCountTupleList = {}", roomCountTupleList);
 
         HashMap<Long, Integer> roomCountMap = getRoomCountMapByRoomCountTupleList(roomCountTupleList);
-        log.info("roomCountMap = {}", roomCountMap);
 
         List<Long> placeBeforeList = getPlaceBeforeListByRoomCountTupleList(roomCountTupleList);
-        log.info("placeBeforeList = {}", placeBeforeList);
 
         Map<Long, Integer> placeReservationCountMap = getPlaceReservationCountMapByCategoryDto(categorySearchRequest, placeBeforeList);
-        log.info("placeReservationCountMap = {}", placeReservationCountMap);
 
         List<Long> placeIdList = getPlaceIdListByRoomCountMapAndPlaceReservationCountMap(roomCountMap, placeReservationCountMap);
-        log.info("placeIdList = {}", placeIdList);
 
         List<PlaceResponse> placeResponseList = getPlaceResponseListByPageableAndPlaceIdList(pageable, placeIdList, categorySearchRequest);
-        log.info("placeResponseList = {}", placeResponseList);
 
         boolean hasNext = getPageableByPlaceResponseList(pageable, placeResponseList);
 
