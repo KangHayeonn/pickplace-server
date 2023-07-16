@@ -14,6 +14,8 @@ import com.server.pickplace.member.service.jwt.JwtTokenProvider;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.json.BasicJsonParser;
+import org.springframework.boot.json.JsonParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +38,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.util.Base64.getUrlDecoder;
 
 /**
  * description    :
@@ -138,43 +142,24 @@ public class MemberController {
 
 	@ApiOperation(tags = "1. Member", value = "토큰 재발급", notes = "토큰을 재발급한다")
 	@PostMapping(value = "reissue", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity reissue(@AuthenticatedRefresh String id , HttpServletRequest httpServletRequest, @RequestBody ReissueRequestDto requestDto) {
+	public ResponseEntity reissue(HttpServletRequest httpServletRequest, @RequestBody ReissueRequestDto requestDto) {
+
+		String token = jwtTokenProvider.resolveToken((HttpServletRequest) httpServletRequest);
+
+		String payloadJWT = token.split("\\.")[1];
+		Base64.Decoder decoder = getUrlDecoder();
+
+		String payload = new String(decoder.decode(payloadJWT));
+		JsonParser jsonParser = new BasicJsonParser();
+		Map<String, Object> jsonArray = jsonParser.parseMap(payload);
+		String id = (String) jsonArray.get("sub");
+
+		memberService.reissue(id,requestDto);
 
 
 
-		String secretKey = this.secretKey;
-
-		SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
-
-
-//		String token = jwtTokenProvider.resolveToken((HttpServletRequest) httpServletRequest);
-
-		String token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.MgOsygXloaQRJC2_clPpgLNr85uitvTUetbwWYweMmk";
-
-		Base64.Decoder decoder = Base64.getUrlDecoder();
-		System.out.println(new String(decoder.decode((token).replace('-', '+').replace('_', '/'))));
-
-//		oAuthClient.get
-
-//		String a= Jwts.parserBuilder()
-//			.setSigningKey(key)
-//			.build()
-//			.parseClaimsJws(token)
-//			.getBody()
-//			.getSubject();
-
-//		System.out.println(a);
-//		public String getPayload(final String token) {
-//			return Jwts.parserBuilder()
-//					.setSigningKey(key)
-//					.build()
-//					.parseClaimsJws(token)
-//					.getBody()
-//					.getSubject();
-//		}
-
-		System.out.println(id);
-		return memberService.reissue(httpServletRequest,requestDto);
+		Map<String, Object> reissueResponseDto = memberService.reissue(id,requestDto);
+		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), reissueResponseDto)); // 성공
 	}
 
 

@@ -169,15 +169,40 @@ public class JwtTokenProvider {
     public String resolveToken(HttpServletRequest request) {
 
         if(request.getHeader("accessToken") != null )
-            return request.getHeader("accessToken").substring(7);
+            return request.getHeader("accessToken");
         return null;
-//        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-//
-//        if (StringUtils.hasText(bearerToken) ) {
-//           return bearerToken.substring(7);
-//        }
-//        return null;
     }
 
+    public String recreationAccessToken(final String id, final String role , final String refreshToken) {
+        Jws<Claims> claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(refreshToken);
+
+        Date tokenExpirationDate = claims.getBody().getExpiration();
+        validateTokenExpiration(tokenExpirationDate);
+
+        return createAccessToken(id , role);
+    }
+
+    private void validateTokenExpiration(Date tokenExpirationDate) {
+        if (tokenExpirationDate.before(new Date())) {
+            throw new MemberException(MemberErrorResult.UNKNOWN_TOKEN); //유효기간 확인
+        }
+    }
+
+    private String createAccessToken(final String id, final String role) {
+        final Date now = new Date();
+
+        return Jwts.builder()
+                .setSubject(id)
+                .claim(AUTHORITIES_KEY, role)
+                .claim("type", TYPE_ACCESS)
+                .setIssuedAt(now)   //토큰 발행 시간 정보
+                .setExpiration(new Date(now.getTime() + ExpireTime.ACCESS_TOKEN_EXPIRE_TIME))  //토큰 만료 시간 설정
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+    }
 
 }

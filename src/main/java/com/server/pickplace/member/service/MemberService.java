@@ -78,7 +78,7 @@ public class MemberService {
 
 		// 4. Redis RefreshToken 저장
 		refreshTokenRedisRepository.save(RefreshToken.builder()
-				.accessToken(tokenInfo.getAccessToken())
+				.id(authentication.getName())
 				.ip(Helper.getClientIp(request))
 				.authorities(authentication.getAuthorities())
 				.refreshToken(tokenInfo.getRefreshToken())
@@ -99,63 +99,32 @@ public class MemberService {
 		return loginMap;
 	}
 
-	public ResponseEntity reissue(HttpServletRequest request, ReissueRequestDto requestDto) {
+	public Map<String, Object> reissue(String id, ReissueRequestDto requestDto) {
 
-
-		String token = jwtTokenProvider.resolveToken((HttpServletRequest) request);
-
-
-		Optional<RefreshToken> accessToken_ID
+		Optional<RefreshToken> refreshToken
 				= refreshTokenRedisRepository.findByRefreshToken(requestDto.getRefreshToken());
-
-		RefreshToken refreshToken1 = accessToken_ID.orElseThrow(() -> new MemberException(MemberErrorResult.UNKNOWN_TOKEN)); // 유효하지 않은 refresh 토큰 예외처리
-
-//		String accesstoken = JwtTokenProvider.recreationAccessToken()
-
-		System.out.println(requestDto);
-
-//		final Token token = tokenRepository.findByGithubId(githubId)
-//				.orElseThrow(TokenNotFoundException::new);
 //
-//		if (!token.getRefreshToken().equals(refreshToken)) {
-//			throw new UnauthorizedException("유효하지 않은 토큰입니다.");
-//		}
-//
-//		String accessToken = tokenProvider.recreationAccessToken(githubId, refreshToken);
-//
-//		return new AccessTokenResponse(accessToken, tokenProvider.getValidityInMilliseconds());
+		RefreshToken refreshToken1 = refreshToken.orElseThrow(() -> new MemberException(MemberErrorResult.UNKNOWN_TOKEN)); // 유효하지 않은 refresh 토큰 예외처리
 
-//		//1. Request Header 에서 JWT Token 추출
-//		String token = jwtTokenProvider.resolveToken((HttpServletRequest) request);
-//
-//		//2. validateToken 메서드로 토큰 유효성 검사
-//		if (token != null && jwtTokenProvider.validateToken(token)) {
-//			//3. refresh token 인지 확인
-//			if (jwtTokenProvider.isRefreshToken(token)) {
-//				//refresh token
-//				RefreshToken refreshToken = refreshTokenRedisRepository.findByRefreshToken(token);
-//				if (refreshToken != null) {
-//					//4. 최초 로그인한 ip 와 같은지 확인 (처리 방식에 따라 재발급을 하지 않거나 메일 등의 알림을 주는 방법이 있음)
-//					String currentIpAddress = Helper.getClientIp(request);
-//					if (refreshToken.getIp().equals(currentIpAddress)) {
-//						// 5. Redis 에 저장된 RefreshToken 정보를 기반으로 JWT Token 생성
-//						TokenInfo tokenInfo = jwtTokenProvider.generateToken(refreshToken.getId(), refreshToken.getAuthorities());
-//
-//						// 4. Redis RefreshToken update
-//						refreshTokenRedisRepository.save(RefreshToken.builder()
-//								.id(refreshToken.getId())
-//								.ip(currentIpAddress)
-//								.authorities(refreshToken.getAuthorities())
-//								.refreshToken(tokenInfo.getRefreshToken())
-//								.build());
-//
-//						return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"갱신 성공"));
-//					}
-//				}
-//			}
-//		}
 
-		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"갱신 실패"));
+		if(!id.equals(refreshToken.get().getId())){
+			throw new MemberException(MemberErrorResult.UNKNOWN_TOKEN); // // 유효하지 않은 refresh 토큰 예외처리
+		}
+
+
+		//유효한 거 확인 된 경우만 넘어옴 // 재발급 과정
+		String accessToken = jwtTokenProvider.recreationAccessToken(id, refreshToken.get().getAuthorities().toString(), requestDto.getRefreshToken());
+
+		Map<String, Object> reissueMap = new HashMap<>();
+
+		ReissueResponseDto reissueResponseDto= ReissueResponseDto.builder()
+				.accessToken(accessToken)
+				.refreshToken(requestDto.getRefreshToken())
+				.build();
+
+		reissueMap.put("member", reissueResponseDto);
+
+		return reissueMap;
 	}
 
 

@@ -9,6 +9,6 @@ public interface RefreshTokenRedisRepository extends CrudRepository<RefreshToken
 
 //    RefreshToken findByRefreshToken(String refreshToken);
     Optional<RefreshToken> findByRefreshToken(String refreshToken);
-    Optional<RefreshToken> findByAccessToken(String accessToken);
+    Optional<RefreshToken> findById(String id);
 
 }
