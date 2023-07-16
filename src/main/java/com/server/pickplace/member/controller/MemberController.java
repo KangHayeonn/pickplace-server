@@ -1,5 +1,6 @@
 package com.server.pickplace.member.controller;
 
+import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -9,9 +10,14 @@ import com.server.pickplace.member.dto.*;
 import com.server.pickplace.member.error.MemberErrorResult;
 import com.server.pickplace.member.error.MemberException;
 import com.server.pickplace.member.repository.MemberRepository;
+import com.server.pickplace.member.service.jwt.JwtTokenProvider;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +30,10 @@ import com.server.pickplace.member.service.MemberService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,6 +58,11 @@ public class MemberController {
 	private final MemberService memberService;
 	private final ResponseService responseService;
 	private final MemberRepository memberRepository;;
+	private final JwtTokenProvider jwtTokenProvider;
+
+	@Value("${jwt.secret}")
+	String secretKey;
+
 
 	@ApiOperation(tags = "1. Member", value = "로그인", notes = "로그인 시도한다")
 	@PostMapping(value = "login", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -57,11 +71,11 @@ public class MemberController {
 //		String password = jwtRequestDto.getPassword();
 
 		if(errors.hasErrors()){
-			throw new MemberException(MemberErrorResult.HAS_NULL);
+			throw new MemberException(MemberErrorResult.HAS_NULL); //null 값 예외 처리
 		}
 
 		Map<String, Object> loginResponseDto = memberService.login(httpServletRequest,jwtRequestDto);
-		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), loginResponseDto));
+		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), loginResponseDto)); // 성공
 	}
 
 	@ApiOperation(tags = "1. Member", value = "회원가입", notes = "회원가입 시도한다")
@@ -73,22 +87,21 @@ public class MemberController {
 
 		if(errors.hasErrors()) {
 			String errorDetail = errors.getFieldErrors().toString();
-
 			Map<String, String> validateMap = new HashMap<>();
 
-			/* 회원가입 실패시 message 값들을 매핑*/
+			// 회원가입 실패시 message 값들을 매핑
 			for (FieldError error : errors.getFieldErrors()) {
 				String validKeyName = error.getField();
 				validateMap.put(validKeyName, error.getDefaultMessage());
 				if (validKeyName.equals("email")){
-					throw new MemberException(MemberErrorResult.NOT_EMAIL);
+					throw new MemberException(MemberErrorResult.NOT_EMAIL); // 이메일 형식 안지켜진 경우
 				}
 				else {
-					throw new MemberException(MemberErrorResult.HAS_NULL);
+					throw new MemberException(MemberErrorResult.HAS_NULL); // null 값인 경우 + 길이 제한 오류
 				}
 			}
 		}
-		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"회원가입 성공"));
+		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"회원가입 성공")); // 성공
 	}
 
 	@ApiOperation(tags = "1. Member", value = "이메일 중복 체크", notes = "이메일 충복 체크 한다")
@@ -125,8 +138,43 @@ public class MemberController {
 
 	@ApiOperation(tags = "1. Member", value = "토큰 재발급", notes = "토큰을 재발급한다")
 	@PostMapping(value = "reissue", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity reissue(HttpServletRequest httpServletRequest) {
-		return memberService.reissue(httpServletRequest);
+	public ResponseEntity reissue(@AuthenticatedRefresh String id , HttpServletRequest httpServletRequest, @RequestBody ReissueRequestDto requestDto) {
+
+
+
+		String secretKey = this.secretKey;
+
+		SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+
+
+//		String token = jwtTokenProvider.resolveToken((HttpServletRequest) httpServletRequest);
+
+		String token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.MgOsygXloaQRJC2_clPpgLNr85uitvTUetbwWYweMmk";
+
+		Base64.Decoder decoder = Base64.getUrlDecoder();
+		System.out.println(new String(decoder.decode((token).replace('-', '+').replace('_', '/'))));
+
+//		oAuthClient.get
+
+//		String a= Jwts.parserBuilder()
+//			.setSigningKey(key)
+//			.build()
+//			.parseClaimsJws(token)
+//			.getBody()
+//			.getSubject();
+
+//		System.out.println(a);
+//		public String getPayload(final String token) {
+//			return Jwts.parserBuilder()
+//					.setSigningKey(key)
+//					.build()
+//					.parseClaimsJws(token)
+//					.getBody()
+//					.getSubject();
+//		}
+
+		System.out.println(id);
+		return memberService.reissue(httpServletRequest,requestDto);
 	}
 
 

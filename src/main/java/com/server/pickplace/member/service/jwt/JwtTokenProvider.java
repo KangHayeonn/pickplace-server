@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider {
 
-    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String AUTHORIZATION_HEADER = "accessToken";
     private static final String BEARER_TYPE = "Bearer";
     private static final String TYPE_REFRESH = "refresh";
     private static final String AUTHORITIES_KEY = "auth";
@@ -167,12 +167,17 @@ public class JwtTokenProvider {
     }
 
     public String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
 
-        if (StringUtils.hasText(bearerToken) ) {
-           return bearerToken.substring(7);
-
-        }
+        if(request.getHeader("accessToken") != null )
+            return request.getHeader("accessToken").substring(7);
         return null;
+//        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+//
+//        if (StringUtils.hasText(bearerToken) ) {
+//           return bearerToken.substring(7);
+//        }
+//        return null;
     }
+
+
 }

@@ -19,7 +19,9 @@ import java.util.Collection;
 @RedisHash(value = "refresh", timeToLive = ExpireTime.REFRESH_TOKEN_EXPIRE_TIME_FOR_REDIS)
 public class RefreshToken {
     @Id
-    private String id;
+//    private String id; ID로 받아서 하려했는데 토큰 페이로드 받아오는 과정에서 id 추출 도저히 안됨... => 어쩔수 없이 바로 accesstoken으로 접근
+    private String accessToken;
+
 
     private String ip;
 

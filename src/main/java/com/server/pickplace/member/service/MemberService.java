@@ -1,14 +1,10 @@
 package com.server.pickplace.member.service;
 
-import com.server.pickplace.member.dto.JwtRequestDto;
-import com.server.pickplace.member.dto.MemberSignupRequestDto;
+import antlr.Token;
+import com.server.pickplace.member.dto.*;
 import com.server.pickplace.auth.dto.TokenInfo;
 import com.server.pickplace.common.service.ResponseService;
 import com.server.pickplace.config.Helper;
-import com.server.pickplace.member.dto.EmailCheckRequestDto;
-import com.server.pickplace.member.dto.LoginResponseDto;
-import com.server.pickplace.member.dto.MemberDetailResponse;
-import com.server.pickplace.member.dto.MemberListResponse;
 import com.server.pickplace.member.entity.MemberRole;
 import com.server.pickplace.member.repository.RefreshTokenRedisRepository;
 import com.server.pickplace.member.service.jwt.JwtTokenProvider;
@@ -82,7 +78,7 @@ public class MemberService {
 
 		// 4. Redis RefreshToken 저장
 		refreshTokenRedisRepository.save(RefreshToken.builder()
-				.id(authentication.getName())
+				.accessToken(tokenInfo.getAccessToken())
 				.ip(Helper.getClientIp(request))
 				.authorities(authentication.getAuthorities())
 				.refreshToken(tokenInfo.getRefreshToken())
@@ -103,37 +99,61 @@ public class MemberService {
 		return loginMap;
 	}
 
-	public ResponseEntity reissue(HttpServletRequest request) {
+	public ResponseEntity reissue(HttpServletRequest request, ReissueRequestDto requestDto) {
 
-		//1. Request Header 에서 JWT Token 추출
+
 		String token = jwtTokenProvider.resolveToken((HttpServletRequest) request);
 
-		//2. validateToken 메서드로 토큰 유효성 검사
-		if (token != null && jwtTokenProvider.validateToken(token)) {
-			//3. refresh token 인지 확인
-			if (jwtTokenProvider.isRefreshToken(token)) {
-				//refresh token
-				RefreshToken refreshToken = refreshTokenRedisRepository.findByRefreshToken(token);
-				if (refreshToken != null) {
-					//4. 최초 로그인한 ip 와 같은지 확인 (처리 방식에 따라 재발급을 하지 않거나 메일 등의 알림을 주는 방법이 있음)
-					String currentIpAddress = Helper.getClientIp(request);
-					if (refreshToken.getIp().equals(currentIpAddress)) {
-						// 5. Redis 에 저장된 RefreshToken 정보를 기반으로 JWT Token 생성
-						TokenInfo tokenInfo = jwtTokenProvider.generateToken(refreshToken.getId(), refreshToken.getAuthorities());
 
-						// 4. Redis RefreshToken update
-						refreshTokenRedisRepository.save(RefreshToken.builder()
-								.id(refreshToken.getId())
-								.ip(currentIpAddress)
-								.authorities(refreshToken.getAuthorities())
-								.refreshToken(tokenInfo.getRefreshToken())
-								.build());
+		Optional<RefreshToken> accessToken_ID
+				= refreshTokenRedisRepository.findByRefreshToken(requestDto.getRefreshToken());
 
-						return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"갱신 성공"));
-					}
-				}
-			}
-		}
+		RefreshToken refreshToken1 = accessToken_ID.orElseThrow(() -> new MemberException(MemberErrorResult.UNKNOWN_TOKEN)); // 유효하지 않은 refresh 토큰 예외처리
+
+//		String accesstoken = JwtTokenProvider.recreationAccessToken()
+
+		System.out.println(requestDto);
+
+//		final Token token = tokenRepository.findByGithubId(githubId)
+//				.orElseThrow(TokenNotFoundException::new);
+//
+//		if (!token.getRefreshToken().equals(refreshToken)) {
+//			throw new UnauthorizedException("유효하지 않은 토큰입니다.");
+//		}
+//
+//		String accessToken = tokenProvider.recreationAccessToken(githubId, refreshToken);
+//
+//		return new AccessTokenResponse(accessToken, tokenProvider.getValidityInMilliseconds());
+
+//		//1. Request Header 에서 JWT Token 추출
+//		String token = jwtTokenProvider.resolveToken((HttpServletRequest) request);
+//
+//		//2. validateToken 메서드로 토큰 유효성 검사
+//		if (token != null && jwtTokenProvider.validateToken(token)) {
+//			//3. refresh token 인지 확인
+//			if (jwtTokenProvider.isRefreshToken(token)) {
+//				//refresh token
+//				RefreshToken refreshToken = refreshTokenRedisRepository.findByRefreshToken(token);
+//				if (refreshToken != null) {
+//					//4. 최초 로그인한 ip 와 같은지 확인 (처리 방식에 따라 재발급을 하지 않거나 메일 등의 알림을 주는 방법이 있음)
+//					String currentIpAddress = Helper.getClientIp(request);
+//					if (refreshToken.getIp().equals(currentIpAddress)) {
+//						// 5. Redis 에 저장된 RefreshToken 정보를 기반으로 JWT Token 생성
+//						TokenInfo tokenInfo = jwtTokenProvider.generateToken(refreshToken.getId(), refreshToken.getAuthorities());
+//
+//						// 4. Redis RefreshToken update
+//						refreshTokenRedisRepository.save(RefreshToken.builder()
+//								.id(refreshToken.getId())
+//								.ip(currentIpAddress)
+//								.authorities(refreshToken.getAuthorities())
+//								.refreshToken(tokenInfo.getRefreshToken())
+//								.build());
+//
+//						return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"갱신 성공"));
+//					}
+//				}
+//			}
+//		}
 
 		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"갱신 실패"));
 	}
