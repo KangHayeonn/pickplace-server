@@ -22,9 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.Errors;
 import com.server.pickplace.common.service.ResponseService;
 import com.server.pickplace.member.service.MemberService;
@@ -32,7 +30,6 @@ import com.server.pickplace.member.service.MemberService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -53,7 +50,7 @@ import static java.util.Base64.getUrlDecoder;
  * 2023-05-28        tkfdk       최초 생성
  */
 @Tag(name = "1. Member", description = "Member API")
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/members")
 //@AllArgsConstructor
