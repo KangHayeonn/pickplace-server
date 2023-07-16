@@ -111,9 +111,13 @@ public class MemberService {
 			throw new MemberException(MemberErrorResult.UNKNOWN_TOKEN); // // 유효하지 않은 refresh 토큰 예외처리
 		}
 
+		String role = refreshToken.get().getAuthorities().toString();
+		role.replace("[","");
+		role.replace("]","");
+		System.out.println(role);
 
 		//유효한 거 확인 된 경우만 넘어옴 // 재발급 과정
-		String accessToken = jwtTokenProvider.recreationAccessToken(id, refreshToken.get().getAuthorities().toString(), requestDto.getRefreshToken());
+		String accessToken = jwtTokenProvider.recreationAccessToken(id,role, requestDto.getRefreshToken());
 
 		Map<String, Object> reissueMap = new HashMap<>();
 
