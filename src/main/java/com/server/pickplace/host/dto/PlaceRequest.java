@@ -19,7 +19,7 @@ public class PlaceRequest {
     @Size(max = 20)
     private String placeName;
 
-    @Pattern(regexp = "^010\\d{8}$")
+    @Pattern(regexp = "^\\d{9,11}$")
     private String placePhone;
 
     @NotBlank
