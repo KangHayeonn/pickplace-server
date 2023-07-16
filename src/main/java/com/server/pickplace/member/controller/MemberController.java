@@ -13,6 +13,8 @@ import com.server.pickplace.member.repository.MemberRepository;
 import com.server.pickplace.member.service.jwt.JwtTokenProvider;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.BasicJsonParser;
 import org.springframework.boot.json.JsonParser;
@@ -28,7 +30,7 @@ import com.server.pickplace.common.service.ResponseService;
 import com.server.pickplace.member.service.MemberService;
 
 import io.swagger.annotations.ApiOperation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+//import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import java.nio.charset.StandardCharsets;
