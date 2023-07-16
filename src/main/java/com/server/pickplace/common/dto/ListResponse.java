@@ -2,6 +2,7 @@ package com.server.pickplace.common.dto;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 
 /**
@@ -17,6 +18,7 @@ import lombok.Getter;
  */
 @Getter
 public class ListResponse<T> extends CommonResponse {
+
 	private List<T> data;
 
 	public ListResponse(boolean success, int code, List<T> data) {

@@ -14,6 +14,7 @@ import springfox.documentation.schema.AlternateTypeRules;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * description    :
@@ -26,28 +27,30 @@ import springfox.documentation.spring.web.plugins.Docket;
  * -----------------------------------------------------------
  * 2023-05-28        tkfdk       최초 생성
  */
+
+
 @Configuration
+@EnableSwagger2
 public class SwaggerConfig {
 	TypeResolver typeResolver = new TypeResolver();
 
 	@Bean
 	public Docket api() {
-		return new Docket(DocumentationType.OAS_30)
-			.useDefaultResponseMessages(false)
-			.select()
-			.apis(RequestHandlerSelectors.basePackage("com.server.pickplace"))
-			.paths(PathSelectors.any())
-			.build()
-			.apiInfo(apiInfo())
-			.alternateTypeRules(AlternateTypeRules.newRule(typeResolver.resolve(Pageable.class),
-				typeResolver.resolve(MyPageable.class)));
+		return new Docket(DocumentationType.SWAGGER_2)
+            .alternateTypeRules(AlternateTypeRules.newRule(typeResolver.resolve(Pageable.class),
+                        typeResolver.resolve(MyPageable.class)))
+            .apiInfo(apiInfo())
+            .select()
+            .apis(RequestHandlerSelectors.basePackage("com.server.pickplace"))
+			.paths(PathSelectors.ant("/**"))
+			.build();
 	}
 
 	private ApiInfo apiInfo() {
 		return new ApiInfoBuilder()
-			.title("Pickplace Swagger")
-			.description("Pickplace swagger config")
-			.version("1.0")
+			.title("PickPlace Swagger")
+			.description("원하는 공간을 실시간 추천/예약 서비스입니다.")
+			.version("1.0.0")
 			.build();
 	}
 }

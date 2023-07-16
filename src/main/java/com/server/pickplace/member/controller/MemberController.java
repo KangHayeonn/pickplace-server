@@ -30,7 +30,6 @@ import com.server.pickplace.common.service.ResponseService;
 import com.server.pickplace.member.service.MemberService;
 
 import io.swagger.annotations.ApiOperation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -52,8 +51,9 @@ import static java.util.Base64.getUrlDecoder;
  * -----------------------------------------------------------
  * 2023-05-28        tkfdk       최초 생성
  */
+
 @Tag(name = "1. Member", description = "Member API")
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/members")
 //@AllArgsConstructor

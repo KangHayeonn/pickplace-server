@@ -1,3 +1,4 @@
+
 //package com.server.pickplace.common.handler;
 //
 //import java.util.List;
@@ -80,3 +81,4 @@
 //		private final String message;
 //	}
 //}
+
