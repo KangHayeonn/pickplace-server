@@ -19,4 +19,7 @@ public class NormalSearchRequest extends SearchRequest {
     @PositiveOrZero
     private Integer pageNum;
 
+    @Positive
+    private Integer countPerPage;
+
 }

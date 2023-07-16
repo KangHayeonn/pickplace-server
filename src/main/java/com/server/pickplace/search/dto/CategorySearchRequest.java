@@ -20,7 +20,6 @@ import java.time.LocalDate;
 public class CategorySearchRequest extends NormalSearchRequest {
 
     private final Integer distance = 5000;
-    private final Integer countPerPage = 10;
 
     private CategoryStatus category;
 
