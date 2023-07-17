@@ -1,10 +1,10 @@
-package com.server.pickplace.mailling.dto;
-
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-public class EmailResponseDto {
-    private String code;
-}
+//package com.server.pickplace.mailling.dto;
+//
+//import lombok.Getter;
+//import lombok.Setter;
+//
+//@Getter
+//@Setter
+//public class EmailResponseDto {
+//    private String code;
+//}
