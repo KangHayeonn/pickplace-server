@@ -138,17 +138,17 @@ public class JwtTokenProvider {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            new MemberException(MemberErrorResult.UNKNOWN_EXCEPTION);
-            log.info("Invalid JWT Token", e);
+            throw new MemberException(MemberErrorResult.INVALID_TOKEN);
+//            log.info("Invalid JWT Token", e);
         } catch (ExpiredJwtException e) {
-            new MemberException(MemberErrorResult.UNKNOWN_EXCEPTION);
-            log.info("Expired JWT Token", e);
+            throw new MemberException(MemberErrorResult.INVALID_TOKEN);
+//            log.info("Expired JWT Token", e);
         } catch (UnsupportedJwtException e) {
-            new MemberException(MemberErrorResult.UNKNOWN_EXCEPTION);
-            log.info("Unsupported JWT Token", e);
+            throw new MemberException(MemberErrorResult.INVALID_TOKEN);
+//            log.info("Unsupported JWT Token", e);
         } catch (IllegalArgumentException e) {
             new MemberException(MemberErrorResult.UNKNOWN_EXCEPTION);
-            log.info("JWT claims string is empty.", e);
+//            log.info("JWT claims string is empty.", e);
         }
         return false;
     }
@@ -187,7 +187,7 @@ public class JwtTokenProvider {
 
     private void validateTokenExpiration(Date tokenExpirationDate) {
         if (tokenExpirationDate.before(new Date())) {
-            throw new MemberException(MemberErrorResult.UNKNOWN_TOKEN); //유효기간 확인
+            throw new MemberException(MemberErrorResult.INVALID_TOKEN); //유효기간 확인
         }
     }
 

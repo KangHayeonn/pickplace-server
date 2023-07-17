@@ -160,13 +160,8 @@ public class MemberService {
 	}
 
 
-	//email로 db 불러오기 (로그인)
-	public Member loginFindByEmail(final String userEmail) {
-		Optional<Member> optionalPlace = memberRepository.findByEmail(userEmail);
+	public void logout(final Long memberId){
 
-		Member email = optionalPlace.orElseThrow(() -> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
-
-		return email;
 	}
 
 

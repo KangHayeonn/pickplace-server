@@ -29,8 +29,10 @@ public enum MemberErrorResult {
 	DUPLICATED_EMAIL(HttpStatus.BAD_REQUEST, "이메일 중복입니다"),
 	MEMBER_NOT_ID(HttpStatus.NOT_FOUND,"존재하지 않는 아이디 입니다"),
 	MEMBER_NOT_PW(HttpStatus.NOT_FOUND,"비밀번호가 틀렸습니다"),
-	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND,"member not found"),
-	UNKNOWN_TOKEN(HttpStatus.NOT_FOUND,"잘못된 refresh token 입니다");
+	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 회원입니다"),
+	UNKNOWN_TOKEN(HttpStatus.NOT_FOUND,"잘못된 refresh token 입니다"),
+	INVALID_TOKEN(HttpStatus.NOT_FOUND,"존재하지 않는 access token 입니다"),
+	NOT_AUTHENTICATION(HttpStatus.NOT_FOUND,"권한이 없습니다");
 
 
 	private final HttpStatus httpStatus;

@@ -2,6 +2,7 @@ package com.server.pickplace.member.controller;
 
 import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import com.server.pickplace.member.dto.JwtRequestDto;
@@ -10,6 +11,7 @@ import com.server.pickplace.member.dto.*;
 import com.server.pickplace.member.error.MemberErrorResult;
 import com.server.pickplace.member.error.MemberException;
 import com.server.pickplace.member.repository.MemberRepository;
+import com.server.pickplace.member.service.MemberInfoService;
 import com.server.pickplace.member.service.jwt.JwtTokenProvider;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -21,7 +23,10 @@ import org.springframework.boot.json.JsonParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +37,7 @@ import com.server.pickplace.member.service.MemberService;
 import io.swagger.annotations.ApiOperation;
 //import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -58,6 +64,7 @@ import static java.util.Base64.getUrlDecoder;
 public class MemberController {
 //	private final ResponseService responseService;
 	private final MemberService memberService;
+	private final MemberInfoService memberInfoService;
 	private final ResponseService responseService;
 	private final MemberRepository memberRepository;;
 	private final JwtTokenProvider jwtTokenProvider;
@@ -68,9 +75,8 @@ public class MemberController {
 
 	@ApiOperation(tags = "1. Member", value = "로그인", notes = "로그인 시도한다")
 	@PostMapping(value = "login", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity login(HttpServletRequest httpServletRequest, @RequestBody @Valid JwtRequestDto jwtRequestDto, Errors errors) throws Exception {
-//		String email = jwtRequestDto.getEmail();
-//		String password = jwtRequestDto.getPassword();
+	public ResponseEntity login(@ApiIgnore HttpServletRequest httpServletRequest, @ApiParam(required = true) @RequestBody @Valid JwtRequestDto jwtRequestDto, @ApiIgnore Errors errors) throws Exception {
+
 
 		if(errors.hasErrors()){
 			throw new MemberException(MemberErrorResult.HAS_NULL); //null 값 예외 처리
@@ -82,7 +88,7 @@ public class MemberController {
 
 	@ApiOperation(tags = "1. Member", value = "회원가입", notes = "회원가입 시도한다")
 	@PostMapping(value = "signup", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity signUp(@RequestBody @Valid MemberSignupRequestDto request , Errors errors) throws Exception{
+	public ResponseEntity signUp(@RequestBody @Valid MemberSignupRequestDto request , @ApiIgnore Errors errors) throws Exception{
 
 		String signUpResponse = memberService.signup(request);
 
@@ -108,7 +114,7 @@ public class MemberController {
 
 	@ApiOperation(tags = "1. Member", value = "이메일 중복 체크", notes = "이메일 충복 체크 한다")
 	@PostMapping(value = "emailCheck", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity emailCheck(@RequestBody @Valid EmailCheckRequestDto email, Errors errors) {
+	public ResponseEntity emailCheck(@RequestBody @Valid EmailCheckRequestDto email, @ApiIgnore Errors errors) {
 		Boolean emailCheckResponse = memberService.emailCheck(email);
 
 		if(errors.hasErrors()) {
@@ -140,7 +146,7 @@ public class MemberController {
 
 	@ApiOperation(tags = "1. Member", value = "토큰 재발급", notes = "토큰을 재발급한다")
 	@PostMapping(value = "reissue", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity reissue(HttpServletRequest httpServletRequest, @RequestBody ReissueRequestDto requestDto) {
+	public ResponseEntity reissue(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody ReissueRequestDto requestDto) {
 
 		String token = jwtTokenProvider.resolveToken((HttpServletRequest) httpServletRequest);
 
@@ -159,6 +165,46 @@ public class MemberController {
 		Map<String, Object> reissueResponseDto = memberService.reissue(id,requestDto);
 		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), reissueResponseDto)); // 성공
 	}
+
+	@ApiOperation(tags = "1. Member", value = "로그아웃", notes = "로그아웃 한다")
+	@GetMapping(value = "logout/{memberId}")
+	public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response , @PathVariable Long memberId) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		System.out.println("");
+
+		if(authentication != null){
+			new SecurityContextLogoutHandler().logout(request,response,authentication);
+		}
+
+		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"로그아웃"));
+	}
+
+	@ApiOperation(tags = "1. Member", value = "내 정보 조회", notes = "내 정보 조회한다")
+	@GetMapping("/{memberId}")
+	public ResponseEntity getInfo(@ApiIgnore HttpServletRequest httpServletRequest, @PathVariable Long memberId){
+
+		Map<String, Object> infoResponseDto = memberInfoService.info(httpServletRequest,memberId);
+		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), infoResponseDto)); // 성공
+	}
+
+	@ApiOperation(tags = "1. Member", value = "내 정보 조회", notes = "내 정보 조회한다")
+	@PutMapping("/phone")
+	public ResponseEntity putPhoneInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody InfoPhoneRequestDto requestDto){
+
+		memberInfoService.phoneUpdate(httpServletRequest,requestDto);
+		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"비밀번호 수정 완료"));
+	}
+
+	@ApiOperation(tags = "1. Member", value = "내 정보 조회", notes = "내 정보 조회한다")
+	@PutMapping("/nickname")
+	public ResponseEntity putNicknameInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody InfoNicknameRequestDto requestDto){
+
+		memberInfoService.nicknameUpdate(httpServletRequest,requestDto);
+		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"닉네임 수정 완료"));
+	}
+
+
 
 
 //	@ApiOperation(tags = "1. Member", value = "회원 생성", notes = "회원을 생성한다.")
