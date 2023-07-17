@@ -1,6 +1,7 @@
 package com.server.pickplace.member.service;
 
 import antlr.Token;
+import com.server.pickplace.config.RedisRepositoryConfig;
 import com.server.pickplace.member.dto.*;
 import com.server.pickplace.auth.dto.TokenInfo;
 import com.server.pickplace.common.service.ResponseService;
@@ -10,6 +11,11 @@ import com.server.pickplace.member.repository.RefreshTokenRedisRepository;
 import com.server.pickplace.member.service.jwt.JwtTokenProvider;
 import com.server.pickplace.member.service.jwt.RefreshToken;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.BasicJsonParser;
+import org.springframework.boot.json.JsonParser;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,12 +30,15 @@ import com.server.pickplace.member.error.MemberException;
 import com.server.pickplace.member.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.Base64.getUrlDecoder;
 
 /**
  * description    :
@@ -57,6 +66,9 @@ public class MemberService {
 	private final ResponseService responseService;
 	private final AuthenticationManagerBuilder authenticationManagerBuilder;
 	private final JwtTokenProvider jwtTokenProvider;
+
+	@Autowired
+	StringRedisTemplate redisTemplate;
 
 	@Transactional
 	//login service
@@ -131,9 +143,6 @@ public class MemberService {
 		return reissueMap;
 	}
 
-
-
-
 	@Transactional
 	public String signup(MemberSignupRequestDto request) {
 
@@ -160,7 +169,36 @@ public class MemberService {
 	}
 
 
-	public void logout(final Long memberId){
+	public void logout(HttpServletRequest request){
+		String token = jwtTokenProvider.resolveToken((HttpServletRequest) request); //access Token 가져옴
+		ValueOperations<String, String> logoutValueOperations = redisTemplate.opsForValue(); //access Token 블랙리스트에 등록
+		logoutValueOperations.set(token, token);
+
+
+		String payloadJWT = token.split("\\.")[1];
+		Base64.Decoder decoder = getUrlDecoder();
+
+		String payload = new String(decoder.decode(payloadJWT));
+		JsonParser jsonParser = new BasicJsonParser();
+		Map<String, Object> jsonArray = jsonParser.parseMap(payload);
+		String email = (String) jsonArray.get("sub"); // id 담아옴
+
+		// refreshToken 삭제
+		refreshTokenRedisRepository.findById(email)
+				.orElseThrow(() -> new MemberException(MemberErrorResult.ALREADY_LOGOUT)); //로그인 안된 사용자 예외처리
+
+		refreshTokenRedisRepository.deleteById(email); // 토큰 삭제
+
+
+	}
+
+	public void deleteMember(Long memberId){
+
+
+		memberRepository.findById(memberId)
+				.orElseThrow(() -> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND)); //존재하지 않는 회원 에외처리
+
+		memberRepository.deleteById(memberId);
 
 	}
 
@@ -204,29 +242,29 @@ public class MemberService {
 //			.build();
 //	}
 
-	public List<MemberListResponse> getMemberListByName(String name) {
-		List<Member> memberList = memberRepository.findByName(name);
-
-		return memberList.stream()
-				.map(member -> MemberListResponse.builder()
-						.id(member.getId())
-						.email(member.getEmail())
-						.name(member.getName())
-						.build())
-				.collect(Collectors.toList());
-	}
-
-	public MemberDetailResponse getMember(Long id) {
-		final Member member = memberRepository.findById(id).orElseThrow(() -> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
-		return MemberDetailResponse.builder()
-				.id(member.getId())
-				.name(member.getName())
-				.email(member.getEmail())
-				.build();
-	}
-
-    public void deleteMember(Long id) {
-		memberRepository.findById(id).orElseThrow(() -> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
-		memberRepository.deleteById(id);
-    }
+//	public List<MemberListResponse> getMemberListByName(String name) {
+//		List<Member> memberList = memberRepository.findByName(name);
+//
+//		return memberList.stream()
+//				.map(member -> MemberListResponse.builder()
+//						.id(member.getId())
+//						.email(member.getEmail())
+//						.name(member.getName())
+//						.build())
+//				.collect(Collectors.toList());
+//	}
+//
+//	public MemberDetailResponse getMember(Long id) {
+//		final Member member = memberRepository.findById(id).orElseThrow(() -> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
+//		return MemberDetailResponse.builder()
+//				.id(member.getId())
+//				.name(member.getName())
+//				.email(member.getEmail())
+//				.build();
+//	}
+//
+//    public void deleteMember(Long id) {
+//		memberRepository.findById(id).orElseThrow(() -> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
+//		memberRepository.deleteById(id);
+//    }
 }

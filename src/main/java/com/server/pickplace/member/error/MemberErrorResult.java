@@ -32,7 +32,8 @@ public enum MemberErrorResult {
 	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 회원입니다"),
 	UNKNOWN_TOKEN(HttpStatus.NOT_FOUND,"잘못된 refresh token 입니다"),
 	INVALID_TOKEN(HttpStatus.NOT_FOUND,"존재하지 않는 access token 입니다"),
-	NOT_AUTHENTICATION(HttpStatus.NOT_FOUND,"권한이 없습니다");
+	NOT_AUTHENTICATION(HttpStatus.NOT_FOUND,"권한이 없습니다"),
+	ALREADY_LOGOUT(HttpStatus.NOT_FOUND,"이미 로그아웃 되어있습니다");
 
 
 	private final HttpStatus httpStatus;

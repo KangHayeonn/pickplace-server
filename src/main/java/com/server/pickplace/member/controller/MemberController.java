@@ -1,8 +1,6 @@
 package com.server.pickplace.member.controller;
 
-import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import com.server.pickplace.member.dto.JwtRequestDto;
@@ -13,9 +11,6 @@ import com.server.pickplace.member.error.MemberException;
 import com.server.pickplace.member.repository.MemberRepository;
 import com.server.pickplace.member.service.MemberInfoService;
 import com.server.pickplace.member.service.jwt.JwtTokenProvider;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.BasicJsonParser;
@@ -23,11 +18,6 @@ import org.springframework.boot.json.JsonParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.Errors;
@@ -39,7 +29,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -167,17 +156,23 @@ public class MemberController {
 	}
 
 	@ApiOperation(tags = "1. Member", value = "로그아웃", notes = "로그아웃 한다")
-	@GetMapping(value = "logout/{memberId}")
-	public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response , @PathVariable Long memberId) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	@GetMapping(value = "logout")
+	public ResponseEntity logout(HttpServletRequest request) {
 
-		System.out.println("");
-
-		if(authentication != null){
-			new SecurityContextLogoutHandler().logout(request,response,authentication);
-		}
+		memberService.logout(request);
 
 		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"로그아웃"));
+	}
+
+	@ApiOperation(tags = "1. Member", value = "회원 탈퇴 ", notes = "회원 탈퇴한다")
+	@DeleteMapping("/")
+	public ResponseEntity putNicknameInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody MemberIdRequestDto memberId){
+
+		System.out.println(memberId.getMemberId());
+		memberInfoService.checkInfoValid(httpServletRequest,memberId.getMemberId()); // 토큰 만료 , 존재하지 않는 회원 , 권한없음 처리
+		memberService.logout(httpServletRequest); //로그아웃 후 회원 탈퇴 진행 (토큰 삭제 과정이라서)
+		memberService.deleteMember(memberId.getMemberId());
+		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"탈퇴"));
 	}
 
 	@ApiOperation(tags = "1. Member", value = "내 정보 조회", notes = "내 정보 조회한다")
@@ -188,7 +183,7 @@ public class MemberController {
 		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), infoResponseDto)); // 성공
 	}
 
-	@ApiOperation(tags = "1. Member", value = "내 정보 조회", notes = "내 정보 조회한다")
+	@ApiOperation(tags = "1. Member", value = "내 정보 수정 - 전화번호 ", notes = "내 전화번호를 수정한다")
 	@PutMapping("/phone")
 	public ResponseEntity putPhoneInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody InfoPhoneRequestDto requestDto){
 
@@ -196,13 +191,14 @@ public class MemberController {
 		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"비밀번호 수정 완료"));
 	}
 
-	@ApiOperation(tags = "1. Member", value = "내 정보 조회", notes = "내 정보 조회한다")
+	@ApiOperation(tags = "1. Member", value = "내 정보 수정 - 닉네임 ", notes = "내 닉네임을 수정한다")
 	@PutMapping("/nickname")
 	public ResponseEntity putNicknameInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody InfoNicknameRequestDto requestDto){
 
 		memberInfoService.nicknameUpdate(httpServletRequest,requestDto);
 		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"닉네임 수정 완료"));
 	}
+
 
 
 
