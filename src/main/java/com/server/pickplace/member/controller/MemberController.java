@@ -133,7 +133,7 @@ public class MemberController {
 
 	}
 
-	@ApiOperation(tags = "1. Member", value = "토큰 재발급", notes = "토큰을 재발급한다!!!!!!!!!!!!!!!!!!")
+	@ApiOperation(tags = "1. Member", value = "토큰 재발급", notes = "토큰을 재발급한다.")
 	@PostMapping(value = "reissue", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity reissue(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody ReissueRequestDto requestDto) {
 
