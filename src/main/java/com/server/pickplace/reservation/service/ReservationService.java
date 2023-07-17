@@ -1,7 +1,10 @@
 package com.server.pickplace.reservation.service;
 
+import com.server.pickplace.reservation.dto.CardInfoResponse;
+import com.server.pickplace.reservation.dto.CardPayRequest;
+import com.server.pickplace.reservation.error.ReservationErrorResult;
+import com.server.pickplace.reservation.error.ReservationException;
 import com.server.pickplace.reservation.repository.ReservationRepository;
-import com.server.pickplace.search.repository.SearchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -25,5 +28,30 @@ public class ReservationService {
         Map<String, Object> reservationPageMapByEmailAndRoomId = reservationRepository.getReservationPageMapByEmailAndRoomId(email, roomId);// 그냥 위임만
 
         return reservationPageMapByEmailAndRoomId;
+    }
+
+    public CardInfoResponse getCardInfoDto(String email, String cardNum) {
+
+        String memberName = reservationRepository.findMemberNameByEmail(email);
+
+        CardInfoResponse cardInfoResponse = CardInfoResponse.builder().name(memberName).number(cardNum).build();
+
+        return cardInfoResponse;
+    }
+
+    public void payByCardAndReservation(String email, CardPayRequest cardPayRequest) {
+
+        // 결제
+        String inputCardPassword = cardPayRequest.getCardPassword();
+
+        String memberPassword = reservationRepository.findMemberPasswordByEmail(email);
+
+        if (!inputCardPassword.equals(memberPassword)) {
+            throw new ReservationException(ReservationErrorResult.WRONG_CARD_PASSWORD);
+        }
+
+        reservationRepository.makeReservation(email, cardPayRequest);
+
+
     }
 }

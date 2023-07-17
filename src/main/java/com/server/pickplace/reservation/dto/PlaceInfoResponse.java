@@ -14,7 +14,7 @@ public class PlaceInfoResponse {
 
     private String roomName;
 
-    private String roomMaxNum;
+    private Integer roomMaxNum;
 
     private String address;
 
