@@ -183,7 +183,7 @@ public class MemberController {
 		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), infoResponseDto)); // 성공
 	}
 
-	@ApiOperation(tags = "1. Member", value = "내 정보 수정 - 전화번호 ", notes = "내 전화번호를 수정한다")
+	@ApiOperation(tags = "1. Member", value = "내 정보 수정 - 전화번호 ", notes = "내 정보 : 전화번호를 수정한다")
 	@PutMapping("/phone")
 	public ResponseEntity putPhoneInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody InfoPhoneRequestDto requestDto){
 
@@ -191,7 +191,7 @@ public class MemberController {
 		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"비밀번호 수정 완료"));
 	}
 
-	@ApiOperation(tags = "1. Member", value = "내 정보 수정 - 닉네임 ", notes = "내 닉네임을 수정한다")
+	@ApiOperation(tags = "1. Member", value = "내 정보 수정 - 닉네임 ", notes = "내 정보 : 내 닉네임을 수정한다")
 	@PutMapping("/nickname")
 	public ResponseEntity putNicknameInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody InfoNicknameRequestDto requestDto){
 
