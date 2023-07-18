@@ -1,5 +1,6 @@
 package com.server.pickplace.reservation.service;
 
+import com.server.pickplace.reservation.dto.AccountPayRequest;
 import com.server.pickplace.reservation.dto.CardInfoResponse;
 import com.server.pickplace.reservation.dto.CardPayRequest;
 import com.server.pickplace.reservation.error.ReservationErrorResult;
@@ -50,8 +51,25 @@ public class ReservationService {
             throw new ReservationException(ReservationErrorResult.WRONG_CARD_PASSWORD);
         }
 
+        // 예약
         reservationRepository.makeReservation(email, cardPayRequest);
 
+    }
+
+
+    public void payByAccountAndReservation(String email, AccountPayRequest accountPayRequest) {
+
+        // 결제
+        String inputAccountPassword = accountPayRequest.getAccountPassword();
+
+        String memberPassword = reservationRepository.findMemberNameByEmail(email);
+
+        if (!inputAccountPassword.equals(memberPassword)) {
+            throw new ReservationException(ReservationErrorResult.WRONG_CARD_PASSWORD);
+        }
+
+        // 예약
+        reservationRepository.makeReservation(email, accountPayRequest);
 
     }
 }

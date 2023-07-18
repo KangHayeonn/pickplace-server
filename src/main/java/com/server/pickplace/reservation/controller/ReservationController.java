@@ -2,9 +2,7 @@ package com.server.pickplace.reservation.controller;
 
 import com.server.pickplace.common.dto.SingleResponse;
 import com.server.pickplace.common.service.ResponseService;
-import com.server.pickplace.reservation.dto.CardInfoResponse;
-import com.server.pickplace.reservation.dto.CardPayRequest;
-import com.server.pickplace.reservation.dto.CardValidRequest;
+import com.server.pickplace.reservation.dto.*;
 import com.server.pickplace.reservation.error.ReservationErrorResult;
 import com.server.pickplace.reservation.error.ReservationException;
 import com.server.pickplace.reservation.repository.ReservationRepository;
@@ -50,7 +48,7 @@ public class ReservationController {
 
     @ApiOperation(tags = "4. Reservation", value = "카드 결제 검증", notes = "신용/체크카드 결제에서, 올바른 카드번호와 CVC 인지 검증한다.")
     @PostMapping("/card/validation")
-    public ResponseEntity cardPayValidation(@RequestHeader("Authorization") String accessToken,
+    public ResponseEntity<SingleResponse> cardPayValidation(@RequestHeader("Authorization") String accessToken,
                                                                @RequestBody @Validated CardValidRequest cardValidRequest) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
@@ -64,14 +62,6 @@ public class ReservationController {
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), cardInfoResponse));
     }
 
-    private void validateCardByCardNum(String cardNum) {
-        int code = calculateVerificationCode(cardNum);
-        int lastDigit = Integer.parseInt(cardNum.substring(cardNum.length() - 1));
-
-        if (code != lastDigit) {
-            throw new ReservationException(ReservationErrorResult.WRONG_CARD_NUMBER);
-        }
-    }
 
     @ApiOperation(tags = "4. Reservation", value = "카드 결제 및 예약", notes = "신용/체크카드 결제와 실제 예약이 이루어진다.")
     @PostMapping("/card")
@@ -90,6 +80,38 @@ public class ReservationController {
 
     }
 
+    @ApiOperation(tags = "4. Reservation", value = "은행 별 가상계좌 받아오기", notes = "은행 별 가상계좌번호를 반환한다.")
+    @PostMapping("/account/number")
+    public ResponseEntity<SingleResponse> accountReturn(@RequestHeader("Authorization") String accessToken,
+                                  @RequestBody BankRequest bankRequest) {
+
+        String bankName = bankRequest.getBankName();
+        String bankNum = getBankNumByBankName(bankName);
+
+        BankResponse bankResponse = BankResponse.builder().bankName(bankName).bankNum(bankNum).build();
+
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), bankResponse));
+
+    }
+
+    @ApiOperation(tags = "4. Reservation", value = "계좌이체 및 예약", notes = "가상계좌를 통한 예약과 실제 예약이 이루어진다.")
+    @PostMapping("/account")
+    public ResponseEntity accountPay(@RequestHeader("Authorization") String accessToken,
+                                                     @RequestBody @Validated AccountPayRequest accountPayRequest) {
+
+        Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
+        String email = (String) payloadMap.get("email");
+
+        String bankNumByBankName = getBankNumByBankName(accountPayRequest.getBankName());
+        if (!bankNumByBankName.equals(accountPayRequest.getBankNum())) {
+            throw new ReservationException(ReservationErrorResult.NO_MATCH_BANK_ACCOUNT);
+        }
+
+        reservationService.payByAccountAndReservation(email, accountPayRequest);
+
+        return ResponseEntity.ok(null);
+
+    }
 
 
 
@@ -98,7 +120,26 @@ public class ReservationController {
 
 
 
-        private int calculateVerificationCode(String cardNumber) {
+
+    private String getBankNumByBankName(String bankName) {
+        String bankNum;
+        if (bankName.equals("국민은행")) {
+            bankNum = "1020315-12108542";
+        } else if (bankName.equals("하나은행")) {
+            bankNum = "2020315-12108542";
+        } else if (bankName.equals("신한은행")) {
+            bankNum = "3020315-12108542";
+        } else if (bankName.equals("우리은행")) {
+            bankNum = "4020315-12108542";
+        } else {
+            throw new ReservationException(ReservationErrorResult.NO_EXIST_BANK);
+        }
+
+        return bankNum;
+    }
+
+
+    private int calculateVerificationCode(String cardNumber) {
         int sum = 0;
         boolean multiplyByTwo = false;
 
@@ -118,32 +159,17 @@ public class ReservationController {
         return verificationCode % 10;
     }
 
+    private void validateCardByCardNum(String cardNum) {
+        int code = calculateVerificationCode(cardNum);
+        int lastDigit = Integer.parseInt(cardNum.substring(cardNum.length() - 1));
+
+        if (code != lastDigit) {
+            throw new ReservationException(ReservationErrorResult.WRONG_CARD_NUMBER);
+        }
+    }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                                               private Map<String, Object> getPayloadMap(String accessToken) {
+    private Map<String, Object> getPayloadMap(String accessToken) {
 
         String payloadJWT = accessToken.split("\\.")[1];
         Base64.Decoder decoder = getUrlDecoder();
@@ -153,8 +179,6 @@ public class ReservationController {
         Map<String, Object> jsonArray = jsonParser.parseMap(payload);
         return jsonArray;
     }
-
-
 
 
 }
