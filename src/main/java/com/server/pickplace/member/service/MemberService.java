@@ -147,7 +147,7 @@ public class MemberService {
 				.role(MemberRole.valueOf(request.getMemberRole()))
 				.build();
 
-		return memberRepository.save(member).getEmail(); //예외 처리 메시지 추가 예정----------->
+		return memberRepository.save(member).getEmail();
 	}
 
 	public boolean emailCheck(EmailCheckRequestDto email) {
