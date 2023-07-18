@@ -5,6 +5,7 @@ import com.server.pickplace.member.entity.MemberRole;
 import com.server.pickplace.place.entity.*;
 import com.server.pickplace.reservation.entity.Reservation;
 import com.server.pickplace.reservation.entity.ReservationStatus;
+import com.server.pickplace.search.repository.SearchRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -28,9 +29,16 @@ import java.util.*;
 public class SearchMockUpSetting {
 
     @Autowired EntityManager em;
+    @Autowired SearchRepository searchRepository;
 
     @EventListener(ApplicationReadyEvent.class)
-    public void initialize() {
+    public Object initialize() {
+
+        // 데이터 이미 채워져있는지 체크
+        List<Place> placeFindAllList = searchRepository.findAll();
+        if (!placeFindAllList.isEmpty()) {
+            return null;
+        }
 
         Member host = hostSetting();
 
@@ -70,6 +78,8 @@ public class SearchMockUpSetting {
         categoryPlaceList.stream().forEach(o -> em.persist(o));
         tagPlaceList.stream().forEach(o -> em.persist(o));
         reservationList.stream().forEach(o -> em.persist(o));
+
+        return null;
     }
 
     private List<Reservation> reservationSetting(List<Unit> unitList, Member user) {
