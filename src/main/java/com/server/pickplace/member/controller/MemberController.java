@@ -76,7 +76,7 @@ public class MemberController {
 		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), loginResponseDto)); // 성공
 	}
 
-	@ApiOperation(tags = "1. Member", value = "회원가입", notes = "회원가입 시도한다..")
+	@ApiOperation(tags = "1. Member", value = "회원가입", notes = "회원가입 시도한다!")
 	@PostMapping(value = "signup", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity signUp(@RequestBody @Valid MemberSignupRequestDto request, @ApiIgnore Errors errors) throws Exception {
 
@@ -101,7 +101,7 @@ public class MemberController {
 		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), "회원가입 성공")); // 성공
 	}
 
-	@ApiOperation(tags = "1. Member", value = "이메일 중복 체크", notes = "이메일 충복 체크 한다")
+	@ApiOperation(tags = "1. Member", value = "이메일 중복 체크", notes = "이메일 중복 체크 한다")
 	@PostMapping(value = "emailCheck", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity emailCheck(@RequestBody @Valid EmailCheckRequestDto email, @ApiIgnore Errors errors) {
 		Boolean emailCheckResponse = memberService.emailCheck(email);
