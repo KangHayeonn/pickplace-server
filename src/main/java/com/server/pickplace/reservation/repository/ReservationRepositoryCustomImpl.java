@@ -12,6 +12,8 @@ import com.server.pickplace.reservation.dto.MemberInfoResponse;
 import com.server.pickplace.reservation.dto.PayInfoResponse;
 import com.server.pickplace.reservation.dto.PayRequest;
 import com.server.pickplace.reservation.dto.PlaceInfoResponse;
+import com.server.pickplace.reservation.entity.QRPaymentInfomation;
+import com.server.pickplace.reservation.entity.QRStatus;
 import com.server.pickplace.reservation.entity.Reservation;
 import com.server.pickplace.reservation.entity.ReservationStatus;
 import com.server.pickplace.reservation.error.ReservationErrorResult;
@@ -116,6 +118,30 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
 
         em.persist(reservation);
 
+    }
+
+
+    @Override
+    public String saveQRPaymentInformation(String email, Integer roomPrice) {
+
+        String uuid = UUID.randomUUID().toString();
+
+        QRPaymentInfomation qrPaymentInfomation = QRPaymentInfomation.builder()
+                .qrPaymentCode(uuid)
+                .email(email)
+                .status(QRStatus.WAITING)
+                .price(roomPrice)
+                .build();
+
+        em.persist(qrPaymentInfomation);
+
+        return uuid;
+
+    }
+
+    @Override
+    public void changeQREntityStatus(QRPaymentInfomation qrPaymentInfomation, QRStatus status) {
+        qrPaymentInfomation.setStatus(status);
     }
 
     private Member getMember(String email) {

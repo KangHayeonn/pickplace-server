@@ -3,6 +3,8 @@ package com.server.pickplace.reservation.controller;
 import com.server.pickplace.common.dto.SingleResponse;
 import com.server.pickplace.common.service.ResponseService;
 import com.server.pickplace.reservation.dto.*;
+import com.server.pickplace.reservation.entity.QRPaymentInfomation;
+import com.server.pickplace.reservation.entity.QRStatus;
 import com.server.pickplace.reservation.error.ReservationErrorResult;
 import com.server.pickplace.reservation.error.ReservationException;
 import com.server.pickplace.reservation.repository.ReservationRepository;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Base64;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Base64.getUrlDecoder;
 
@@ -49,7 +52,7 @@ public class ReservationController {
     @ApiOperation(tags = "4. Reservation", value = "카드 결제 검증", notes = "신용/체크카드 결제에서, 올바른 카드번호와 CVC 인지 검증한다.")
     @PostMapping("/card/validation")
     public ResponseEntity<SingleResponse> cardPayValidation(@RequestHeader("Authorization") String accessToken,
-                                                               @RequestBody @Validated CardValidRequest cardValidRequest) {
+                                                            @RequestBody @Validated CardValidRequest cardValidRequest) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
         String email = (String) payloadMap.get("email");
@@ -66,7 +69,7 @@ public class ReservationController {
     @ApiOperation(tags = "4. Reservation", value = "카드 결제 및 예약", notes = "신용/체크카드 결제와 실제 예약이 이루어진다.")
     @PostMapping("/card")
     public ResponseEntity cardPay(@RequestHeader("Authorization") String accessToken,
-                                          @RequestBody @Validated CardPayRequest cardPayRequest) {
+                                  @RequestBody @Validated CardPayRequest cardPayRequest) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
         String email = (String) payloadMap.get("email");
@@ -83,7 +86,7 @@ public class ReservationController {
     @ApiOperation(tags = "4. Reservation", value = "은행 별 가상계좌 받아오기", notes = "은행 별 가상계좌번호를 반환한다.")
     @PostMapping("/account/number")
     public ResponseEntity<SingleResponse> accountReturn(@RequestHeader("Authorization") String accessToken,
-                                  @RequestBody BankRequest bankRequest) {
+                                                        @RequestBody BankRequest bankRequest) {
 
         String bankName = bankRequest.getBankName();
         String bankNum = getBankNumByBankName(bankName);
@@ -97,7 +100,7 @@ public class ReservationController {
     @ApiOperation(tags = "4. Reservation", value = "계좌이체 및 예약", notes = "가상계좌를 통한 예약과 실제 예약이 이루어진다.")
     @PostMapping("/account")
     public ResponseEntity accountPay(@RequestHeader("Authorization") String accessToken,
-                                                     @RequestBody @Validated AccountPayRequest accountPayRequest) {
+                                     @RequestBody @Validated AccountPayRequest accountPayRequest) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
         String email = (String) payloadMap.get("email");
@@ -113,6 +116,83 @@ public class ReservationController {
 
     }
 
+    @ApiOperation(tags = "4. Reservation", value = "QR 코드 응답", notes = "페이지에 보여지는 QR코드를 리턴한다.")
+    @PostMapping(value = "/qrcode/image")
+    public ResponseEntity<SingleResponse> qrCodeImage(@RequestHeader("Authorization") String accessToken,
+                                                      @Validated @RequestBody QRImageReqeust qrImageReqeust) {
+
+        Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
+        String email = (String) payloadMap.get("email");
+
+        String uuid = reservationRepository.saveQRPaymentInformation(email, qrImageReqeust.getRoomPrice());
+
+        String url = "https://pickplace.kr/payment?code=" + uuid;  // 결제 비밀번호 입력하는 링크로...
+
+        QRImageResponse qrImageResponse = reservationService.getQRImageResponse(qrImageReqeust, uuid, url);
+
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), qrImageResponse));
+
+
+    }
+
+
+    @ApiOperation(tags = "4. Reservation", value = "QR 코드 결제 페이지 가격 정보", notes = "모바일 환경에서 보여지는 비밀번호 입력 페이지에, 결제 가격을 보여준다.")
+    @GetMapping(value = "/qrcode/{qrPaymentCode}")
+    public ResponseEntity<SingleResponse<QRPriceResponse>> qrCodePrice(@PathVariable("qrPaymentCode") String qrPaymentCode) {
+
+        Optional<Integer> optionalQRPrice = reservationRepository.findQRPriceByQRPaymentCode(qrPaymentCode);
+        Integer price = optionalQRPrice.orElseThrow(() -> new ReservationException(ReservationErrorResult.NON_EXIST_QR_PAYMENT_CODE));
+
+        QRPriceResponse qrPriceResponse = QRPriceResponse.builder().roomPrice(price).build();
+
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), qrPriceResponse));
+
+    }
+
+    @ApiOperation(tags = "4. Reservation", value = "QR 코드 비밀번호 인증", notes = "결제 비밀번호를 받아, 일치한다면 결제/예약을 진행할 수 있도록 한다.")
+    @PostMapping(value = "/qrcode/{qrPaymentCode}")
+    public ResponseEntity qrPassword(@PathVariable("qrPaymentCode") String qrPaymentCode,
+                                                                      @Validated @RequestBody QRPasswordRequest qrPasswordRequest) {
+
+        Optional<QRPaymentInfomation> optionalQREntity = reservationRepository.findQREntityByQRPaymentCode(qrPaymentCode);
+        QRPaymentInfomation qrPaymentInfomation = optionalQREntity.orElseThrow(() -> new ReservationException(ReservationErrorResult.NON_EXIST_QR_PAYMENT_CODE));
+
+        String email = qrPaymentInfomation.getEmail();
+
+        String memberPassword = reservationRepository.findMemberPasswordByEmail(email);
+
+        if (memberPassword != qrPasswordRequest.getQrPassword()) {
+            throw new ReservationException(ReservationErrorResult.WRONG_PASSWORD);
+        }
+
+        // 비밀번호 일치 -> 결제 상태를 '인증됨'으로
+
+        reservationRepository.changeQREntityStatus(qrPaymentInfomation, QRStatus.APPROVAL);
+
+        return ResponseEntity.ok(null);
+
+    }
+
+    @ApiOperation(tags = "4. Reservation", value = "QR 결제", notes = "모바일로 QR 비밀번호 인증을 한 후, PC에서 다음 버튼을 눌러 실 결제를 진행한다.")
+    @PostMapping(value = "/qrcode}")
+    public ResponseEntity qrPassword(@RequestHeader("Authorization") String accessToken,
+                                     @Validated @RequestBody QRPayRequest qrPayRequest) {
+
+        Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
+        String email = (String) payloadMap.get("email");
+
+        // 1. QR을 통해 인증 했는지 확인
+        Optional<QRPaymentInfomation> optionalQREntity = reservationRepository.findQREntityByQRPaymentCode(qrPayRequest.getQrPaymentCode());
+        QRPaymentInfomation qrPaymentInfomation = optionalQREntity.orElseThrow(() -> new ReservationException(ReservationErrorResult.NON_EXIST_QR_PAYMENT_CODE));
+        if (!qrPaymentInfomation.getStatus().equals(QRStatus.APPROVAL)) {
+            throw new ReservationException(ReservationErrorResult.QR_AUTH_NOT_COMPLETE);
+        }
+
+        // 2. 예약
+        reservationRepository.makeReservation(email, qrPayRequest);
+
+        return ResponseEntity.ok(null);
+    }
 
 
 
@@ -121,7 +201,19 @@ public class ReservationController {
 
 
 
-    private String getBankNumByBankName(String bankName) {
+
+
+
+
+
+
+
+
+
+
+
+
+        private String getBankNumByBankName(String bankName) {
         String bankNum;
         if (bankName.equals("국민은행")) {
             bankNum = "1020315-12108542";
