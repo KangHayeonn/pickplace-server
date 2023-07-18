@@ -2,6 +2,7 @@ package com.server.pickplace.member.entity;
 
 import javax.persistence.*;
 
+import com.server.pickplace.member.dto.MemberSignupRequestDto;
 import com.server.pickplace.common.common.BaseEntity;
 
 import lombok.AllArgsConstructor;
@@ -9,6 +10,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Collection;
 
 /**
  * description    :
@@ -20,6 +26,7 @@ import lombok.Setter;
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
  * 2023-05-28        tkfdk       최초 생성
+ * 2023-06-23		 sohyun		 비밀번호 암호화 추가 / dto 생성자 추가
  */
 @Getter
 @Setter
@@ -28,7 +35,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "MEMBER_TB")
-public class Member extends BaseEntity {
+public class Member extends BaseEntity implements UserDetails {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,4 +58,53 @@ public class Member extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private MemberRole role;
 
+
+	public Member(MemberSignupRequestDto request) {
+		email = request.getEmail();
+		password = request.getPassword();
+		number = request.getPhone();
+		name = request.getNickname();
+		role = role.USER; // 회원가입하는 사용자 권한 기본 USER (임시)
+	}
+
+	//비밀번호 암호화
+	public void encryptPassword(PasswordEncoder passwordEncoder) {
+		password = passwordEncoder.encode(password);
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return null;
+	}
+
+	// 이메일과 비밀번호로 인증 진행 email , password
+	@Override
+	public String getUsername() {
+		return email;
+	}
+
+	@Override
+	public String getPassword() {
+		return password;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return false;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return false;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return false;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return false;
+	}
 }

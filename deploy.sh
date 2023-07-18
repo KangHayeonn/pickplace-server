@@ -22,5 +22,7 @@ else
 fi
 
 echo "> $JAR_PATH 배포"
-nohup java -jar -Dspring.profiles.active=dev $JAR_PATH > /dev/null 2> /dev/null < /dev/null &
+nohup java -jar $JAR_PATH > /dev/null 2> /dev/null < /dev/null &
+
+#nohup java -jar -Dspring.profiles.active=dev $JAR_PATH > /dev/null 2> /dev/null < /dev/null &
 # swagger , spring 버전 관련 오류 해결위한 dev application.properties 적용
