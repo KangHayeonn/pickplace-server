@@ -76,7 +76,7 @@ public class MemberController {
 		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), loginResponseDto)); // 성공
 	}
 
-	@ApiOperation(tags = "1. Member", value = "회원가입", notes = "회원가입 시도한다")
+	@ApiOperation(tags = "1. Member", value = "회원가입", notes = "회원가입 시도한다..")
 	@PostMapping(value = "signup", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity signUp(@RequestBody @Valid MemberSignupRequestDto request, @ApiIgnore Errors errors) throws Exception {
 
