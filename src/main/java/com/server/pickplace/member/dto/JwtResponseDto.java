@@ -1,4 +1,4 @@
-package com.server.pickplace.auth.dto;
+package com.server.pickplace.member.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

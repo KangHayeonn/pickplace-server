@@ -51,11 +51,12 @@ import static java.util.Base64.getUrlDecoder;
 @RequestMapping(value = "/api/v1/members")
 //@AllArgsConstructor
 public class MemberController {
-//	private final ResponseService responseService;
+	//	private final ResponseService responseService;
 	private final MemberService memberService;
 	private final MemberInfoService memberInfoService;
 	private final ResponseService responseService;
-	private final MemberRepository memberRepository;;
+	private final MemberRepository memberRepository;
+	;
 	private final JwtTokenProvider jwtTokenProvider;
 
 	@Value("${jwt.secret}")
@@ -67,22 +68,22 @@ public class MemberController {
 	public ResponseEntity login(@ApiIgnore HttpServletRequest httpServletRequest, @ApiParam(required = true) @RequestBody @Valid JwtRequestDto jwtRequestDto, @ApiIgnore Errors errors) throws Exception {
 
 
-		if(errors.hasErrors()){
+		if (errors.hasErrors()) {
 			throw new MemberException(MemberErrorResult.HAS_NULL); //null 값 예외 처리
 		}
 
-		Map<String, Object> loginResponseDto = memberService.login(httpServletRequest,jwtRequestDto);
-		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), loginResponseDto)); // 성공
+		Map<String, Object> loginResponseDto = memberService.login(httpServletRequest, jwtRequestDto);
+		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), loginResponseDto)); // 성공
 	}
 
 	@ApiOperation(tags = "1. Member", value = "회원가입", notes = "회원가입 시도한다")
 	@PostMapping(value = "signup", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity signUp(@RequestBody @Valid MemberSignupRequestDto request , @ApiIgnore Errors errors) throws Exception{
+	public ResponseEntity signUp(@RequestBody @Valid MemberSignupRequestDto request, @ApiIgnore Errors errors) throws Exception {
 
 		String signUpResponse = memberService.signup(request);
 
 
-		if(errors.hasErrors()) {
+		if (errors.hasErrors()) {
 			String errorDetail = errors.getFieldErrors().toString();
 			Map<String, String> validateMap = new HashMap<>();
 
@@ -90,15 +91,14 @@ public class MemberController {
 			for (FieldError error : errors.getFieldErrors()) {
 				String validKeyName = error.getField();
 				validateMap.put(validKeyName, error.getDefaultMessage());
-				if (validKeyName.equals("email")){
+				if (validKeyName.equals("email")) {
 					throw new MemberException(MemberErrorResult.NOT_EMAIL); // 이메일 형식 안지켜진 경우
-				}
-				else {
+				} else {
 					throw new MemberException(MemberErrorResult.HAS_NULL); // null 값인 경우 + 길이 제한 오류
 				}
 			}
 		}
-		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"회원가입 성공")); // 성공
+		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), "회원가입 성공")); // 성공
 	}
 
 	@ApiOperation(tags = "1. Member", value = "이메일 중복 체크", notes = "이메일 충복 체크 한다")
@@ -106,7 +106,7 @@ public class MemberController {
 	public ResponseEntity emailCheck(@RequestBody @Valid EmailCheckRequestDto email, @ApiIgnore Errors errors) {
 		Boolean emailCheckResponse = memberService.emailCheck(email);
 
-		if(errors.hasErrors()) {
+		if (errors.hasErrors()) {
 			String errorDetail = errors.getFieldErrors().toString();
 
 			Map<String, String> validateMap = new HashMap<>();
@@ -114,19 +114,15 @@ public class MemberController {
 			for (FieldError error : errors.getFieldErrors()) {
 				String validKeyName = error.getField();
 				validateMap.put(validKeyName, error.getDefaultMessage());
-				System.out.println(validateMap);
-				if (error.getDefaultMessage().equals("공백")){
+				if (error.getDefaultMessage().equals("공백")) {
 					throw new MemberException(MemberErrorResult.HAS_NULL); //공백
-				}
-				else {
+				} else {
 					throw new MemberException(MemberErrorResult.NOT_EMAIL); // 형식
 				}
 			}
 		}
-
-		System.out.println(emailCheckResponse);
-		if (emailCheckResponse==true)
-			return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"이메일 사용 가능"));
+		if (emailCheckResponse == true)
+			return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), "이메일 사용 가능"));
 		else {
 			throw new MemberException(MemberErrorResult.DUPLICATED_EMAIL); // 중복
 		}
@@ -147,12 +143,11 @@ public class MemberController {
 		Map<String, Object> jsonArray = jsonParser.parseMap(payload);
 		String id = (String) jsonArray.get("sub");
 
-		memberService.reissue(id,requestDto);
+		memberService.reissue(id, requestDto);
 
 
-
-		Map<String, Object> reissueResponseDto = memberService.reissue(id,requestDto);
-		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), reissueResponseDto)); // 성공
+		Map<String, Object> reissueResponseDto = memberService.reissue(id, requestDto);
+		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), reissueResponseDto)); // 성공
 	}
 
 	@ApiOperation(tags = "1. Member", value = "로그아웃", notes = "로그아웃 한다")
@@ -161,75 +156,42 @@ public class MemberController {
 
 		memberService.logout(request);
 
-		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"로그아웃"));
+		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), "로그아웃"));
 	}
 
 	@ApiOperation(tags = "1. Member", value = "회원 탈퇴 ", notes = "회원 탈퇴한다")
 	@DeleteMapping("/")
-	public ResponseEntity putNicknameInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody MemberIdRequestDto memberId){
+	public ResponseEntity putNicknameInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody MemberIdRequestDto memberId) {
 
-		System.out.println(memberId.getMemberId());
-		memberInfoService.checkInfoValid(httpServletRequest,memberId.getMemberId()); // 토큰 만료 , 존재하지 않는 회원 , 권한없음 처리
+		memberInfoService.checkInfoValid(httpServletRequest, memberId.getMemberId()); // 토큰 만료 , 존재하지 않는 회원 , 권한없음 처리
 		memberService.logout(httpServletRequest); //로그아웃 후 회원 탈퇴 진행 (토큰 삭제 과정이라서)
 		memberService.deleteMember(memberId.getMemberId());
-		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"탈퇴"));
+		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), "탈퇴"));
 	}
 
 	@ApiOperation(tags = "1. Member", value = "내 정보 조회", notes = "내 정보 조회한다")
 	@GetMapping("/{memberId}")
-	public ResponseEntity getInfo(@ApiIgnore HttpServletRequest httpServletRequest, @PathVariable Long memberId){
+	public ResponseEntity getInfo(@ApiIgnore HttpServletRequest httpServletRequest, @PathVariable Long memberId) {
 
-		Map<String, Object> infoResponseDto = memberInfoService.info(httpServletRequest,memberId);
-		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), infoResponseDto)); // 성공
+		Map<String, Object> infoResponseDto = memberInfoService.info(httpServletRequest, memberId);
+		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), infoResponseDto)); // 성공
 	}
 
 	@ApiOperation(tags = "1. Member", value = "내 정보 수정 - 전화번호 ", notes = "내 정보 : 전화번호를 수정한다")
 	@PutMapping("/phone")
-	public ResponseEntity putPhoneInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody InfoPhoneRequestDto requestDto){
+	public ResponseEntity putPhoneInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody InfoPhoneRequestDto requestDto) {
 
-		memberInfoService.phoneUpdate(httpServletRequest,requestDto);
-		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"비밀번호 수정 완료"));
+		memberInfoService.phoneUpdate(httpServletRequest, requestDto);
+		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), "비밀번호 수정 완료"));
 	}
 
 	@ApiOperation(tags = "1. Member", value = "내 정보 수정 - 닉네임 ", notes = "내 정보 : 내 닉네임을 수정한다")
 	@PutMapping("/nickname")
-	public ResponseEntity putNicknameInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody InfoNicknameRequestDto requestDto){
+	public ResponseEntity putNicknameInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody InfoNicknameRequestDto requestDto) {
 
-		memberInfoService.nicknameUpdate(httpServletRequest,requestDto);
-		return 	ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(),"닉네임 수정 완료"));
+		memberInfoService.nicknameUpdate(httpServletRequest, requestDto);
+		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), "닉네임 수정 완료"));
 	}
 
 
-
-
-
-//	@ApiOperation(tags = "1. Member", value = "회원 생성", notes = "회원을 생성한다.")
-//	@PostMapping("")
-//	public ResponseEntity<SingleResponse<MemberSaveResponse>> createMember(
-//		@Valid @RequestBody MemberSaveRequest memberSaveRequest) {
-//		final MemberSaveResponse memberSaveResponse = memberService.addMember(memberSaveRequest);
-//
-//		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.CREATED.value(), memberSaveResponse));
-//	}
-//
-//	@ApiOperation(tags = "1. Member", value = "회원 리스트 조회", notes = "이름으로 회원들을 조회한다.")
-//	@GetMapping("")
-//	public ResponseEntity<ListResponse<MemberListResponse>> findMemberByName(
-//		@RequestParam(name = "name") String name) {
-//		return ResponseEntity.ok(
-//			responseService.getListResponse(HttpStatus.CREATED.value(), memberService.getMemberListByName(name)));
-//	}
-//
-//	@ApiOperation(tags = "1. Member", value = "회원 상세 조회", notes = "고유 아이디로 회원을 상세 조회한다.")
-//	@GetMapping("/{id}")
-//	public ResponseEntity<MemberDetailResponse> findMemberByName(@PathVariable(name = "id") Long id) {
-//		return ResponseEntity.ok(memberService.getMember(id));
-//	}
-//
-//	@ApiOperation(tags = "1. Member", value = "회원 삭제", notes = "고유 아이디로 회원을 삭제한다.")
-//	@DeleteMapping("/{id}")
-//	public ResponseEntity<Void> deleteMemberByName(@PathVariable(name = "id") Long id) {
-//		memberService.deleteMember(id);
-//		return ResponseEntity.noContent().build();
-//	}
 }

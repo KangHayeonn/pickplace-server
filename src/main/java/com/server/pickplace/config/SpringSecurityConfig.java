@@ -47,6 +47,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     };
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+
+            //이 부분은 정리 필요,,
             http
                     .httpBasic().disable()
                     .csrf().disable() //postman test 위한 설정 변경

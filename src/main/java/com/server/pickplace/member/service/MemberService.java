@@ -1,9 +1,7 @@
 package com.server.pickplace.member.service;
 
-import antlr.Token;
-import com.server.pickplace.config.RedisRepositoryConfig;
 import com.server.pickplace.member.dto.*;
-import com.server.pickplace.auth.dto.TokenInfo;
+import com.server.pickplace.member.dto.TokenInfo;
 import com.server.pickplace.common.service.ResponseService;
 import com.server.pickplace.config.Helper;
 import com.server.pickplace.member.entity.MemberRole;
@@ -16,8 +14,6 @@ import org.springframework.boot.json.BasicJsonParser;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -30,13 +26,10 @@ import com.server.pickplace.member.error.MemberException;
 import com.server.pickplace.member.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
-import javax.validation.Valid;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.Base64.getUrlDecoder;
 
@@ -72,17 +65,17 @@ public class MemberService {
 
 	@Transactional
 	//login service
-	public Map<String, Object> login(HttpServletRequest request,  JwtRequestDto jwtRequestDto) throws Exception {
+	public Map<String, Object> login(HttpServletRequest request, JwtRequestDto jwtRequestDto) throws Exception {
 
-		if (memberRepository.findByEmail(jwtRequestDto.getEmail()).orElse(null)==null)
+		if (memberRepository.findByEmail(jwtRequestDto.getEmail()).orElse(null) == null)
 			throw new MemberException(MemberErrorResult.MEMBER_NOT_ID); //없는 아이디
 
 		if (!memberRepository.findByEmail(jwtRequestDto.getEmail()).get().getPassword().equals(jwtRequestDto.getPassword())) {
-				throw new MemberException(MemberErrorResult.MEMBER_NOT_PW); // 비밀번호 틀린 경우
+			throw new MemberException(MemberErrorResult.MEMBER_NOT_PW); // 비밀번호 틀린 경우
 		}
 
 		//email 과 password를 기반으로하는 Authentication 객체 생성
-		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(jwtRequestDto.getEmail(),jwtRequestDto.getPassword());
+		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(jwtRequestDto.getEmail(), jwtRequestDto.getPassword());
 		// 실제 검증 -> loadUserByUsername 메서드 실행
 		Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 		// 3. 인증 정보를 기반으로 JWT 토큰 생성
@@ -119,21 +112,20 @@ public class MemberService {
 		RefreshToken refreshToken1 = refreshToken.orElseThrow(() -> new MemberException(MemberErrorResult.UNKNOWN_TOKEN)); // 유효하지 않은 refresh 토큰 예외처리
 
 
-		if(!id.equals(refreshToken.get().getId())){
+		if (!id.equals(refreshToken.get().getId())) {
 			throw new MemberException(MemberErrorResult.UNKNOWN_TOKEN); // // 유효하지 않은 refresh 토큰 예외처리
 		}
 
 		String role = refreshToken.get().getAuthorities().toString();
-		role.replace("[","");
-		role.replace("]","");
-		System.out.println(role);
+		role.replace("[", "");
+		role.replace("]", "");
 
 		//유효한 거 확인 된 경우만 넘어옴 // 재발급 과정
-		String accessToken = jwtTokenProvider.recreationAccessToken(id,role, requestDto.getRefreshToken());
+		String accessToken = jwtTokenProvider.recreationAccessToken(id, role, requestDto.getRefreshToken());
 
 		Map<String, Object> reissueMap = new HashMap<>();
 
-		ReissueResponseDto reissueResponseDto= ReissueResponseDto.builder()
+		ReissueResponseDto reissueResponseDto = ReissueResponseDto.builder()
 				.accessToken(accessToken)
 				.refreshToken(requestDto.getRefreshToken())
 				.build();
@@ -159,17 +151,14 @@ public class MemberService {
 	}
 
 	public boolean emailCheck(EmailCheckRequestDto email) {
-//		memberRepository.findByEmail(email).get().getEmail()
-		System.out.println(email.getEmail());
 
 		boolean existMember = memberRepository.existsByEmail(email.getEmail());
-//		System.out.println(memberRepository.existsByEmail(email));
 		if (existMember) return false;
 		else return true;
 	}
 
 
-	public void logout(HttpServletRequest request){
+	public void logout(HttpServletRequest request) {
 		String token = jwtTokenProvider.resolveToken((HttpServletRequest) request); //access Token 가져옴
 		ValueOperations<String, String> logoutValueOperations = redisTemplate.opsForValue(); //access Token 블랙리스트에 등록
 		logoutValueOperations.set(token, token);
@@ -192,7 +181,7 @@ public class MemberService {
 
 	}
 
-	public void deleteMember(Long memberId){
+	public void deleteMember(Long memberId) {
 
 
 		memberRepository.findById(memberId)
@@ -203,68 +192,4 @@ public class MemberService {
 	}
 
 
-
-//	@Override
-//	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//		return memberRepository.findByEmail(username)
-//				.map(this::createUserDetails)
-//				.orElseThrow(() -> new UsernameNotFoundException("해당하는 유저를 찾을 수 없습니다."));
-//	}
-//
-//	// 해당하는 User 의 데이터가 존재한다면 UserDetails 객체로 만들어서 리턴
-//	private UserDetails createUserDetails(Member member) {
-//		return User.builder()
-//				.username(member.getUsername())
-//				.password(passwordEncoder.encode(member.getPassword()))
-//				.roles(String.valueOf(member.getRole()))
-//				.build();
-//	}
-
-
-
-//	public MemberSaveResponse addMember(MemberSaveRequest memberSaveRequest) {
-//		final Member findMember = memberRepository.findByEmail(memberSaveRequest.getEmail());
-//
-//		if (findMember != null) {
-//			log.error(findMember.getName());
-//			throw new MemberException(MemberErrorResult.DUPLICATED_MEMBER_REGISTER);
-//		}
-//
-//		Member member = memberRepository.save(Member.builder()
-//			.email(memberSaveRequest.getEmail())
-//			.name(memberSaveRequest.getName())
-//			.build());
-//
-//		return MemberSaveResponse.builder()
-//			.id(member.getId())
-//			.email(member.getEmail())
-//			.name(member.getName())
-//			.build();
-//	}
-
-//	public List<MemberListResponse> getMemberListByName(String name) {
-//		List<Member> memberList = memberRepository.findByName(name);
-//
-//		return memberList.stream()
-//				.map(member -> MemberListResponse.builder()
-//						.id(member.getId())
-//						.email(member.getEmail())
-//						.name(member.getName())
-//						.build())
-//				.collect(Collectors.toList());
-//	}
-//
-//	public MemberDetailResponse getMember(Long id) {
-//		final Member member = memberRepository.findById(id).orElseThrow(() -> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
-//		return MemberDetailResponse.builder()
-//				.id(member.getId())
-//				.name(member.getName())
-//				.email(member.getEmail())
-//				.build();
-//	}
-//
-//    public void deleteMember(Long id) {
-//		memberRepository.findById(id).orElseThrow(() -> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
-//		memberRepository.deleteById(id);
-//    }
 }

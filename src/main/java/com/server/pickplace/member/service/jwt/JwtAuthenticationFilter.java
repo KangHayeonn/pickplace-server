@@ -41,8 +41,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         }
-        System.out.println(response);
-        System.out.println(request);
+
 
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");

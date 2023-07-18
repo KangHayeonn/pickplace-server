@@ -1,4 +1,4 @@
-package com.server.pickplace.auth.dto;
+package com.server.pickplace.member.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,8 +8,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class TokenInfo {
-    //클라이언트에 토큰을 보내기 위한 dto
-//    private String grantType; //jwt 인증타입 : bearer
+    //클라이언트에 보낼 토큰 dto
     private String accessToken;
     private String refreshToken;
 }

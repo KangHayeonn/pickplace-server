@@ -1,6 +1,6 @@
 package com.server.pickplace.member.service.jwt;
 
-import com.server.pickplace.auth.dto.TokenInfo;
+import com.server.pickplace.member.dto.TokenInfo;
 import com.server.pickplace.config.ExpireTime;
 import com.server.pickplace.member.error.MemberErrorResult;
 import com.server.pickplace.member.error.MemberException;
@@ -17,8 +17,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Key;

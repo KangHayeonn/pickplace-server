@@ -37,7 +37,6 @@ public class MemberInfoService {
     public Map<String, Object> info(HttpServletRequest httpServletRequest, Long memberId){
 
         String token = jwtTokenProvider.resolveToken((HttpServletRequest) httpServletRequest); //access Token 가져옴
-        System.out.println(memberId);
 
         Map<String, Object> InfoMap = new HashMap<>();
 
