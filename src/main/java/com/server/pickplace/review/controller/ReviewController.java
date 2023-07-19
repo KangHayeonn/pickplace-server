@@ -3,7 +3,9 @@ package com.server.pickplace.review.controller;
 
 import com.server.pickplace.common.dto.SingleResponse;
 import com.server.pickplace.common.service.ResponseService;
-import com.server.pickplace.review.dto.MemberReviewResponse;
+import com.server.pickplace.review.dto.CreateReviewRequest;
+import com.server.pickplace.review.dto.ReviewDetailResponse;
+import com.server.pickplace.review.dto.ReviewResponse;
 import com.server.pickplace.review.repository.ReviewRepository;
 import com.server.pickplace.review.service.ReviewService;
 import io.swagger.annotations.ApiOperation;
@@ -13,6 +15,7 @@ import org.springframework.boot.json.BasicJsonParser;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Base64;
@@ -33,21 +36,61 @@ public class ReviewController {
     private final ReviewRepository reviewRepository;
 
     @ApiOperation(tags = "5. Review", value = "작성한 리뷰 전체 조회", notes = "사용자 입장에서, 작성한 리뷰 전체를 조회한다.")
-    @GetMapping("/members/{memberID}")
-    public ResponseEntity<SingleResponse<Map>> reservationPage(@RequestHeader("Authorization") String accessToken) {
+    @GetMapping("/")
+    public ResponseEntity<SingleResponse<Map>> reviewPage(@RequestHeader("Authorization") String accessToken) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
         String email = (String) payloadMap.get("email");
 
 
-        List<MemberReviewResponse> memberReviewResponses =  reviewRepository.getMemberReviewDtosByEmail(email);
+        List<ReviewResponse> reviewRespons =  reviewRepository.getReviewDtosByEmail(email);
 
         Map<String, Object> reviewListMap = new HashMap<>();
-        reviewListMap.put("reviewList", memberReviewResponses);
+        reviewListMap.put("reviewList", reviewRespons);
 
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), reviewListMap));
 
     }
+
+    @ApiOperation(tags = "5. Review", value = "시설에 따른 리뷰 전체 조회", notes = "시설에 따른 리뷰 전체를 조회한다.")
+    @GetMapping("/places/{placeId}")
+    public ResponseEntity<SingleResponse<Map<String, Object>>> placeReviewPage(@PathVariable("placeId") Long placeId) {
+
+
+        Map<String, Object> placeReviewListMap = reviewService.getPlaceReviewListMapByPlaceId(placeId);
+
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), placeReviewListMap));
+
+    }
+
+    @ApiOperation(tags = "5. Review", value = "리뷰 상세 조회", notes = "reviewId를 수단으로, 리뷰를 상세 조회한다.")
+    @GetMapping("{reviewId}")
+    public ResponseEntity<SingleResponse<ReviewDetailResponse>> reviewDetailPage(@PathVariable("reviewId") Long reviewId) {
+
+        ReviewDetailResponse reviewDetailResponse = reviewRepository.getReviewDetailDtoByReviewId(reviewId);
+
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), reviewDetailResponse));
+    }
+
+    @ApiOperation(tags = "5. Review", value = "리뷰 생성", notes = "reviewId를 수단으로, 리뷰를 생성한다.")
+    @PostMapping("/")
+    public ResponseEntity createReview(@RequestHeader("Authorization") String accessToken,
+                             @Validated @RequestBody CreateReviewRequest createReviewRequest) {
+
+        Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
+        String email = (String) payloadMap.get("email");
+
+
+        reviewService.createReviewByEmailAndRequest(email, createReviewRequest);
+
+        return ResponseEntity.ok(null);
+    }
+
+
+
+
+
+
 
 
 

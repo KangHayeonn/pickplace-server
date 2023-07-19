@@ -2,7 +2,6 @@ package com.server.pickplace.review.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 
@@ -10,7 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Builder
-public class MemberReviewResponse {
+public class ReviewResponse {
 
     private Long reviewId;
 
@@ -29,13 +28,13 @@ public class MemberReviewResponse {
 
 
     @QueryProjection
-    public MemberReviewResponse(Long reviewId, String placeName, Long reservationId, Float reviewRating, String reviewContent, String memberName, LocalDateTime reviewCreatedDate) {
+    public ReviewResponse(Long reviewId, String placeName, Long reservationId, Float reviewRating, String reviewContent, String memberName, LocalDateTime reviewDate) {
         this.reviewId = reviewId;
         this.placeName = placeName;
         this.reservationId = reservationId;
         this.reviewRating = reviewRating;
         this.reviewContent = reviewContent;
         this.memberName = memberName;
-        this.reviewCreatedDate = reviewCreatedDate.toLocalDate();
+        this.reviewCreatedDate = reviewDate.toLocalDate();
     }
 }
