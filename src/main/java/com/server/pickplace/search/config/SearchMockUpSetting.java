@@ -37,6 +37,10 @@ public class SearchMockUpSetting {
         // 데이터 이미 채워져있는지 체크
         List<Place> placeFindAllList = searchRepository.findAll();
         if (!placeFindAllList.isEmpty()) {
+            log.info("------------------------------");
+            log.info("데이터 이미 채워짐");
+            log.info("------------------------------");
+
             return null;
         }
 

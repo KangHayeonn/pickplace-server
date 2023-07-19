@@ -59,7 +59,7 @@ public class Reservation extends BaseEntity {
     @JoinColumn(name = "UNIT_ID")
     private Unit unit;
 
-    @OneToOne(mappedBy = "review")
+    @OneToOne(mappedBy = "reservation")
     private Review review;
 
 }
