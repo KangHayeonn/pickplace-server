@@ -7,6 +7,8 @@ import com.server.pickplace.reservation.entity.QReservation;
 import com.server.pickplace.reservation.entity.Reservation;
 import com.server.pickplace.review.dto.*;
 import com.server.pickplace.review.entity.Review;
+import com.server.pickplace.review.error.ReviewErrorResult;
+import com.server.pickplace.review.error.ReviewException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -126,4 +128,63 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
         reservationPlace.setRating(reservationPlace.getRating() + createReviewRequest.getRating());
 
     }
+
+    @Override
+    public void amendReview(String email, AmendReviewRequest amendReviewRequest, Long reviewId) {
+
+        // 1. 리뷰ID null check + 리뷰ID와 토큰 정보 일치 체크
+        // 2. 리뷰 수정
+
+        Review review1 = getReviewInAmendAndDelete(email, reviewId);
+
+        review1.setContent(amendReviewRequest.getContent());
+        review1.setRating(amendReviewRequest.getRating());
+
+    }
+
+    @Override
+    public void deleteReview(String email, Long reviewId) {
+
+        // 1. 리뷰ID null check + 리뷰ID와 토큰 정보 일치 체크
+        // 2. 리뷰 삭제
+
+        Review review = getReviewInAmendAndDelete(email, reviewId);
+
+        Place place1 = queryFactory
+                .select(place)
+                .from(reservation)
+                .join(reservation.room, room)
+                .join(room.place, place)
+                .where(reservation.id.eq(review.getReservation().getId()))
+                .fetchOne();
+
+        place1.setRating(place1.getRating() - review.getRating());
+        place1.setReviewCount(place1.getReviewCount() - 1);
+
+        em.remove(review);
+
+    }
+
+
+    private Review getReviewInAmendAndDelete(String email, Long reviewId) {
+
+        Review review1 = queryFactory
+                .select(review)
+                .from(review)
+                .join(review.reservation, reservation)
+                .fetchJoin()
+                .join(reservation.member, member)
+                .fetchJoin()
+                .where(review.id.eq(reviewId))
+                .fetchOne();
+
+        if (review1 == null) {
+            throw new ReviewException(ReviewErrorResult.NO_EXIST_REVIEW_ID);
+        } else if (!review1.getReservation().getMember().getEmail().equals(email)) {
+            throw new ReviewException(ReviewErrorResult.NO_PERMISSION);
+        }
+        return review1;
+    }
+
+
 }
