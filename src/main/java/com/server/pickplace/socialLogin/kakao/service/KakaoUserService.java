@@ -132,7 +132,7 @@ public class KakaoUserService {
         String kakaoEmail = kakaoUserInfo.getEmail();
         String nickname = kakaoUserInfo.getNickname();
         Member kakaoUser = memberRepository.findByEmail(kakaoEmail)
-                .orElseThrow(() -> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
+                .orElse(null);
 
         if (kakaoUser == null) {
             // 회원가입
