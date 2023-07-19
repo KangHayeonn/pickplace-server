@@ -32,58 +32,8 @@ public class SearchMockUpSetting {
     @Autowired SearchRepository searchRepository;
 
     @EventListener(ApplicationReadyEvent.class)
-    public Object initialize() {
+    public void initialize() {
 
-        // 데이터 이미 채워져있는지 체크
-        List<Place> placeFindAllList = searchRepository.findAll();
-        if (!placeFindAllList.isEmpty()) {
-            log.info("------------------------------");
-            log.info("데이터 이미 채워짐");
-            log.info("------------------------------");
-
-            return null;
-        }
-
-        Member host = hostSetting();
-
-        Member user = userSetting();
-
-        List<Place> placeList = placeSetting(host);
-
-        List<Room> roomList = RoomSetting();
-
-        List<Unit> unitList = UnitSetting();
-
-        List<Category> categoryList = CategorySetting();
-
-        List<Tag> tagList = tagSetting();
-
-        List<CategoryPlace> categoryPlaceList = categoryPlaceSetting(placeList, categoryList);
-
-        List<TagPlace> tagPlaceList = tagPlaceSetting(placeList, tagList);
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-
-        roomSet(placeList, roomList);
-
-        unitSet(roomList, unitList);
-
-        List<Reservation> reservationList = reservationSetting(unitList, user);
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////
-
-        em.persist(host);
-        em.persist(user);
-        placeList.stream().forEach(o -> em.persist(o));
-        roomList.stream().forEach(o -> em.persist(o));
-        unitList.stream().forEach(o -> em.persist(o));
-        categoryList.stream().forEach(o -> em.persist(o));
-        tagList.stream().forEach(o -> em.persist(o));
-        categoryPlaceList.stream().forEach(o -> em.persist(o));
-        tagPlaceList.stream().forEach(o -> em.persist(o));
-        reservationList.stream().forEach(o -> em.persist(o));
-
-        return null;
     }
 
     private List<Reservation> reservationSetting(List<Unit> unitList, Member user) {
