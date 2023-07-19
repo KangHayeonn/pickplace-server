@@ -25,7 +25,6 @@ import java.util.Map;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
-    private final ModelMapper modelMapper;
 
     public Map<String, Object> getReservationPageMapByEmailAndRoomId(String email, Long roomId) {
 
