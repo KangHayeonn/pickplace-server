@@ -72,6 +72,10 @@ dependencies {
     //smtp
 //    implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+    //소셜로그인 관련
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'com.google.code.gson:gson:2.8.7'
+
 }
 
 tasks.named('test') {

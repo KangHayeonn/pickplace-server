@@ -67,6 +67,11 @@ public class Member extends BaseEntity implements UserDetails {
 		role = role.USER; // 회원가입하는 사용자 권한 기본 USER (임시)
 	}
 
+	public Member(String kakaoEmail, String nickname, String profile, String encodedPassword) {
+		super();
+	}
+
+
 	//비밀번호 암호화
 	public void encryptPassword(PasswordEncoder passwordEncoder) {
 		password = passwordEncoder.encode(password);
