@@ -56,7 +56,7 @@ public class MemberController {
 	private final MemberInfoService memberInfoService;
 	private final ResponseService responseService;
 	private final MemberRepository memberRepository;
-	;
+
 	private final JwtTokenProvider jwtTokenProvider;
 
 	@Value("${jwt.secret}")

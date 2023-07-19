@@ -3,9 +3,18 @@ package com.server.pickplace.socialLogin.kakao.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.server.pickplace.common.service.ResponseService;
+import com.server.pickplace.config.Helper;
+import com.server.pickplace.member.dto.LoginResponseDto;
+import com.server.pickplace.member.dto.TokenInfo;
 import com.server.pickplace.member.entity.Member;
 import com.server.pickplace.member.entity.MemberRole;
+import com.server.pickplace.member.error.MemberErrorResult;
+import com.server.pickplace.member.error.MemberException;
 import com.server.pickplace.member.repository.MemberRepository;
+import com.server.pickplace.member.repository.RefreshTokenRedisRepository;
+import com.server.pickplace.member.service.jwt.JwtTokenProvider;
+import com.server.pickplace.member.service.jwt.RefreshToken;
 import com.server.pickplace.socialLogin.kakao.dto.SocialUserInfoDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,14 +27,20 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+
+import static com.server.pickplace.member.entity.MemberRole.USER;
 
 @Slf4j
 @Service
@@ -33,23 +48,16 @@ import java.util.UUID;
 public class KakaoUserService {
     private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
+    private final RefreshTokenRedisRepository refreshTokenRedisRepository;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public String kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
-        // 1. "인가 코드"로 "액세스 토큰" 요청
-        String accessToken = getAccessToken(code);
+    public Map<String, Object> kakaoLogin(String code, HttpServletRequest request, HttpServletResponse response) throws JsonProcessingException {
 
-        // 2. 토큰으로 카카오 API 호출
-//        SocialUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
-//
-//        // 3. 카카오ID로 회원가입 처리
-//        Member kakaoUser = registerKakaoUserIfNeed(kakaoUserInfo);
-
-//        // 4. 강제 로그인 처리
-//        Authentication authentication = forceLogin(kakaoUser);
-//
-//        // 5. response Header에 JWT 토큰 추가
-//        kakaoUsersAuthorizationInput(authentication, response);
-        return "go";
+        String accessToken = getAccessToken(code); // 1. "인가 코드"로 "액세스 토큰" 요청
+        SocialUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken); // 2. 토큰으로 카카오 API 호출
+        Member kakaoUser = registerKakaoUserIfNeed(kakaoUserInfo); // 3. 카카오ID로 회원가입 처리
+        return forceLogin(kakaoUser, request); //4. 강제 로그인 처리
     }
 
     private String getAccessToken(String code) throws JsonProcessingException {
@@ -63,10 +71,12 @@ public class KakaoUserService {
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", "bfda6b8db499bbed75b448fd6bc66d09");
+        body.add("client_id", "17daada2a5511b9f5ad422950ad1c268");
         body.add("redirect_uri", "http://localhost:8080/api/v1/members/user/kakao/callback");
+        body.add("client_secret", "VODb154UxG9n1uWAJ3UFvpEpfeT3vK3Y");
         body.add("code", code);
 
+        log.info(code);
         log.info("hello");
 
         // HTTP 요청 보내기
@@ -117,12 +127,12 @@ public class KakaoUserService {
     }
 
     // 3. 카카오ID로 회원가입 처리
-    private Member registerKakaoUserIfNeed (SocialUserInfoDto kakaoUserInfo) {
+    private Member registerKakaoUserIfNeed(SocialUserInfoDto kakaoUserInfo) {
         // DB 에 중복된 email이 있는지 확인
         String kakaoEmail = kakaoUserInfo.getEmail();
         String nickname = kakaoUserInfo.getNickname();
         Member kakaoUser = memberRepository.findByEmail(kakaoEmail)
-                .orElse(null);
+                .orElseThrow(() -> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
 
         if (kakaoUser == null) {
             // 회원가입
@@ -130,28 +140,46 @@ public class KakaoUserService {
             String password = UUID.randomUUID().toString();
             String encodedPassword = passwordEncoder.encode(password);
 
-            String profile = "https://ossack.s3.ap-northeast-2.amazonaws.com/basicprofile.png";
-
-            kakaoUser = new Member(kakaoEmail, nickname, profile, encodedPassword);
-            memberRepository.save(kakaoUser);
+            //새 맴버로 추가
+            kakaoUser = memberRepository.save(Member.builder()
+                    .name(nickname)
+                    .email(kakaoEmail)
+                    .role(USER)//USER용
+                    .number("0")//default
+                    .password(encodedPassword)
+                    .build());
 
         }
         return kakaoUser;
     }
 
-//    // 4. 강제 로그인 처리
-//    private Authentication forceLogin(User kakaoUser) {
-//        UserDetails userDetails = new UserDetailsImpl(kakaoUser);
-//        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-//        return authentication;
-//    }
-//
-//    // 5. response Header에 JWT 토큰 추가
-//    private void kakaoUsersAuthorizationInput(Authentication authentication, HttpServletResponse response) {
-//        // response header에 token 추가
-//        UserDetailsImpl userDetailsImpl = ((UserDetailsImpl) authentication.getPrincipal());
-//        String token = JwtTokenUtils.generateJwtToken(userDetailsImpl);
-//        response.addHeader("Authorization", "BEARER" + " " + token);
-//    }
+    private Map<String, Object> forceLogin(Member kakaoUser, HttpServletRequest request) {
+
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(kakaoUser.getEmail(), kakaoUser.getPassword());
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
+        TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
+
+
+        refreshTokenRedisRepository.save(RefreshToken.builder()
+                .id(authentication.getName())
+                .ip(Helper.getClientIp(request))
+                .authorities(authentication.getAuthorities())
+                .refreshToken(tokenInfo.getRefreshToken())
+                .build());
+
+        Map<String, Object> loginMap = new HashMap<>();
+
+        LoginResponseDto loginResponseDtoDto = LoginResponseDto.builder()
+                .memberId(kakaoUser.getId())
+                .nickname(kakaoUser.getName())
+                .accessToken(tokenInfo.getAccessToken())
+                .refreshToken(tokenInfo.getRefreshToken())
+                .build();
+
+        loginMap.put("member", loginResponseDtoDto);
+
+
+        return loginMap;
+    }
 }
