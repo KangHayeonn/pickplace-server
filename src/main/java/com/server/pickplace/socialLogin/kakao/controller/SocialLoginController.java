@@ -27,7 +27,7 @@ public class SocialLoginController {
     private final ResponseService responseService;
 
     // 카카오 로그인
-    @ApiOperation(tags = "1. Member", value = "소셜로그인", notes = "소셜 로그인 후 연결되는 작업(직접 요청X)")
+    @ApiOperation(tags = "1. Member", value = "소셜로그인- 카카오", notes = "소셜 로그인 후 연결되는 작업(직접 요청X)")
     @GetMapping("/user/kakao/callback")
     public ResponseEntity kakaoLogin(@RequestParam String code, HttpServletRequest request, HttpServletResponse response) throws JsonProcessingException {
         Map<String, Object> loginResponseDto = kakaoUserService.kakaoLogin(code, request ,response);
