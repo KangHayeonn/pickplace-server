@@ -56,7 +56,7 @@ public class ReservationController {
     public ResponseEntity<SingleResponse> cardPayValidation(@RequestHeader("accessToken") String accessToken,
                                                             @RequestBody @Validated CardValidRequest cardValidRequest) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
+        Map<String, Object> payloadMap = getPayloadMap(accessToken); 
         String email = (String) payloadMap.get("sub");
         String cardNum = cardValidRequest.getCardNum();
 
@@ -100,7 +100,7 @@ public class ReservationController {
     public ResponseEntity accountPay(@RequestHeader("accessToken") String accessToken,
                                      @RequestBody @Validated AccountPayRequest accountPayRequest) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
+        Map<String, Object> payloadMap = getPayloadMap(accessToken); 
         String email = (String) payloadMap.get("sub");
 
         String bankNumByBankName = getBankNumByBankName(accountPayRequest.getBankName());
@@ -119,7 +119,7 @@ public class ReservationController {
     public ResponseEntity<SingleResponse> qrCodeImage(@RequestHeader("accessToken") String accessToken,
                                                       @Validated @RequestBody QRImageReqeust qrImageReqeust) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
+        Map<String, Object> payloadMap = getPayloadMap(accessToken); 
         String email = (String) payloadMap.get("sub");
 
         String uuid = reservationRepository.saveQRPaymentInformation(email, qrImageReqeust.getRoomPrice());
@@ -176,7 +176,7 @@ public class ReservationController {
     public ResponseEntity qrPassword(@RequestHeader("accessToken") String accessToken,
                                      @Validated @RequestBody QRPayRequest qrPayRequest) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
+        Map<String, Object> payloadMap = getPayloadMap(accessToken); 
         String email = (String) payloadMap.get("sub");
 
         // 1. QR을 통해 인증 했는지 확인
