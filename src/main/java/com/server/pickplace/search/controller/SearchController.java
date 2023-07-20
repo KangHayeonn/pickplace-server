@@ -53,6 +53,7 @@ public class SearchController {
                 .searchType(request.getSearchType())
                 .pageNum(request.getPageNum())
                 .category(request.getCategory())
+                .countPerPage(request.getCountPerPage())
                 .build();
 
 
