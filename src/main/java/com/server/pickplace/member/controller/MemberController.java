@@ -63,7 +63,7 @@ public class MemberController {
 	String secretKey;
 
 
-	@ApiOperation(tags = "1. Member", value = "로그인", notes = "로그인 시도한다")
+	@ApiOperation(tags = "1. Member", value = "로그인", notes = "로그인 시도한다!!")
 	@PostMapping(value = "login", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity login(@ApiIgnore HttpServletRequest httpServletRequest, @ApiParam(required = true) @RequestBody @Valid JwtRequestDto jwtRequestDto, @ApiIgnore Errors errors) throws Exception {
 
