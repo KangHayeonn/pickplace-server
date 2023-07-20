@@ -5,8 +5,7 @@ import com.server.pickplace.host.error.HostErrorResult;
 import com.server.pickplace.host.error.HostException;
 import com.server.pickplace.host.repository.HostRepository;
 import com.server.pickplace.member.entity.Member;
-import com.server.pickplace.place.entity.Place;
-import com.server.pickplace.place.entity.Room;
+import com.server.pickplace.place.entity.*;
 import com.server.pickplace.reservation.entity.Reservation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -159,12 +158,12 @@ public class HostService {
 
     }
 
-    public void savePlaceAndRoomsByDto(PlaceRequest placeRequest, Member host, List<RoomReqeust> roomReqeusts) {
+    public void savePlaceAndRoomsByDto(PlaceRequest placeRequest, Member host, List<RoomReqeust> roomReqeusts, CategoryStatus categoryStatus, List<TagStatus> tagStatusList) {
 
         // 같은 트랜잭션
 
         Place place = modelMapper.map(placeRequest, Place.class);
-        place.setPoint(new Point(127.011804, 38.478695));
+        place.setPoint(new Point(placeRequest.getX(), placeRequest.getY()));
         place.setMember(host);
 
         hostRepository.savePlace(place);
@@ -180,6 +179,15 @@ public class HostService {
         for (Room room : rooms) {
             hostRepository.saveRoom(room);
         }
+
+        Category category = hostRepository.findCategoryByCategoryStatus(categoryStatus);
+
+        CategoryPlace categoryPlace = CategoryPlace.builder().category(category).place(place).build();
+        hostRepository.saveCategoryPlace(categoryPlace);
+
+        List<Tag> tagList = hostRepository.findTagListByTagStatusList(tagStatusList);
+        tagList.forEach(tag -> hostRepository.saveTagPlace(TagPlace.builder().tag(tag).place(place).build()));
+
 
     }
 

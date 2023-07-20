@@ -38,7 +38,7 @@ public class ReviewController {
 
     @ApiOperation(tags = "5. Review", value = "작성한 리뷰 전체 조회", notes = "사용자 입장에서, 작성한 리뷰 전체를 조회한다.")
     @GetMapping("/")
-    public ResponseEntity<SingleResponse<Map>> reviewPage(@RequestHeader("Authorization") String accessToken) {
+    public ResponseEntity<SingleResponse<Map>> reviewPage(@RequestHeader("accessToken") String accessToken) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
         String email = (String) payloadMap.get("sub");
@@ -75,7 +75,7 @@ public class ReviewController {
 
     @ApiOperation(tags = "5. Review", value = "리뷰 생성", notes = "리뷰를 생성한다.")
     @PostMapping("/")
-    public ResponseEntity createReview(@RequestHeader("Authorization") String accessToken,
+    public ResponseEntity createReview(@RequestHeader("accessToken") String accessToken,
                              @Validated @RequestBody CreateReviewRequest createReviewRequest) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
@@ -89,7 +89,7 @@ public class ReviewController {
 
     @ApiOperation(tags = "5. Review", value = "리뷰 변경", notes = "리뷰를 수정한다.")
     @PutMapping("/{reviewId}")
-    public ResponseEntity amendReview(@RequestHeader("Authorization") String accessToken,
+    public ResponseEntity amendReview(@RequestHeader("accessToken") String accessToken,
                                       @Validated @RequestBody AmendReviewRequest amendReviewRequest,
                                       @PathVariable("reviewId") Long reviewId) {
 
@@ -103,7 +103,7 @@ public class ReviewController {
 
     @ApiOperation(tags = "5. Review", value = "리뷰 삭제", notes = "리뷰를 삭제한다.")
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity deleteReview(@RequestHeader("Authorization") String accessToken,
+    public ResponseEntity deleteReview(@RequestHeader("accessToken") String accessToken,
                                       @PathVariable("reviewId") Long reviewId) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정

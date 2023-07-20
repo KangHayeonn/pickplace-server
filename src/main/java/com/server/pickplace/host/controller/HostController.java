@@ -5,9 +5,14 @@ import com.server.pickplace.common.dto.ListResponse;
 import com.server.pickplace.common.dto.SingleResponse;
 import com.server.pickplace.common.service.ResponseService;
 import com.server.pickplace.host.dto.*;
+import com.server.pickplace.host.error.HostErrorResult;
+import com.server.pickplace.host.error.HostException;
 import com.server.pickplace.host.repository.HostRepository;
 import com.server.pickplace.host.service.HostService;
 import com.server.pickplace.member.entity.Member;
+import com.server.pickplace.member.entity.MemberRole;
+import com.server.pickplace.place.entity.CategoryStatus;
+import com.server.pickplace.place.entity.TagStatus;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,8 +41,8 @@ public class HostController {
 
     @ApiOperation(tags = "2. Host", value = "공간 관리 페이지", notes = "DB상에 존재하는 플레이스들을 보여준다.")
     @GetMapping("/place")
-    public ResponseEntity<ListResponse<PlaceResponse>> placePage(@RequestHeader("Authorization") String accessToken) {
-
+    public ResponseEntity<ListResponse<PlaceResponse>> placePage(@RequestHeader("accessToken") String accessToken) {
+        
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
 
         String email = (String) payloadMap.get("sub");
@@ -50,8 +55,7 @@ public class HostController {
 
     @ApiOperation(tags = "2. Host", value = "공간 상세 - 방 조회", notes = "시설 내의 방 리스트를 보여준다.")
     @GetMapping("/{placeId}/rooms")
-    public ResponseEntity<SingleResponse<Map>> roomPage(@RequestHeader("Authorization") String accessToken,
-                                                                 @PathVariable Long placeId) {
+    public ResponseEntity<SingleResponse<Map>> roomPage(@PathVariable Long placeId) {
 
         PlaceResponse placeDto = hostService.findPlaceDtoByPlaceId(placeId);
 
@@ -68,7 +72,7 @@ public class HostController {
 
     @ApiOperation(tags = "2. Host", value = "공간 상세 - 예약 조회", notes = "시설 예약 정보를 보여준다.")
     @GetMapping("/{placeId}/reservations")
-    public ResponseEntity<SingleResponse<Map>> reservationPage(@RequestHeader("Authorization") String accessToken, @PathVariable Long placeId) {
+    public ResponseEntity<SingleResponse<Map>> reservationPage(@PathVariable Long placeId) {
 
         PlaceResponse placeDto = hostService.findPlaceDtoByPlaceId(placeId);
 
@@ -84,7 +88,7 @@ public class HostController {
 
     @ApiOperation(tags = "2. Host", value = "예약 관리", notes = "호스트 입장에서 모든 시설의 예약현황을 보여준다.")
     @GetMapping("/reservations")
-    public ResponseEntity<SingleResponse<Map>> allReservationsPage(@RequestHeader("Authorization") String accessToken) {
+    public ResponseEntity<SingleResponse<Map>> allReservationsPage(@RequestHeader("accessToken") String accessToken) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken);
         String email = (String) payloadMap.get("sub");
@@ -96,8 +100,7 @@ public class HostController {
 
     @ApiOperation(tags = "2. Host", value = "예약 상세", notes = "한 예약의 상세 페이지를 보여준다.")
     @GetMapping("/reservations/{reservationId}")
-    public ResponseEntity<SingleResponse<Map>> reservationDetailPage(@RequestHeader("Authorization") String accessToken,
-                                                                      @PathVariable Long reservationId) {
+    public ResponseEntity<SingleResponse<Map>> reservationDetailPage(@PathVariable Long reservationId) {
 
         Map<String, Object> memberReservationPlaceDtos = hostService.getMemberReservationPlaceDtoMapByReservationId(reservationId);
 
@@ -106,18 +109,29 @@ public class HostController {
 
     @ApiOperation(tags = "2. Host", value = "공간 등록", notes = "신규 공간을 등록한다.") // 방만 추가하는 페이지도 필요할듯
     @PostMapping("/place")
-    public ResponseEntity<Void> placeRegister(@RequestHeader("Authorization") String accessToken,
+    public ResponseEntity<Void> placeRegister(@RequestHeader("accessToken") String accessToken,
                                               @Validated @RequestBody PlaceRoomReqeuest placeRoomReqeuest) {
+
+        log.info("컨트롤러 진입");
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
         String email = (String) payloadMap.get("sub");
 
         Member host = hostRepository.findByEmail(email);
+//        if (host.getRole() != MemberRole.HOST) {
+//            throw new HostException(HostErrorResult.NO_PERMISSION);
+//        }
+
 
         PlaceRequest placeRequest = placeRoomReqeuest.getPlace();
         List<RoomReqeust> roomReqeusts = placeRoomReqeuest.getRooms();
+        CategoryStatus category = placeRoomReqeuest.getCategory();
+        List<TagStatus> tagList = placeRoomReqeuest.getTagList();
 
-        hostService.savePlaceAndRoomsByDto(placeRequest, host, roomReqeusts);
+
+        log.info("서비스 계층 진입");
+
+        hostService.savePlaceAndRoomsByDto(placeRequest, host, roomReqeusts, category, tagList);
 
         return ResponseEntity.ok(null);
     }

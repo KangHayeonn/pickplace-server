@@ -37,7 +37,7 @@ public class ReservationController {
 
     @ApiOperation(tags = "4. Reservation", value = "예약페이지 접근", notes = "상세페이지 공간안내/예약에서 예약 버튼을 눌렀을때 이동하는 페이지")
     @GetMapping("/{roomId}")
-    public ResponseEntity<SingleResponse<Map>> reservationPage(@RequestHeader("Authorization") String accessToken,
+    public ResponseEntity<SingleResponse<Map>> reservationPage(@RequestHeader("accessToken") String accessToken,
                                                                @PathVariable("roomId") Long roomId) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
@@ -51,7 +51,7 @@ public class ReservationController {
 
     @ApiOperation(tags = "4. Reservation", value = "카드 결제 검증", notes = "신용/체크카드 결제에서, 올바른 카드번호와 CVC 인지 검증한다.")
     @PostMapping("/card/validation")
-    public ResponseEntity<SingleResponse> cardPayValidation(@RequestHeader("Authorization") String accessToken,
+    public ResponseEntity<SingleResponse> cardPayValidation(@RequestHeader("accessToken") String accessToken,
                                                             @RequestBody @Validated CardValidRequest cardValidRequest) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
@@ -68,7 +68,7 @@ public class ReservationController {
 
     @ApiOperation(tags = "4. Reservation", value = "카드 결제 및 예약", notes = "신용/체크카드 결제와 실제 예약이 이루어진다.")
     @PostMapping("/card")
-    public ResponseEntity cardPay(@RequestHeader("Authorization") String accessToken,
+    public ResponseEntity cardPay(@RequestHeader("accessToken") String accessToken,
                                   @RequestBody @Validated CardPayRequest cardPayRequest) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
@@ -85,7 +85,7 @@ public class ReservationController {
 
     @ApiOperation(tags = "4. Reservation", value = "은행 별 가상계좌 받아오기", notes = "은행 별 가상계좌번호를 반환한다.")
     @PostMapping("/account/number")
-    public ResponseEntity<SingleResponse> accountReturn(@RequestHeader("Authorization") String accessToken,
+    public ResponseEntity<SingleResponse> accountReturn(@RequestHeader("accessToken") String accessToken,
                                                         @RequestBody BankRequest bankRequest) {
 
         String bankName = bankRequest.getBankName();
@@ -99,7 +99,7 @@ public class ReservationController {
 
     @ApiOperation(tags = "4. Reservation", value = "계좌이체 및 예약", notes = "가상계좌를 통한 예약과 실제 예약이 이루어진다.")
     @PostMapping("/account")
-    public ResponseEntity accountPay(@RequestHeader("Authorization") String accessToken,
+    public ResponseEntity accountPay(@RequestHeader("accessToken") String accessToken,
                                      @RequestBody @Validated AccountPayRequest accountPayRequest) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
@@ -118,7 +118,7 @@ public class ReservationController {
 
     @ApiOperation(tags = "4. Reservation", value = "QR 코드 응답", notes = "페이지에 보여지는 QR코드를 리턴한다.")
     @PostMapping(value = "/qrcode/image")
-    public ResponseEntity<SingleResponse> qrCodeImage(@RequestHeader("Authorization") String accessToken,
+    public ResponseEntity<SingleResponse> qrCodeImage(@RequestHeader("accessToken") String accessToken,
                                                       @Validated @RequestBody QRImageReqeust qrImageReqeust) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
@@ -175,7 +175,7 @@ public class ReservationController {
 
     @ApiOperation(tags = "4. Reservation", value = "QR 결제", notes = "모바일로 QR 비밀번호 인증을 한 후, PC에서 다음 버튼을 눌러 실 결제를 진행한다.")
     @PostMapping(value = "/qrcode}")
-    public ResponseEntity qrPassword(@RequestHeader("Authorization") String accessToken,
+    public ResponseEntity qrPassword(@RequestHeader("accessToken") String accessToken,
                                      @Validated @RequestBody QRPayRequest qrPayRequest) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정

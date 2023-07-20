@@ -1,6 +1,7 @@
 package com.server.pickplace.host.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,14 +19,16 @@ import javax.validation.constraints.Size;
 public class RoomReqeust {
 
     @NotBlank
-    @Size(max = 20)
-    private String roomName;
+    @JsonProperty("roomName")
+    private String name;
 
     @Positive
-    private Integer roomPrice;
+    @JsonProperty("roomPrice")
+    private Integer price;
 
     @Positive
-    private Integer roomAmount;  // 방 갯수
+    @JsonProperty("roomAmount")
+    private Integer amount;  // 방 갯수
 
     @JsonProperty("roomMaxNum")
     @Positive
