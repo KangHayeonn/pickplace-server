@@ -69,8 +69,8 @@ dependencies {
     // modelmapper 라이브러리
     implementation 'org.modelmapper:modelmapper:2.4.2'
 
-    //smtp
-//    implementation 'org.springframework.boot:spring-boot-starter-mail'
+//    smtp
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 
 }
 
