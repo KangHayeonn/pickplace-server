@@ -42,7 +42,7 @@ public class HostService {
             return placeDtos;
 
         } else {
-            return null;
+            return new ArrayList<>();
         }
 
     }
@@ -71,6 +71,7 @@ public class HostService {
         Optional<Place> optionalPlace = hostRepository.findOptionalPlaceByPlaceId(placeId);
 
         Place place = optionalPlace.orElseThrow(() -> new HostException(HostErrorResult.NOT_EXIST_PLACE));
+        memberPlaceIdCheck(placeId, place);
 
         PlaceResponse placeResponse = modelMapper.map(place, PlaceResponse.class);
 
@@ -140,6 +141,8 @@ public class HostService {
         Member member = (Member) memberReservationPlaceList[0];
         Reservation reservation = (Reservation) memberReservationPlaceList[1];
         Place place = (Place) memberReservationPlaceList[2];
+        reservationMemberCheck(member, place);
+
 
         MemberResponse MemberDto = MemberResponse.builder()
                 .name(member.getName()).build();
@@ -156,6 +159,12 @@ public class HostService {
 
         return map;
 
+    }
+
+    private void reservationMemberCheck(Member member, Place place) {
+        if (!place.getMember().equals(member)) {
+            throw new HostException(HostErrorResult.NO_PERMISSION);
+        }
     }
 
     public void savePlaceAndRoomsByDto(PlaceRequest placeRequest, Member host, List<RoomReqeust> roomReqeusts, CategoryStatus categoryStatus, List<TagStatus> tagStatusList) {
@@ -189,6 +198,12 @@ public class HostService {
         tagList.forEach(tag -> hostRepository.saveTagPlace(TagPlace.builder().tag(tag).place(place).build()));
 
 
+    }
+
+    private void memberPlaceIdCheck(Long placeId, Place place) {
+        if (place.getMember().getId() != placeId) {
+            throw new HostException(HostErrorResult.NO_PERMISSION);
+        }
     }
 
 }

@@ -2,6 +2,7 @@ package com.server.pickplace.reservation.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Positive;
 import java.time.LocalDate;
@@ -14,10 +15,10 @@ public class PayRequest {
     @Positive
     private Long roomId;
 
-    @JsonFormat(pattern = "yyyy년 MM월 dd일(EEE) HH:mm", locale = "ko-KR")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일(EEE) HH:mm")
     private LocalDateTime checkInTime;
 
-    @JsonFormat(pattern = "yyyy년 MM월 dd일(EEE) HH:mm", locale = "ko-KR")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일(EEE) HH:mm")
     private LocalDateTime checkOutTime;
 
     public LocalDate getStartDate() {

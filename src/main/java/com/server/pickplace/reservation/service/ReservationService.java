@@ -54,6 +54,7 @@ public class ReservationService {
             throw new ReservationException(ReservationErrorResult.WRONG_PASSWORD);
         }
 
+
         // 예약
         reservationRepository.makeReservation(email, cardPayRequest);
 
@@ -65,7 +66,7 @@ public class ReservationService {
         // 결제
         String inputAccountPassword = accountPayRequest.getAccountPassword();
 
-        String memberPassword = reservationRepository.findMemberNameByEmail(email);
+        String memberPassword = reservationRepository.findMemberPasswordByEmail(email);
 
         if (!inputAccountPassword.equals(memberPassword)) {
             throw new ReservationException(ReservationErrorResult.WRONG_PASSWORD);

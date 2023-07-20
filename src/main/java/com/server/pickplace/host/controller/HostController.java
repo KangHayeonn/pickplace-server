@@ -43,19 +43,26 @@ public class HostController {
     @GetMapping("/place")
     public ResponseEntity<ListResponse<PlaceResponse>> placePage(@RequestHeader("accessToken") String accessToken) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
-
+        Map<String, Object> payloadMap = getPayloadMap(accessToken);
         String email = (String) payloadMap.get("sub");
+        hostCheck(email);
 
-        List<PlaceResponse> placeList = hostService.findPlaceDtoListByEmail(email); // null 가능
+
+
+        List<PlaceResponse> placeList = hostService.findPlaceDtoListByEmail(email);
 
         return ResponseEntity.ok(responseService.getListResponse(HttpStatus.OK.value(), placeList));
 
-    }  // null 가능
+    }
 
     @ApiOperation(tags = "2. Host", value = "공간 상세 - 방 조회", notes = "시설 내의 방 리스트를 보여준다.")
     @GetMapping("/{placeId}/rooms")
-    public ResponseEntity<SingleResponse<Map>> roomPage(@PathVariable Long placeId) {
+    public ResponseEntity<SingleResponse<Map>> roomPage(@RequestHeader("accessToken") String accessToken,
+                                                        @PathVariable Long placeId) {
+
+        Map<String, Object> payloadMap = getPayloadMap(accessToken);
+        String email = (String) payloadMap.get("sub");
+        hostCheck(email);
 
         PlaceResponse placeDto = hostService.findPlaceDtoByPlaceId(placeId);
 
@@ -72,7 +79,13 @@ public class HostController {
 
     @ApiOperation(tags = "2. Host", value = "공간 상세 - 예약 조회", notes = "시설 예약 정보를 보여준다.")
     @GetMapping("/{placeId}/reservations")
-    public ResponseEntity<SingleResponse<Map>> reservationPage(@PathVariable Long placeId) {
+    public ResponseEntity<SingleResponse<Map>> reservationPage(@RequestHeader("accessToken") String accessToken,
+                                                               @PathVariable Long placeId) {
+
+        Map<String, Object> payloadMap = getPayloadMap(accessToken);
+        String email = (String) payloadMap.get("sub");
+        hostCheck(email);
+
 
         PlaceResponse placeDto = hostService.findPlaceDtoByPlaceId(placeId);
 
@@ -92,6 +105,7 @@ public class HostController {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken);
         String email = (String) payloadMap.get("sub");
+        hostCheck(email);
 
         Map<String, List<ReservationResponse>> placeReservationMap = hostService.createReservationDtoMapByEmail(email);
 
@@ -100,7 +114,12 @@ public class HostController {
 
     @ApiOperation(tags = "2. Host", value = "예약 상세", notes = "한 예약의 상세 페이지를 보여준다.")
     @GetMapping("/reservations/{reservationId}")
-    public ResponseEntity<SingleResponse<Map>> reservationDetailPage(@PathVariable Long reservationId) {
+    public ResponseEntity<SingleResponse<Map>> reservationDetailPage(@RequestHeader("accessToken") String accessToken,
+                                                                     @PathVariable Long reservationId) {
+
+        Map<String, Object> payloadMap = getPayloadMap(accessToken);
+        String email = (String) payloadMap.get("sub");
+        hostCheck(email);
 
         Map<String, Object> memberReservationPlaceDtos = hostService.getMemberReservationPlaceDtoMapByReservationId(reservationId);
 
@@ -112,16 +131,10 @@ public class HostController {
     public ResponseEntity<Void> placeRegister(@RequestHeader("accessToken") String accessToken,
                                               @Validated @RequestBody PlaceRoomReqeuest placeRoomReqeuest) {
 
-        log.info("공간 등록 API 작동");
-
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
         String email = (String) payloadMap.get("sub");
 
-        Member host = hostRepository.findByEmail(email);
-        if (host.getRole() != MemberRole.HOST) {
-            throw new HostException(HostErrorResult.NO_PERMISSION);
-        }
-
+        Member host = hostCheck(email);
 
         PlaceRequest placeRequest = placeRoomReqeuest.getPlace();
         List<RoomReqeust> roomReqeusts = placeRoomReqeuest.getRooms();
@@ -129,14 +142,20 @@ public class HostController {
         List<TagStatus> tagList = placeRoomReqeuest.getTagList();
 
 
-
         hostService.savePlaceAndRoomsByDto(placeRequest, host, roomReqeusts, category, tagList);
 
         return ResponseEntity.ok(null);
     }
 
+    private Member hostCheck(String email) {
+        Member host = hostRepository.findByEmail(email);
+        if (host.getRole() != MemberRole.HOST) {
+            throw new HostException(HostErrorResult.NO_PERMISSION);
+        }
+        return host;
+    }
 
-    // 일단 BASE64 -> payload의 "email" 디코딩해서 리턴하는 것으로 설정... ( 추후 변경 가능 )
+
     private Map<String, Object> getPayloadMap(String accessToken) {
 
         String payloadJWT = accessToken.split("\\.")[1];
