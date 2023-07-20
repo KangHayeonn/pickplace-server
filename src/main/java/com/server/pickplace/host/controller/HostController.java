@@ -40,7 +40,7 @@ public class HostController {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
 
-        String email = (String) payloadMap.get("email");
+        String email = (String) payloadMap.get("sub");
 
         List<PlaceResponse> placeList = hostService.findPlaceDtoListByEmail(email); // null 가능
 
@@ -87,7 +87,7 @@ public class HostController {
     public ResponseEntity<SingleResponse<Map>> allReservationsPage(@RequestHeader("Authorization") String accessToken) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken);
-        String email = (String) payloadMap.get("email");
+        String email = (String) payloadMap.get("sub");
 
         Map<String, List<ReservationResponse>> placeReservationMap = hostService.createReservationDtoMapByEmail(email);
 
@@ -110,7 +110,7 @@ public class HostController {
                                               @Validated @RequestBody PlaceRoomReqeuest placeRoomReqeuest) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
-        String email = (String) payloadMap.get("email");
+        String email = (String) payloadMap.get("sub");
 
         Member host = hostRepository.findByEmail(email);
 

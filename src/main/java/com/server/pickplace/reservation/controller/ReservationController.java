@@ -41,7 +41,7 @@ public class ReservationController {
                                                                @PathVariable("roomId") Long roomId) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
-        String email = (String) payloadMap.get("email");
+        String email = (String) payloadMap.get("sub");
 
         Map<String, Object> reservationPageMapByEmailAndRoomId = reservationService.getReservationPageMapByEmailAndRoomId(email, roomId);
 
@@ -55,7 +55,7 @@ public class ReservationController {
                                                             @RequestBody @Validated CardValidRequest cardValidRequest) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
-        String email = (String) payloadMap.get("email");
+        String email = (String) payloadMap.get("sub");
 
         String cardNum = cardValidRequest.getCardNum();
         validateCardByCardNum(cardNum);
@@ -72,7 +72,7 @@ public class ReservationController {
                                   @RequestBody @Validated CardPayRequest cardPayRequest) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
-        String email = (String) payloadMap.get("email");
+        String email = (String) payloadMap.get("sub");
 
         validateCardByCardNum(cardPayRequest.getCardNum());
 
@@ -103,7 +103,7 @@ public class ReservationController {
                                      @RequestBody @Validated AccountPayRequest accountPayRequest) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
-        String email = (String) payloadMap.get("email");
+        String email = (String) payloadMap.get("sub");
 
         String bankNumByBankName = getBankNumByBankName(accountPayRequest.getBankName());
         if (!bankNumByBankName.equals(accountPayRequest.getBankNum())) {
@@ -122,7 +122,7 @@ public class ReservationController {
                                                       @Validated @RequestBody QRImageReqeust qrImageReqeust) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
-        String email = (String) payloadMap.get("email");
+        String email = (String) payloadMap.get("sub");
 
         String uuid = reservationRepository.saveQRPaymentInformation(email, qrImageReqeust.getRoomPrice());
 
@@ -179,7 +179,7 @@ public class ReservationController {
                                      @Validated @RequestBody QRPayRequest qrPayRequest) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
-        String email = (String) payloadMap.get("email");
+        String email = (String) payloadMap.get("sub");
 
         // 1. QR을 통해 인증 했는지 확인
         Optional<QRPaymentInfomation> optionalQREntity = reservationRepository.findQREntityByQRPaymentCode(qrPayRequest.getQrPaymentCode());

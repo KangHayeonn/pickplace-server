@@ -41,7 +41,7 @@ public class ReviewController {
     public ResponseEntity<SingleResponse<Map>> reviewPage(@RequestHeader("Authorization") String accessToken) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
-        String email = (String) payloadMap.get("email");
+        String email = (String) payloadMap.get("sub");
 
 
         List<ReviewResponse> reviewRespons =  reviewRepository.getReviewDtosByEmail(email);
@@ -79,7 +79,7 @@ public class ReviewController {
                              @Validated @RequestBody CreateReviewRequest createReviewRequest) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
-        String email = (String) payloadMap.get("email");
+        String email = (String) payloadMap.get("sub");
 
 
         reviewService.createReviewByEmailAndRequest(email, createReviewRequest);
@@ -94,7 +94,7 @@ public class ReviewController {
                                       @PathVariable("reviewId") Long reviewId) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
-        String email = (String) payloadMap.get("email");
+        String email = (String) payloadMap.get("sub");
 
         reviewRepository.amendReview(email, amendReviewRequest, reviewId);
 
@@ -107,7 +107,7 @@ public class ReviewController {
                                       @PathVariable("reviewId") Long reviewId) {
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
-        String email = (String) payloadMap.get("email");
+        String email = (String) payloadMap.get("sub");
 
         reviewRepository.deleteReview(email, reviewId);
 
