@@ -50,6 +50,7 @@ public class SearchController {
                 .startDate(LocalDate.now())
                 .endDate(LocalDate.now().plusDays(1))
                 .searchType(request.getSearchType())
+                .countPerPage(request.getCountPerPage())
                 .pageNum(request.getPageNum())
                 .category(request.getCategory())
                 .build();
