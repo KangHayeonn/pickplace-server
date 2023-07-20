@@ -1,9 +1,11 @@
 package com.server.pickplace.place.entity;
 
 import com.server.pickplace.common.common.BaseEntity;
+import com.server.pickplace.reservation.entity.Reservation;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -12,10 +14,13 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "ROOM_TB")
+@ToString(exclude = "place")
 public class Room extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+
     @Column(name = "ROOM_ID", nullable = false)
     private Long id;
 
@@ -35,4 +40,6 @@ public class Room extends BaseEntity {
     @JoinColumn(name = "PLACE_ID")
     private Place place;
 
+    @OneToMany(mappedBy = "room")
+    private List<Reservation> reservations;
 }

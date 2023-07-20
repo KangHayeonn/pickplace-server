@@ -1,3 +1,4 @@
+
 package com.server.pickplace.common.handler;
 
 import java.util.List;
@@ -56,17 +57,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			.body(new ErrorResponse(HttpStatus.BAD_REQUEST.toString(), errorDescription));
 	}
 
-	@ExceptionHandler({MemberException.class})
-	public ResponseEntity<ErrorResponse> handleRestApiException(final MemberException exception) {
-		log.warn("MemberException occur: ", exception);
-		return this.makeErrorResponseEntity(exception.getErrorResult());
-	}
+//	@ExceptionHandler({MemberException.class})
+//	public ResponseEntity<ErrorResponse> handleRestApiException(final MemberException exception) {
+//		log.warn("MemberException occur: ", exception);
+//		return this.makeErrorResponseEntity(exception.getErrorResult());
+//	}
 
-	@ExceptionHandler({Exception.class})
-	public ResponseEntity<ErrorResponse> handleException(final Exception exception) {
-		log.warn("Exception occur: ", exception);
-		return this.makeErrorResponseEntity(MemberErrorResult.UNKNOWN_EXCEPTION);
-	}
+//	@ExceptionHandler({Exception.class})
+//	public ResponseEntity<ErrorResponse> handleException(final Exception exception) {
+//		log.warn("Exception occur: ", exception);
+//		return this.makeErrorResponseEntity(MemberErrorResult.UNKNOWN_EXCEPTION);
+//	}
 
 	private ResponseEntity<ErrorResponse> makeErrorResponseEntity(final MemberErrorResult errorResult) {
 		return ResponseEntity.status(errorResult.getHttpStatus())
@@ -80,3 +81,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		private final String message;
 	}
 }
+

@@ -3,6 +3,7 @@ package com.server.pickplace.reservation.entity;
 import com.server.pickplace.common.common.BaseEntity;
 import com.server.pickplace.member.entity.Member;
 import com.server.pickplace.place.entity.Room;
+import com.server.pickplace.place.entity.Unit;
 import lombok.*;
 
 import javax.persistence.*;
@@ -24,12 +25,15 @@ public class Reservation extends BaseEntity {
     @Column(name = "RESERVATION_ID", nullable = false)
     private Long id;
 
+    @Column(name = "RESERVATION_NUMBER", nullable = false)
+    private String reservationNum;
+
+    @Column(name = "RESERVATION_PEOPLE_NUM", nullable = false)
+    private Integer peopleNum;
+
     @Column(name = "RESERVATION_STATUS", nullable = false)
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
-
-    // https://m.blog.naver.com/nieah914/221810697040 -> MYSQL
-    // https://hianna.tistory.com/607  -> JAVA
 
     @Column(name = "START_DATE", nullable = false)
     private LocalDate startDate;
@@ -50,4 +54,9 @@ public class Reservation extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ROOM_ID")
     private Room room;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UNIT_ID")
+    private Unit unit;
+
 }
