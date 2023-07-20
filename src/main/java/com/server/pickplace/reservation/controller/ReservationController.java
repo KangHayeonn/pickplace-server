@@ -40,9 +40,8 @@ public class ReservationController {
     public ResponseEntity<SingleResponse<Map>> reservationPage(@RequestHeader("accessToken") String accessToken,
                                                                @PathVariable("roomId") Long roomId) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken);
-        String email = (String) payloadMap.get("sub");
-        
+        String email = reservationService.getPayloadMapAndGetEmail(accessToken);
+
         reservationRepository.roomIdCheck(roomId);
         
         Map<String, Object> reservationPageMapByEmailAndRoomId = reservationService.getReservationPageMapByEmailAndRoomId(email, roomId);
@@ -56,8 +55,8 @@ public class ReservationController {
     public ResponseEntity<SingleResponse> cardPayValidation(@RequestHeader("accessToken") String accessToken,
                                                             @RequestBody @Validated CardValidRequest cardValidRequest) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken); 
-        String email = (String) payloadMap.get("sub");
+        String email = reservationService.getPayloadMapAndGetEmail(accessToken);
+
         String cardNum = cardValidRequest.getCardNum();
 
         CardInfoResponse cardInfoResponse = reservationService.getCardInfoDto(email, cardNum);
@@ -71,8 +70,7 @@ public class ReservationController {
     public ResponseEntity cardPay(@RequestHeader("accessToken") String accessToken,
                                   @RequestBody @Validated CardPayRequest cardPayRequest) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken);
-        String email = (String) payloadMap.get("sub");
+        String email = reservationService.getPayloadMapAndGetEmail(accessToken);
 
         // 결제 + 예약( 단일 트랜잭션 )
         reservationService.payByCardAndReservation(email, cardPayRequest);
@@ -87,7 +85,7 @@ public class ReservationController {
                                                         @RequestBody BankRequest bankRequest) {
 
         String bankName = bankRequest.getBankName();
-        String bankNum = getBankNumByBankName(bankName);
+        String bankNum = reservationService.getBankNumByBankName(bankName);
 
         BankResponse bankResponse = BankResponse.builder().bankName(bankName).bankNum(bankNum).build();
 
@@ -100,10 +98,10 @@ public class ReservationController {
     public ResponseEntity accountPay(@RequestHeader("accessToken") String accessToken,
                                      @RequestBody @Validated AccountPayRequest accountPayRequest) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken); 
-        String email = (String) payloadMap.get("sub");
+        String email = reservationService.getPayloadMapAndGetEmail(accessToken);
 
-        String bankNumByBankName = getBankNumByBankName(accountPayRequest.getBankName());
+
+        String bankNumByBankName = reservationService.getBankNumByBankName(accountPayRequest.getBankName());
         if (!bankNumByBankName.equals(accountPayRequest.getBankNum())) {
             throw new ReservationException(ReservationErrorResult.NO_MATCH_BANK_ACCOUNT);
         }
@@ -119,8 +117,8 @@ public class ReservationController {
     public ResponseEntity<SingleResponse> qrCodeImage(@RequestHeader("accessToken") String accessToken,
                                                       @Validated @RequestBody QRImageReqeust qrImageReqeust) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken); 
-        String email = (String) payloadMap.get("sub");
+        String email = reservationService.getPayloadMapAndGetEmail(accessToken);
+
 
         String uuid = reservationRepository.saveQRPaymentInformation(email, qrImageReqeust.getRoomPrice());
 
@@ -152,16 +150,10 @@ public class ReservationController {
     public ResponseEntity qrPassword(@PathVariable("qrPaymentCode") String qrPaymentCode,
                                                                       @Validated @RequestBody QRPasswordRequest qrPasswordRequest) {
 
-        Optional<QRPaymentInfomation> optionalQREntity = reservationRepository.findQREntityByQRPaymentCode(qrPaymentCode);
-        QRPaymentInfomation qrPaymentInfomation = optionalQREntity.orElseThrow(() -> new ReservationException(ReservationErrorResult.NON_EXIST_QR_PAYMENT_CODE));
+        // qr 엔티티 반환 및 예외 처리
 
-        String email = qrPaymentInfomation.getEmail();
+        QRPaymentInfomation qrPaymentInfomation = reservationService.getQREntityByDto(qrPaymentCode, qrPasswordRequest);
 
-        String memberPassword = reservationRepository.findMemberPasswordByEmail(email);
-
-        if (!memberPassword.equals(qrPasswordRequest.getQrPassword())) {
-            throw new ReservationException(ReservationErrorResult.WRONG_PASSWORD);
-        }
 
         // 비밀번호 일치 -> 결제 상태를 '인증됨'으로
 
@@ -176,15 +168,11 @@ public class ReservationController {
     public ResponseEntity qrPassword(@RequestHeader("accessToken") String accessToken,
                                      @Validated @RequestBody QRPayRequest qrPayRequest) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken); 
-        String email = (String) payloadMap.get("sub");
+        String email = reservationService.getPayloadMapAndGetEmail(accessToken);
 
         // 1. QR을 통해 인증 했는지 확인
-        Optional<QRPaymentInfomation> optionalQREntity = reservationRepository.findQREntityByQRPaymentCode(qrPayRequest.getQrPaymentCode());
-        QRPaymentInfomation qrPaymentInfomation = optionalQREntity.orElseThrow(() -> new ReservationException(ReservationErrorResult.NON_EXIST_QR_PAYMENT_CODE));
-        if (!qrPaymentInfomation.getStatus().equals(QRStatus.APPROVAL)) {
-            throw new ReservationException(ReservationErrorResult.QR_AUTH_NOT_COMPLETE);
-        }
+        QRPaymentInfomation qrPaymentInfomation = reservationService.qrCheckByDto(qrPayRequest);
+
 
         // 2. 예약
         reservationRepository.makeReservation(email, qrPayRequest);
@@ -194,73 +182,6 @@ public class ReservationController {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        private String getBankNumByBankName(String bankName) {
-        String bankNum;
-        if (bankName.equals("국민은행")) {
-            bankNum = "1020315-12108542";
-        } else if (bankName.equals("하나은행")) {
-            bankNum = "2020315-12108542";
-        } else if (bankName.equals("신한은행")) {
-            bankNum = "3020315-12108542";
-        } else if (bankName.equals("우리은행")) {
-            bankNum = "4020315-12108542";
-        } else {
-            throw new ReservationException(ReservationErrorResult.NO_EXIST_BANK);
-        }
-
-        return bankNum;
-    }
-
-
-    private int calculateVerificationCode(String cardNumber) {
-        int sum = 0;
-        boolean multiplyByTwo = false;
-
-        for (int i = cardNumber.length() - 2; i >= 0; i--) {
-            int digit = cardNumber.charAt(i) - '0';
-            if (multiplyByTwo) {
-                digit *= 2;
-                if (digit > 9) {
-                    digit = digit % 10 + digit / 10;
-                }
-            }
-            sum += digit;
-            multiplyByTwo = !multiplyByTwo;
-        }
-
-        int verificationCode = 10 - (sum % 10);
-        return verificationCode % 10;
-    }
-
-
-    private Map<String, Object> getPayloadMap(String accessToken) {
-
-        String payloadJWT = accessToken.split("\\.")[1];
-        Base64.Decoder decoder = getUrlDecoder();
-
-        String payload = new String(decoder.decode(payloadJWT));
-        JsonParser jsonParser = new BasicJsonParser();
-        Map<String, Object> jsonArray = jsonParser.parseMap(payload);
-        return jsonArray;
-    }
 
 
 }
