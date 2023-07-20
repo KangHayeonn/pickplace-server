@@ -112,6 +112,7 @@ public class HostController {
     public ResponseEntity<Void> placeRegister(@RequestHeader("accessToken") String accessToken,
                                               @Validated @RequestBody PlaceRoomReqeuest placeRoomReqeuest) {
 
+        log.info("공간 등록 API 작동");
 
         Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
         String email = (String) payloadMap.get("sub");
