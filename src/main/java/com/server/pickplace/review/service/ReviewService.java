@@ -1,6 +1,7 @@
 package com.server.pickplace.review.service;
 
 
+import com.server.pickplace.common.service.CommonService;
 import com.server.pickplace.reservation.entity.Reservation;
 import com.server.pickplace.review.dto.CreateReviewRequest;
 import com.server.pickplace.review.dto.PlaceReviewResponse;
@@ -22,7 +23,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class ReviewService {
+public class ReviewService extends CommonService {
 
     private final ReviewRepository reviewRepository;
 
@@ -43,9 +44,9 @@ public class ReviewService {
 
         // 1. reservation 존재 + 본인꺼 + 아직 리뷰 없음
         Optional<Reservation> optionalReservation = reviewRepository.findReservationByReservationId(createReviewRequest.getReservationId());
-        Reservation reservation = optionalReservation.orElseThrow(() -> new ReviewException(ReviewErrorResult.NO_PERMISSION));
+        Reservation reservation = optionalReservation.orElseThrow(() -> new ReviewException(ReviewErrorResult.WRONG_RESERVATION_ID));
         if (!(reservation.getMember().getEmail().equals(email))) {
-            throw new ReviewException(ReviewErrorResult.WRONG_RESERVATION_ID);
+            throw new ReviewException(ReviewErrorResult.NO_PERMISSION);
         } else if (!(reservation.getReview() == null)) {
             throw new ReviewException(ReviewErrorResult.REVIEW_ALREADY_EXIST);
         }
@@ -56,4 +57,13 @@ public class ReviewService {
     }
 
 
+    public Map<String, List<ReviewResponse>> getReviewListMapByEmail(String email) {
+
+        List<ReviewResponse> reviewResponse =  reviewRepository.getReviewDtosByEmail(email);
+
+        Map<String, List<ReviewResponse>> reviewListMap = new HashMap<>();
+        reviewListMap.put("reviewList", reviewResponse);
+
+        return reviewListMap;
     }
+}

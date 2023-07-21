@@ -1,10 +1,12 @@
 package com.server.pickplace.host.service;
 
+import com.server.pickplace.common.service.CommonService;
 import com.server.pickplace.host.dto.*;
 import com.server.pickplace.host.error.HostErrorResult;
 import com.server.pickplace.host.error.HostException;
 import com.server.pickplace.host.repository.HostRepository;
 import com.server.pickplace.member.entity.Member;
+import com.server.pickplace.member.entity.MemberRole;
 import com.server.pickplace.place.entity.*;
 import com.server.pickplace.reservation.entity.Reservation;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class HostService {
+public class HostService extends CommonService {
 
     private final HostRepository hostRepository;
     private final ModelMapper modelMapper;
@@ -180,9 +182,15 @@ public class HostService {
         }
     }
 
-    public void savePlaceAndRoomsByDto(PlaceRequest placeRequest, Member host, List<RoomReqeust> roomReqeusts, CategoryStatus categoryStatus, List<TagStatus> tagStatusList) {
+    public void savePlaceAndRoomsByDto(PlaceRoomReqeuest placeRoomReqeuest, Member host) {
 
         // 같은 트랜잭션
+
+        PlaceRequest placeRequest = placeRoomReqeuest.getPlace();
+        List<RoomReqeust> roomReqeusts = placeRoomReqeuest.getRooms();
+        CategoryStatus categoryStatus = placeRoomReqeuest.getCategory();
+        List<TagStatus> tagStatusList = placeRoomReqeuest.getTagList();
+
 
         Place place = modelMapper.map(placeRequest, Place.class);
         place.setPoint(new Point(placeRequest.getX(), placeRequest.getY()));
@@ -219,4 +227,15 @@ public class HostService {
         }
     }
 
+    public Member hostCheck(String email) {
+
+        Member host = hostRepository.findByEmail(email);
+        if (host.getRole() != MemberRole.HOST) {
+            throw new HostException(HostErrorResult.NO_PERMISSION);
+        }
+
+        return host;
+
+
+    }
 }

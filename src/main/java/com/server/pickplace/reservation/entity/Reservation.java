@@ -18,6 +18,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "RESERVATION_TB")
+@ToString
 public class Reservation extends BaseEntity {
 
     @Id

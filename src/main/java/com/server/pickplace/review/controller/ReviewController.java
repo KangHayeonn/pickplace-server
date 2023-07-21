@@ -37,17 +37,12 @@ public class ReviewController {
     private final ReviewRepository reviewRepository;
 
     @ApiOperation(tags = "5. Review", value = "작성한 리뷰 전체 조회", notes = "사용자 입장에서, 작성한 리뷰 전체를 조회한다.")
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<SingleResponse<Map>> reviewPage(@RequestHeader("accessToken") String accessToken) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
-        String email = (String) payloadMap.get("sub");
+        String email = reviewService.getPayloadMapAndGetEmail(accessToken);
 
-
-        List<ReviewResponse> reviewRespons =  reviewRepository.getReviewDtosByEmail(email);
-
-        Map<String, Object> reviewListMap = new HashMap<>();
-        reviewListMap.put("reviewList", reviewRespons);
+        Map<String, List<ReviewResponse>> reviewListMap = reviewService.getReviewListMapByEmail(email);
 
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), reviewListMap));
 
@@ -74,13 +69,11 @@ public class ReviewController {
     }
 
     @ApiOperation(tags = "5. Review", value = "리뷰 생성", notes = "리뷰를 생성한다.")
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity createReview(@RequestHeader("accessToken") String accessToken,
                              @Validated @RequestBody CreateReviewRequest createReviewRequest) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
-        String email = (String) payloadMap.get("sub");
-
+        String email = reviewService.getPayloadMapAndGetEmail(accessToken);
 
         reviewService.createReviewByEmailAndRequest(email, createReviewRequest);
 
@@ -93,8 +86,7 @@ public class ReviewController {
                                       @Validated @RequestBody AmendReviewRequest amendReviewRequest,
                                       @PathVariable("reviewId") Long reviewId) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
-        String email = (String) payloadMap.get("sub");
+        String email = reviewService.getPayloadMapAndGetEmail(accessToken);
 
         reviewRepository.amendReview(email, amendReviewRequest, reviewId);
 
@@ -106,8 +98,7 @@ public class ReviewController {
     public ResponseEntity deleteReview(@RequestHeader("accessToken") String accessToken,
                                       @PathVariable("reviewId") Long reviewId) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken); // 일단 토큰이 존재하고, 유효하다고 가정
-        String email = (String) payloadMap.get("sub");
+        String email = reviewService.getPayloadMapAndGetEmail(accessToken);
 
         reviewRepository.deleteReview(email, reviewId);
 

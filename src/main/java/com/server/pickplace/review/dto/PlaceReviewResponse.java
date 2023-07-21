@@ -2,7 +2,9 @@ package com.server.pickplace.review.dto;
 
 
 import com.querydsl.core.annotations.QueryProjection;
+import lombok.Getter;
 
+@Getter
 public class PlaceReviewResponse {
 
     private Long placeId;

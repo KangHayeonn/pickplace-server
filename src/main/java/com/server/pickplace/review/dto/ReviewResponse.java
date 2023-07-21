@@ -4,10 +4,12 @@ package com.server.pickplace.review.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
+import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Getter
 public class ReviewResponse {
 
     private Long reviewId;

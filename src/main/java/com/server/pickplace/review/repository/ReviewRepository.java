@@ -11,6 +11,6 @@ import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRepositoryCustom {
 
-    @Query("select r from Reservation r where r.id = :id")
+    @Query("select r from Reservation r left join fetch r.review where r.id = :id")
     Optional<Reservation> findReservationByReservationId(@Param("id") Long reservationId);
 }

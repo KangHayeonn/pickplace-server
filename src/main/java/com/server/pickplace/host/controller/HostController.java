@@ -37,18 +37,15 @@ public class HostController {
 
     private final ResponseService responseService;
     private final HostService hostService;
-    private final HostRepository hostRepository;
 
     @ApiOperation(tags = "2. Host", value = "공간 관리 페이지", notes = "DB상에 존재하는 플레이스들을 보여준다.")
     @GetMapping("/place")
     public ResponseEntity<ListResponse<PlaceResponse>> placePage(@RequestHeader("accessToken") String accessToken) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken);
-        String email = (String) payloadMap.get("sub");
-        hostCheck(email);
+        String email = hostService.getPayloadMapAndGetEmail(accessToken);
 
-
-
+        hostService.hostCheck(email);
+        
         List<PlaceResponse> placeList = hostService.findPlaceDtoListByEmail(email);
 
         return ResponseEntity.ok(responseService.getListResponse(HttpStatus.OK.value(), placeList));
@@ -60,16 +57,14 @@ public class HostController {
     public ResponseEntity<SingleResponse<Map>> roomPage(@RequestHeader("accessToken") String accessToken,
                                                         @PathVariable Long placeId) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken);
-        String email = (String) payloadMap.get("sub");
-        hostCheck(email);
+        String email = hostService.getPayloadMapAndGetEmail(accessToken);
+        hostService.hostCheck(email);
 
         PlaceResponse placeDto = hostService.findPlaceDtoByPlaceId(email, placeId);
 
         List<RoomResponse> roomDtos = hostService.findRoomDtoListByPlaceId(placeId);
 
         Map<String, Object> roomPlaceDtos = new HashMap<>();
-
         roomPlaceDtos.put("room", roomDtos);
         roomPlaceDtos.put("place", placeDto);
 
@@ -82,9 +77,8 @@ public class HostController {
     public ResponseEntity<SingleResponse<Map>> reservationPage(@RequestHeader("accessToken") String accessToken,
                                                                @PathVariable Long placeId) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken);
-        String email = (String) payloadMap.get("sub");
-        hostCheck(email);
+        String email = hostService.getPayloadMapAndGetEmail(accessToken);
+        hostService.hostCheck(email);
 
 
         PlaceResponse placeDto = hostService.findPlaceDtoByPlaceId(email, placeId);
@@ -92,7 +86,6 @@ public class HostController {
         List<ReservationResponse> reservationDtos = hostService.findReservationDtoListByPlaceId(placeId);
 
         Map<String, Object> placeReservationDtos = new HashMap<>();
-
         placeReservationDtos.put("place", placeDto);
         placeReservationDtos.put("reservation", reservationDtos);
 
@@ -103,9 +96,8 @@ public class HostController {
     @GetMapping("/reservations")
     public ResponseEntity<SingleResponse<Map>> allReservationsPage(@RequestHeader("accessToken") String accessToken) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken);
-        String email = (String) payloadMap.get("sub");
-        hostCheck(email);
+        String email = hostService.getPayloadMapAndGetEmail(accessToken);
+        hostService.hostCheck(email);
 
         Map<String, Object> placeReservationMap = hostService.createReservationDtoMapByEmail(email);
 
@@ -117,9 +109,8 @@ public class HostController {
     public ResponseEntity<SingleResponse<Map>> reservationDetailPage(@RequestHeader("accessToken") String accessToken,
                                                                      @PathVariable Long reservationId) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken);
-        String email = (String) payloadMap.get("sub");
-        hostCheck(email);
+        String email = hostService.getPayloadMapAndGetEmail(accessToken);
+        hostService.hostCheck(email);
 
         Map<String, Object> memberReservationPlaceDtos = hostService.getMemberReservationPlaceDtoMapByReservationId(reservationId);
 
@@ -131,40 +122,12 @@ public class HostController {
     public ResponseEntity<Void> placeRegister(@RequestHeader("accessToken") String accessToken,
                                               @Validated @RequestBody PlaceRoomReqeuest placeRoomReqeuest) {
 
-        Map<String, Object> payloadMap = getPayloadMap(accessToken); 
-        String email = (String) payloadMap.get("sub");
+        String email = hostService.getPayloadMapAndGetEmail(accessToken);
+        Member host = hostService.hostCheck(email);
 
-        Member host = hostCheck(email);
-
-        PlaceRequest placeRequest = placeRoomReqeuest.getPlace();
-        List<RoomReqeust> roomReqeusts = placeRoomReqeuest.getRooms();
-        CategoryStatus category = placeRoomReqeuest.getCategory();
-        List<TagStatus> tagList = placeRoomReqeuest.getTagList();
-
-
-        hostService.savePlaceAndRoomsByDto(placeRequest, host, roomReqeusts, category, tagList);
+        hostService.savePlaceAndRoomsByDto(placeRoomReqeuest, host);
 
         return ResponseEntity.ok(null);
-    }
-
-    private Member hostCheck(String email) {
-        Member host = hostRepository.findByEmail(email);
-        if (host.getRole() != MemberRole.HOST) {
-            throw new HostException(HostErrorResult.NO_PERMISSION);
-        }
-        return host;
-    }
-
-
-    private Map<String, Object> getPayloadMap(String accessToken) {
-
-        String payloadJWT = accessToken.split("\\.")[1];
-        Decoder decoder = getUrlDecoder();
-
-        String payload = new String(decoder.decode(payloadJWT));
-        JsonParser jsonParser = new BasicJsonParser();
-        Map<String, Object> jsonArray = jsonParser.parseMap(payload);
-        return jsonArray;
     }
 
 

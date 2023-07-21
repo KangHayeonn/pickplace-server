@@ -2,17 +2,19 @@ package com.server.pickplace.review.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.querydsl.core.annotations.QueryProjection;
+import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Getter
 public class ReviewDetailResponse {
 
     private Long reviewId;
 
     private String memberName;
 
-    @JsonFormat(pattern = "yyyy년 MM월 dd일", locale = "ko-KR")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일", locale = "ko-KR")
     private LocalDate reviewDate;
 
     private String placeAddress;

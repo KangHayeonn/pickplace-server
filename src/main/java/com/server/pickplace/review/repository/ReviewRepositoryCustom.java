@@ -2,6 +2,7 @@ package com.server.pickplace.review.repository;
 
 import com.server.pickplace.reservation.entity.Reservation;
 import com.server.pickplace.review.dto.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,7 +17,9 @@ public interface ReviewRepositoryCustom {
 
     void createReview(Reservation reservation, CreateReviewRequest createReviewRequest);
 
+    @Transactional
     void amendReview(String email, AmendReviewRequest amendReviewRequest, Long reviewId);
 
+    @Transactional
     void deleteReview(String email, Long reviewId);
 }

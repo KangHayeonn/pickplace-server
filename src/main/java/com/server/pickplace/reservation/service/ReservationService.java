@@ -4,6 +4,7 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
+import com.server.pickplace.common.service.CommonService;
 import com.server.pickplace.reservation.dto.*;
 import com.server.pickplace.reservation.entity.BankStatus;
 import com.server.pickplace.reservation.entity.QRPaymentInfomation;
@@ -31,7 +32,7 @@ import static java.util.Base64.getUrlDecoder;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class ReservationService {
+public class ReservationService extends CommonService {
 
     private final ReservationRepository reservationRepository;
 
@@ -147,21 +148,6 @@ public class ReservationService {
         }
 
         return qrPaymentInfomation;
-    }
-
-
-    public String getPayloadMapAndGetEmail(String accessToken) {
-
-        String payloadJWT = accessToken.split("\\.")[1];
-        Base64.Decoder decoder = getUrlDecoder();
-
-        String payload = new String(decoder.decode(payloadJWT));
-        JsonParser jsonParser = new BasicJsonParser();
-        Map<String, Object> jsonArray = jsonParser.parseMap(payload);
-
-        String email = (String) jsonArray.get("sub");
-
-        return email;
     }
 
 }
