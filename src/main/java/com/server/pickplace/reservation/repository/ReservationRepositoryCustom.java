@@ -16,4 +16,6 @@ public interface ReservationRepositoryCustom {
     String saveQRPaymentInformation(String email, Integer roomPrice);
 
     void changeQREntityStatus(QRPaymentInfomation qrPaymentInfomation, QRStatus status);
+
+    void roomIdCheck(Long roomId);
 }

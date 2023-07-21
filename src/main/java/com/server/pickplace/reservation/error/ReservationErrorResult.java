@@ -15,6 +15,7 @@ public enum ReservationErrorResult {
     NO_MATCH_BANK_ACCOUNT(HttpStatus.BAD_REQUEST, "Does not match between bank and account."),
     QR_CODE_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "Error occurs in making QR code."),
     NON_EXIST_QR_PAYMENT_CODE(HttpStatus.BAD_REQUEST, "Not exist QR payment code."),
+    NO_EXIST_ROOM_ID(HttpStatus.BAD_REQUEST, "NO EXIST ROOM ID"),
     QR_AUTH_NOT_COMPLETE(HttpStatus.BAD_REQUEST, "QR authentication is not completed.");
 
 

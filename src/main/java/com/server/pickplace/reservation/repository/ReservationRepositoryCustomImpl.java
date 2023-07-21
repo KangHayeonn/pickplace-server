@@ -20,12 +20,10 @@ import com.server.pickplace.reservation.error.ReservationErrorResult;
 import com.server.pickplace.reservation.error.ReservationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static com.server.pickplace.member.entity.QMember.member;
 import static com.server.pickplace.place.entity.QPlace.*;
@@ -35,6 +33,7 @@ import static com.server.pickplace.reservation.entity.QReservation.reservation;
 
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class ReservationRepositoryCustomImpl implements ReservationRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
@@ -82,21 +81,28 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
 
         // 1. 비어있는 호실 체크 ( 비어있는 호실이 없다면, 빈 호실 없음 반환 )
 
-        Optional<Tuple> optionalTuple = Optional.ofNullable(
-                        queryFactory
+        List<Tuple> tupleList =
+                queryFactory
                         .select(room, unit)
                         .from(unit)
                         .join(unit.room, room)
+                        .join(room.reservations, reservation)
                         .where(
                                 room.id.eq(payRequest.getRoomId()),
 
                                 dateCheckByRequest(payRequest).not().or(timeCheckByRequest(payRequest).not())
+
                         )
                         .orderBy(unit.id.asc())
-                        .fetchOne()
-                    );
+                        .fetch();
 
-        Tuple tuple = optionalTuple.orElseThrow(() -> new ReservationException(ReservationErrorResult.NO_EMPTY_ROOM));
+        Tuple tuple;
+        if (tupleList.isEmpty()) {
+            throw new ReservationException(ReservationErrorResult.NO_EMPTY_ROOM);
+        } else {
+            tuple = tupleList.get(0);
+        }
+
         Room room = tuple.get(0, Room.class);
         Unit unit = tuple.get(1, Unit.class);
         Member member = getMember(email);
@@ -142,6 +148,19 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
     @Override
     public void changeQREntityStatus(QRPaymentInfomation qrPaymentInfomation, QRStatus status) {
         qrPaymentInfomation.setStatus(status);
+
+        em.merge(qrPaymentInfomation);
+    }
+
+    @Override
+    public void roomIdCheck(Long roomId) {
+        Optional<Room> room1 = Optional.ofNullable(queryFactory
+                .select(room)
+                .from(room)
+                .where(room.id.eq(roomId))
+                .fetchOne());
+
+        room1.orElseThrow(() -> new ReservationException(ReservationErrorResult.NO_EXIST_ROOM_ID));
     }
 
     private Member getMember(String email) {

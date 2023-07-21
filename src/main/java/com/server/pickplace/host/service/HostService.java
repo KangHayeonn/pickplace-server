@@ -42,7 +42,7 @@ public class HostService {
             return placeDtos;
 
         } else {
-            return null;
+            return new ArrayList<>();
         }
 
     }
@@ -66,11 +66,12 @@ public class HostService {
 
     }
 
-    public PlaceResponse findPlaceDtoByPlaceId(Long placeId) {
+    public PlaceResponse findPlaceDtoByPlaceId(String email, Long placeId) {
 
         Optional<Place> optionalPlace = hostRepository.findOptionalPlaceByPlaceId(placeId);
 
         Place place = optionalPlace.orElseThrow(() -> new HostException(HostErrorResult.NOT_EXIST_PLACE));
+        memberPlaceIdCheck(email, place);
 
         PlaceResponse placeResponse = modelMapper.map(place, PlaceResponse.class);
 
@@ -97,11 +98,12 @@ public class HostService {
     }
 
 
-    public Map<String, List<ReservationResponse>> createReservationDtoMapByEmail(String email) {
+    public Map<String, Object> createReservationDtoMapByEmail(String email) {
 
-        Optional<List<Object[]>> optionalReservationsAndNames = hostRepository.findOptionalReservationAndNamesByEmail(email, LocalDate.now());
+        Optional<List<Object[]>> optionalReservationsAndNames = hostRepository.findOptionalReservationAndNamesByEmail(email);
 
         Map<String, List<ReservationResponse>> map = new HashMap<>();
+        List<Object> placeList = new ArrayList<>();
 
         if (optionalReservationsAndNames.isPresent()) {
 
@@ -120,13 +122,25 @@ public class HostService {
 
             }
 
-            return map;
+            for (Map.Entry<String, List<ReservationResponse>> localEntry : map.entrySet()) {
+                Map<String, Object> localMap = new HashMap<>();
 
-        } else {
-            return null;
+                localMap.put("placeName", localEntry.getKey());
+                localMap.put("reservations", localEntry.getValue());
+
+                placeList.add(localMap);
+            }
+
+            Map<String, Object> globalMap = new HashMap<>(){{
+                put("placeList", placeList);
+            }};
+
+            return globalMap;
+
         }
-    }
 
+        return new HashMap<>();
+    }
     public Map<String, Object> getMemberReservationPlaceDtoMapByReservationId(Long reservationId) {
 
         Optional<List<Object[]>> optionalMemberReservationPlaceList = hostRepository.findOptionalMemberReservationPlaceListByReservationId(reservationId); // reservationId만 유효하다면, 셋 다 존재해야함
@@ -140,6 +154,8 @@ public class HostService {
         Member member = (Member) memberReservationPlaceList[0];
         Reservation reservation = (Reservation) memberReservationPlaceList[1];
         Place place = (Place) memberReservationPlaceList[2];
+        reservationMemberCheck(member, place);
+
 
         MemberResponse MemberDto = MemberResponse.builder()
                 .name(member.getName()).build();
@@ -156,6 +172,12 @@ public class HostService {
 
         return map;
 
+    }
+
+    private void reservationMemberCheck(Member member, Place place) {
+        if (!place.getMember().equals(member)) {
+            throw new HostException(HostErrorResult.NO_PERMISSION);
+        }
     }
 
     public void savePlaceAndRoomsByDto(PlaceRequest placeRequest, Member host, List<RoomReqeust> roomReqeusts, CategoryStatus categoryStatus, List<TagStatus> tagStatusList) {
@@ -189,6 +211,12 @@ public class HostService {
         tagList.forEach(tag -> hostRepository.saveTagPlace(TagPlace.builder().tag(tag).place(place).build()));
 
 
+    }
+
+    private void memberPlaceIdCheck(String email, Place place) {
+        if (!place.getMember().getEmail().equals(email)) {
+            throw new HostException(HostErrorResult.NO_PERMISSION);
+        }
     }
 
 }
