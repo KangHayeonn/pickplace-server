@@ -107,7 +107,7 @@ public class HostController {
         String email = (String) payloadMap.get("sub");
         hostCheck(email);
 
-        Map<String, List<ReservationResponse>> placeReservationMap = hostService.createReservationDtoMapByEmail(email);
+        Map<String, Object> placeReservationMap = hostService.createReservationDtoMapByEmail(email);
 
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), placeReservationMap));
     }

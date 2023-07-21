@@ -98,11 +98,12 @@ public class HostService {
     }
 
 
-    public Map<String, List<ReservationResponse>> createReservationDtoMapByEmail(String email) {
+    public Map<String, Object> createReservationDtoMapByEmail(String email) {
 
-        Optional<List<Object[]>> optionalReservationsAndNames = hostRepository.findOptionalReservationAndNamesByEmail(email, LocalDate.now());
+        Optional<List<Object[]>> optionalReservationsAndNames = hostRepository.findOptionalReservationAndNamesByEmail(email);
 
         Map<String, List<ReservationResponse>> map = new HashMap<>();
+        List<Object> placeList = new ArrayList<>();
 
         if (optionalReservationsAndNames.isPresent()) {
 
@@ -121,13 +122,25 @@ public class HostService {
 
             }
 
-            return map;
+            for (Map.Entry<String, List<ReservationResponse>> localEntry : map.entrySet()) {
+                Map<String, Object> localMap = new HashMap<>();
 
-        } else {
-            return null;
+                localMap.put("placeName", localEntry.getKey());
+                localMap.put("reservations", localEntry.getValue());
+
+                placeList.add(localMap);
+            }
+
+            Map<String, Object> globalMap = new HashMap<>(){{
+                put("placeList", placeList);
+            }};
+
+            return globalMap;
+
         }
-    }
 
+        return new HashMap<>();
+    }
     public Map<String, Object> getMemberReservationPlaceDtoMapByReservationId(Long reservationId) {
 
         Optional<List<Object[]>> optionalMemberReservationPlaceList = hostRepository.findOptionalMemberReservationPlaceListByReservationId(reservationId); // reservationId만 유효하다면, 셋 다 존재해야함
