@@ -2,6 +2,7 @@ package com.server.pickplace.host.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.server.pickplace.place.entity.Room;
 import lombok.*;
 
 @AllArgsConstructor
@@ -15,5 +16,12 @@ public class RoomResponse {
 
     @JsonProperty("roomPrice")
     private Integer price;
+
+    @JsonProperty("roomAmount")
+    private Integer amount;
+
+    @JsonProperty("roomMaxNum")
+    private Integer peopleNum;
+
 
 }
