@@ -6,7 +6,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 
 @Getter
-public class AmendReviewRequest {
+public class UpdateReviewRequest {
 
     @NotBlank
     private String content;

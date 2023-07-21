@@ -135,22 +135,22 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
     }
 
     @Override
-    public void amendReview(String email, AmendReviewRequest amendReviewRequest, Long reviewId) {
+    public void updateReview(String email, UpdateReviewRequest updateReviewRequest, Long reviewId) {
 
         // 1. 리뷰ID null check + 리뷰ID와 토큰 정보 일치 체크
         // 2. 리뷰 수정
 
-        Review review = getReviewInAmendAndDelete(email, reviewId);
+        Review review = getReviewInUpdateAndDelete(email, reviewId);
 
         Place place = getPlaceByReservationIdFetchedByReview(review);
 
-        Float newRating = amendReviewRequest.getRating();
+        Float newRating = updateReviewRequest.getRating();
         Float originalRating = review.getRating();
 
         place.setRating(place.getRating() + (newRating - originalRating));
 
-        review.setContent(amendReviewRequest.getContent());
-        review.setRating(amendReviewRequest.getRating());
+        review.setContent(updateReviewRequest.getContent());
+        review.setRating(updateReviewRequest.getRating());
 
     }
 
@@ -160,7 +160,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
         // 1. 리뷰ID null check + 리뷰ID와 토큰 정보 일치 체크
         // 2. 리뷰 삭제
 
-        Review review = getReviewInAmendAndDelete(email, reviewId);
+        Review review = getReviewInUpdateAndDelete(email, reviewId);
 
         Place place1 = getPlaceByReservationIdFetchedByReview(review);
 
@@ -183,7 +183,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
     }
 
 
-    private Review getReviewInAmendAndDelete(String email, Long reviewId) {
+    private Review getReviewInUpdateAndDelete(String email, Long reviewId) {
 
         Review review1 = queryFactory
                 .select(review)

@@ -3,7 +3,7 @@ package com.server.pickplace.review.controller;
 
 import com.server.pickplace.common.dto.SingleResponse;
 import com.server.pickplace.common.service.ResponseService;
-import com.server.pickplace.review.dto.AmendReviewRequest;
+import com.server.pickplace.review.dto.UpdateReviewRequest;
 import com.server.pickplace.review.dto.CreateReviewRequest;
 import com.server.pickplace.review.dto.ReviewDetailResponse;
 import com.server.pickplace.review.dto.ReviewResponse;
@@ -20,7 +20,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -82,13 +81,13 @@ public class ReviewController {
 
     @ApiOperation(tags = "5. Review", value = "리뷰 변경", notes = "리뷰를 수정한다.")
     @PutMapping("/{reviewId}")
-    public ResponseEntity amendReview(@RequestHeader("accessToken") String accessToken,
-                                      @Validated @RequestBody AmendReviewRequest amendReviewRequest,
-                                      @PathVariable("reviewId") Long reviewId) {
+    public ResponseEntity updateReview(@RequestHeader("accessToken") String accessToken,
+                                       @Validated @RequestBody UpdateReviewRequest updateReviewRequest,
+                                       @PathVariable("reviewId") Long reviewId) {
 
         String email = reviewService.getPayloadMapAndGetEmail(accessToken);
 
-        reviewRepository.amendReview(email, amendReviewRequest, reviewId);
+        reviewRepository.updateReview(email, updateReviewRequest, reviewId);
 
         return ResponseEntity.ok(null);
     }

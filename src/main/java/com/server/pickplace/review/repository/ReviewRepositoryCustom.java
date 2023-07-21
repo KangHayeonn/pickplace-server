@@ -18,7 +18,7 @@ public interface ReviewRepositoryCustom {
     void createReview(Reservation reservation, CreateReviewRequest createReviewRequest);
 
     @Transactional
-    void amendReview(String email, AmendReviewRequest amendReviewRequest, Long reviewId);
+    void updateReview(String email, UpdateReviewRequest updateReviewRequest, Long reviewId);
 
     @Transactional
     void deleteReview(String email, Long reviewId);
