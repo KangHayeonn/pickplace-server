@@ -29,13 +29,12 @@ public class SearchController {
 
     @ApiOperation(tags = "3. Search", value = "상세페이지", notes = "상세페이지에서의 날짜/시간 조건에 따른 이용가능한 Room 검색")
     @PostMapping("/{placeId}")
-    public Map<String, Object> detailPage(@Validated @RequestBody DetailPageRequest detailPageRequest,
+    public ResponseEntity<SingleResponse<Map>> detailPage(@Validated @RequestBody DetailPageRequest detailPageRequest,
                                                           @PathVariable Long placeId) {
-
 
         Map<String, Object> detailPageMap = searchService.getDetailPageMap(detailPageRequest, placeId);
 
-        return detailPageMap;
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), detailPageMap));
 
     }
 

@@ -150,25 +150,18 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
         Point point = new Point(detailSearchRequest.getX(), detailSearchRequest.getY());
 
         List<Tuple> roomCountTupleList = getRoomCountTupleListByDetailSearchDto(detailSearchRequest, point);
-        log.info("roomCountTupleList = {}", roomCountTupleList);
 
         Integer tagAmount = detailSearchRequest.getTagList().size();
-        log.info("tagAmount = {}", tagAmount);
 
         HashMap<Long, Integer> roomCountMap = getRoomCountMapByRoomCountTupleListInDetail(roomCountTupleList, tagAmount);
-        log.info("roomCountMap = {}", roomCountMap);
 
         List<Long> placeBeforeList = getPlaceBeforeListByRoomCountTupleListInDetail(roomCountTupleList, tagAmount);
-        log.info("placeBeforeList = {}", placeBeforeList);
 
         Map<Long, Integer> placeReservationCountMap = getPlaceReservationCountMapByDetailDto(detailSearchRequest, placeBeforeList);
-        log.info("placeReservationCountMap= {}", placeReservationCountMap);
 
         List<Long> placeIdList = getPlaceIdListByRoomCountMapAndPlaceReservationCountMap(roomCountMap, placeReservationCountMap);
-        log.info("placeIdList= {}", placeIdList);
 
         List<PlaceResponse> placeResponseList = getPlaceResponseListByPageableAndPlaceIdList(pageable, placeIdList, detailSearchRequest);
-        log.info("placeResponseList= {}", placeResponseList);
 
         boolean hasNext = getPageableByPlaceResponseList(pageable, placeResponseList);
 
