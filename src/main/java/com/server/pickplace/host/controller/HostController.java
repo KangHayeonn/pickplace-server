@@ -64,7 +64,7 @@ public class HostController {
         String email = (String) payloadMap.get("sub");
         hostCheck(email);
 
-        PlaceResponse placeDto = hostService.findPlaceDtoByPlaceId(placeId);
+        PlaceResponse placeDto = hostService.findPlaceDtoByPlaceId(email, placeId);
 
         List<RoomResponse> roomDtos = hostService.findRoomDtoListByPlaceId(placeId);
 
@@ -87,7 +87,7 @@ public class HostController {
         hostCheck(email);
 
 
-        PlaceResponse placeDto = hostService.findPlaceDtoByPlaceId(placeId);
+        PlaceResponse placeDto = hostService.findPlaceDtoByPlaceId(email, placeId);
 
         List<ReservationResponse> reservationDtos = hostService.findReservationDtoListByPlaceId(placeId);
 

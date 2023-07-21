@@ -66,12 +66,12 @@ public class HostService {
 
     }
 
-    public PlaceResponse findPlaceDtoByPlaceId(Long placeId) {
+    public PlaceResponse findPlaceDtoByPlaceId(String email, Long placeId) {
 
         Optional<Place> optionalPlace = hostRepository.findOptionalPlaceByPlaceId(placeId);
 
         Place place = optionalPlace.orElseThrow(() -> new HostException(HostErrorResult.NOT_EXIST_PLACE));
-        memberPlaceIdCheck(placeId, place);
+        memberPlaceIdCheck(email, place);
 
         PlaceResponse placeResponse = modelMapper.map(place, PlaceResponse.class);
 
@@ -200,8 +200,8 @@ public class HostService {
 
     }
 
-    private void memberPlaceIdCheck(Long placeId, Place place) {
-        if (place.getMember().getId() != placeId) {
+    private void memberPlaceIdCheck(String email, Place place) {
+        if (!place.getMember().getEmail().equals(email)) {
             throw new HostException(HostErrorResult.NO_PERMISSION);
         }
     }
