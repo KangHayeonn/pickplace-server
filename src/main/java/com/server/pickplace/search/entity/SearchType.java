@@ -7,13 +7,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum SearchType {
 
-    BASIC("추천 순"),
+    추천순("추천 순"),
 
-    LOW_PRICE("낮은 가격순"),
+    낮은가격순("낮은 가격순"),
 
-    HIGH_PRICE("높은 가격순");
-
-    // 추후 추가 필요
+    높은가격순("높은 가격순");
 
     private final String value;
 

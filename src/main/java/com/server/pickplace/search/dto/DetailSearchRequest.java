@@ -31,6 +31,7 @@ public class DetailSearchRequest extends NormalSearchRequest {
     @NotNull(message = "거리를 입력해주세요.")
     private Integer distance;
 
+    @NotNull(message = "{tag.NotNull}")
     private List<@NotNull(message = "{tag.NotNull}") TagStatus> tagList;
 
 

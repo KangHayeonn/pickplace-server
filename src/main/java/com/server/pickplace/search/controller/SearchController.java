@@ -29,6 +29,8 @@ public class SearchController {
     public ResponseEntity<SingleResponse<Map>> detailPage(@Validated @RequestBody DetailPageRequest detailPageRequest,
                                                           @PathVariable Long placeId) {
 
+        searchService.dateTimeNullChck(detailPageRequest);
+
         Map<String, Object> detailPageMap = searchService.getDetailPageMap(detailPageRequest, placeId);
 
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), detailPageMap));
@@ -67,6 +69,8 @@ public class SearchController {
     @PostMapping("/basic")
     public ResponseEntity<SingleResponse<Map>> basicSearch(@Validated @RequestBody BasicSearchRequest basicSearchRequest) {
 
+        searchService.dateTimeNullChck(basicSearchRequest);
+
         Map<String, Object> placeDtoHasNextMap = searchService.findPlaceListByDto(basicSearchRequest);
         placeDtoHasNextMap.put("countPerPage", basicSearchRequest.getCountPerPage());
 
@@ -78,6 +82,8 @@ public class SearchController {
     @ApiOperation(tags = "3. Search", value = "상세 검색", notes = "주소/날짜와시간/카테고리/인원수/거리/태그/정렬순 을 활용한 상세 검색")
     @PostMapping("/detail")
     public ResponseEntity<SingleResponse<Map>> placePage(@Validated @RequestBody DetailSearchRequest detailSearchRequest) {
+
+        searchService.dateTimeNullChck(detailSearchRequest);
 
         Map<String, Object> placeDtoHasNextMap = searchService.findPlaceListByDto(detailSearchRequest);
         placeDtoHasNextMap.put("countPerPage", detailSearchRequest.getCountPerPage());

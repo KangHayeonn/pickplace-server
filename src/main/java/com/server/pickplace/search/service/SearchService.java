@@ -141,4 +141,11 @@ public class SearchService {
                 ).build();
         return placeResponse;
     }
+
+    public void dateTimeNullChck(SearchRequest request) {
+
+        if (request.getStartDate() == null || request.getEndDate() == null) {
+            throw new SearchException(SearchErrorResult.DATE_TIME_NULL_CHECK);
+        }
+    }
 }
