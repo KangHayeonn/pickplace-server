@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,12 +14,15 @@ import java.time.LocalTime;
 public class PayRequest {
 
     @Positive
+    @NotNull(message = "올바른 방 번호를 입력해주세요.")
     private Long roomId;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일(EEE) HH:mm")
+    @NotNull(message = "{startDate.NotNull}")
     private LocalDateTime checkInTime;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일(EEE) HH:mm")
+    @NotNull(message = "{endDate.NotNull}")
     private LocalDateTime checkOutTime;
 
     public LocalDate getStartDate() {

@@ -2,10 +2,7 @@ package com.server.pickplace.search.controller;
 
 import com.server.pickplace.common.dto.SingleResponse;
 import com.server.pickplace.common.service.ResponseService;
-import com.server.pickplace.search.dto.BasicSearchRequest;
-import com.server.pickplace.search.dto.CategorySearchRequest;
-import com.server.pickplace.search.dto.DetailPageRequest;
-import com.server.pickplace.search.dto.DetailSearchRequest;
+import com.server.pickplace.search.dto.*;
 import com.server.pickplace.search.service.SearchService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;

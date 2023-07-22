@@ -3,12 +3,11 @@ package com.server.pickplace.search.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDate;
+import javax.validation.constraints.NotNull;
 import java.time.LocalTime;
 
 @Getter
@@ -18,9 +17,11 @@ import java.time.LocalTime;
 public class DetailPageRequest extends SearchRequest {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    @NotNull(message = "{startDate.NotNull}")
     private LocalTime startTime;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    @NotNull(message = "{endDate.NotNull}")
     private LocalTime endTime;
 
 }
