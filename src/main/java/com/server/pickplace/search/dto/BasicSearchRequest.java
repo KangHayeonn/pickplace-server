@@ -8,7 +8,6 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
 public class BasicSearchRequest extends NormalSearchRequest {
 
     private final Integer distance = 5000;
