@@ -17,11 +17,9 @@ import java.time.LocalTime;
 public class DetailPageRequest extends SearchRequest {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    @NotNull(message = "{startDate.NotNull}")
     private LocalTime startTime;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    @NotNull(message = "{endDate.NotNull}")
     private LocalTime endTime;
 
 }

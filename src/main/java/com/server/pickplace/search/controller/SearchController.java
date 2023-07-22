@@ -29,7 +29,7 @@ public class SearchController {
     public ResponseEntity<SingleResponse<Map>> detailPage(@Validated @RequestBody DetailPageRequest detailPageRequest,
                                                           @PathVariable Long placeId) {
 
-        searchService.dateTimeNullChck(detailPageRequest);
+        searchService.dateNullCheck(detailPageRequest);
 
         Map<String, Object> detailPageMap = searchService.getDetailPageMap(detailPageRequest, placeId);
 
@@ -69,7 +69,7 @@ public class SearchController {
     @PostMapping("/basic")
     public ResponseEntity<SingleResponse<Map>> basicSearch(@Validated @RequestBody BasicSearchRequest basicSearchRequest) {
 
-        searchService.dateTimeNullChck(basicSearchRequest);
+        searchService.dateNullCheck(basicSearchRequest);
 
         Map<String, Object> placeDtoHasNextMap = searchService.findPlaceListByDto(basicSearchRequest);
         placeDtoHasNextMap.put("countPerPage", basicSearchRequest.getCountPerPage());
@@ -83,7 +83,7 @@ public class SearchController {
     @PostMapping("/detail")
     public ResponseEntity<SingleResponse<Map>> placePage(@Validated @RequestBody DetailSearchRequest detailSearchRequest) {
 
-        searchService.dateTimeNullChck(detailSearchRequest);
+        searchService.dateNullCheck(detailSearchRequest);
 
         Map<String, Object> placeDtoHasNextMap = searchService.findPlaceListByDto(detailSearchRequest);
         placeDtoHasNextMap.put("countPerPage", detailSearchRequest.getCountPerPage());
