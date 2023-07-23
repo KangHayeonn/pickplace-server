@@ -138,10 +138,12 @@ public class MemberService {
 	@Transactional
 	public String signup(MemberSignupRequestDto request) {
 
+		String encodedPassword = passwordEncoder.encode(request.getPassword());
+
 		//db에 저장
 		Member member = Member.builder()
 				.email(request.getEmail())
-				.password(request.getPassword())
+				.password(encodedPassword)
 				.number(request.getPhone())
 				.name(request.getNickname())
 				.type("common")
