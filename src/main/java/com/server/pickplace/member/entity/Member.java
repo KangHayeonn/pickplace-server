@@ -42,6 +42,9 @@ public class Member extends BaseEntity implements UserDetails {
 	@Column(name = "MEMBER_ID", nullable = false)
 	private Long id;
 
+	@Column(name = "MEMBER_TYPE", nullable = false, length = 10)
+	private String type; // 카카오 / 일반
+
 	@Column(name = "MEMBER_EMAIL", nullable = false, length = 30)
 	private String email;
 
@@ -53,6 +56,7 @@ public class Member extends BaseEntity implements UserDetails {
 
 	@Column(name = "MEMBER_NICKNAME", nullable = false, length = 10)
 	private String name;
+
 
 	@Column(name = "MEMBER_ROLE", nullable = false)
 	@Enumerated(EnumType.STRING)

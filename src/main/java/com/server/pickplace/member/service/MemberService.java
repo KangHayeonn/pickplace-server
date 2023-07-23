@@ -145,6 +145,7 @@ public class MemberService {
 				.number(request.getPhone())
 				.name(request.getNickname())
 				.role(MemberRole.valueOf(request.getMemberRole()))
+				.type("일반")
 				.build();
 
 		return memberRepository.save(member).getEmail();
