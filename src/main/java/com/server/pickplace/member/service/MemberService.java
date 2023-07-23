@@ -70,6 +70,10 @@ public class MemberService {
 		if (memberRepository.findByEmail(jwtRequestDto.getEmail()).orElse(null) == null)
 			throw new MemberException(MemberErrorResult.MEMBER_NOT_ID); //없는 아이디
 
+//		if (!passwordEncoder.matches(memberRepository.findByEmail(jwtRequestDto.getEmail()).get().getPassword(), jwtRequestDto.getPassword())) {
+//			throw new MemberException(MemberErrorResult.MEMBER_NOT_PW); // 비밀번호 틀린 경우
+//		}
+
 		if (!memberRepository.findByEmail(jwtRequestDto.getEmail()).get().getPassword().equals(jwtRequestDto.getPassword())) {
 			throw new MemberException(MemberErrorResult.MEMBER_NOT_PW); // 비밀번호 틀린 경우
 		}
@@ -138,12 +142,13 @@ public class MemberService {
 	@Transactional
 	public String signup(MemberSignupRequestDto request) {
 
-		String encodedPassword = passwordEncoder.encode(request.getPassword());
+//		String encodedPassword = passwordEncoder.encode(request.getPassword());
+
 
 		//db에 저장
 		Member member = Member.builder()
 				.email(request.getEmail())
-				.password(encodedPassword)
+				.password(request.getPassword())
 				.number(request.getPhone())
 				.name(request.getNickname())
 				.type("common")
