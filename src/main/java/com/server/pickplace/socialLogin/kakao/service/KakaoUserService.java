@@ -65,9 +65,6 @@ public class KakaoUserService {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
-        System.out.println("굿1");
-        log.info("hello");
-
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
@@ -146,6 +143,7 @@ public class KakaoUserService {
                     .email(kakaoEmail)
                     .role(USER)//USER용
                     .number("0")//default
+                    .type("kakao")
                     .password(encodedPassword)
                     .build());
 

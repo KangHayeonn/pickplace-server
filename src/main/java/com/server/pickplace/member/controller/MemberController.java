@@ -80,8 +80,8 @@ public class MemberController {
 	@PostMapping(value = "signup", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity signUp(@RequestBody @Valid MemberSignupRequestDto request, @ApiIgnore Errors errors) throws Exception {
 
-		String signUpResponse = memberService.signup(request);
 
+		String signUpResponse = memberService.signup(request);
 
 		if (errors.hasErrors()) {
 			String errorDetail = errors.getFieldErrors().toString();
