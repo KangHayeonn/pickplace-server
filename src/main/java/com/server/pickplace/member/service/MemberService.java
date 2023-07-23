@@ -144,6 +144,7 @@ public class MemberService {
 				.password(request.getPassword())
 				.number(request.getPhone())
 				.name(request.getNickname())
+				.type("일반")
 				.role(MemberRole.valueOf(request.getMemberRole()))
 				.build();
 
