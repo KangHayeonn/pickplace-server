@@ -125,54 +125,22 @@ public class MemberInfoService {
         }
     }
 
-    public String reservationDetails (HttpServletRequest httpServletRequest, Long id){
+    public List<MemberReservationResponseDto> reservationDetails (HttpServletRequest httpServletRequest, Long id){
 //        List<Reservation> reservationDetail = memberReservationRepository.findByMember_Id(id);
 
         Optional<List<Reservation>> reservationDetail = memberReservationRepository.findReservationListByMemberId(id);
-        System.out.println(reservationDetail.get());
-//
-//        if(reservationDetail==null){
-//            throw new MemberException(MemberErrorResult.MEMBER_NOT_FOUND); // 예약 내역이 없습니다 처리
-//        }
-//
-//        List<Reservation> reservations = reservationDetail.get();
-//
-//        List<MemberReservationResponseDto> responseDto = reservations.stream().map(reservation -> modelMapper.map(reservation, MemberReservationResponseDto.class))
-//                .collect(Collectors.toList());
 
-//        System.out.println(responseDto.get(0).getPlaceId());
+        if(reservationDetail==null){
+            throw new MemberException(MemberErrorResult.MEMBER_NOT_FOUND); // 예약 내역이 없습니다 처리
+        }
+
+        List<Reservation> reservations = reservationDetail.get();
+//
+        List<MemberReservationResponseDto> responseDto = reservations.stream().map(reservation -> modelMapper.map(reservation, MemberReservationResponseDto.class))
+                .collect(Collectors.toList());
 
 
-//        Map< Object, Object > reservationMap = new HashMap<>();
-
-//        reservationMap.put("reservationDetails",)
-//        for(int i=0 ; i<reservationDetail.size();i++){
-//            reservationMap.put(i,reser)
-//
-//        }
-
-
-//        System.out.println(reservationDetail.get(0).getMember().getId());
-//
-//        System.out.println(reservationDetail.get().get(0));
-//        .orElseThrow(()-> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND)); //존재하지 않는 아이디 예외처리
-//        List<Object[]> reservationAndNames = reservationDetail.
-//
-//        for (Object[] reservationsAndName : reservationAndNames) {
-//
-//            Reservation reservation = (Reservation) reservationsAndName[0];
-//            String key = (String) reservationsAndName[1];
-//            ReservationResponse reservationResponse = modelMapper.map(reservation, ReservationResponse.class);
-//
-//            List<ReservationResponse> reservations = map.getOrDefault(key, new ArrayList<>());
-//            reservations.add(reservationResponse);
-//
-//            map.put(key, reservations);
-//
-//        }
-//        System.out.println(reservationDetail);
-
-        return "goof";
+        return responseDto;
 
     }
 }

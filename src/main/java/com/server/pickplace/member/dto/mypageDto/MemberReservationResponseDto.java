@@ -17,30 +17,27 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class MemberReservationResponseDto {
 
-    @JsonProperty("reservationId")
     Long reservationId;
 
     Long placeId;
 
     String placeName;
 
-    @JsonProperty("checkInDate")
     String startDate;
 
-    @JsonProperty("checkOutDate")
     String endDate;
 
-    @JsonProperty("checkInDate")
     String startTime;
 
-    @JsonProperty("checkOutTime")
     String endTime;
 
-    @JsonProperty("reservationStatus")
     String reservationStatus;
+
 
     Boolean reviewExistence;
 
+    @JsonProperty("reservationDate")
+    String updateDate;
 
 
 
