@@ -45,7 +45,7 @@ public class Member extends BaseEntity implements UserDetails {
 	@Column(name = "MEMBER_EMAIL", nullable = false, length = 30, unique = true)
 	private String email;
 
-	@Column(name = "MEMBER_EMAIL", nullable = false, length = 10)
+	@Column(name = "MEMBER_TYPE", nullable = false, length = 10)
 	private String type; //일반 / 카카오
 
 	@Column(name = "MEMBER_PWD", nullable = false, length = 255)  // 일단 null 가능하게
