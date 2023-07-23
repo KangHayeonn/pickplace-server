@@ -9,6 +9,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 
 @RequestMapping("/send-mail")
 @RestController
@@ -22,7 +25,7 @@ public class EmailController {
 
     @ApiOperation(tags = "1. Member", value = "메일", notes = "메일 관련")
     @PostMapping("/pwd")
-    public ResponseEntity sendPasswordMail() {
+    public ResponseEntity sendPasswordMail() throws MessagingException {
 //        EmailMessage emailMessage = EmailMessage.builder()
 //                .to(emailPostDto.getEmail()) //수신자
 //                .subject("[SAVIEW] 임시 비밀번호 발급") // 제목
@@ -34,6 +37,11 @@ public class EmailController {
         simpleMailMessage.setSubject("sub");
         simpleMailMessage.setText("test");
         javaMailSender.send(simpleMailMessage);
+//        MimeMessage message = javaMailSender.createMimeMessage();
+//        message.addRecipients(MimeMessage.RecipientType.TO, "rkdgkdus522@naver.com");
+//        message.setSubject("test");
+
+//        javaMailSender.send(message);
 
         return ResponseEntity.ok().build();
     }
