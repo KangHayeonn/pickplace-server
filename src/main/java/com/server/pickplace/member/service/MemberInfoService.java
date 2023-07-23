@@ -24,6 +24,7 @@ import org.modelmapper.ModelMapper;
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -125,16 +126,22 @@ public class MemberInfoService {
     }
 
     public String reservationDetails (HttpServletRequest httpServletRequest, Long id){
-        List<Reservation> reservationDetail = memberReservationRepository.findByMember_Id(id);
+//        List<Reservation> reservationDetail = memberReservationRepository.findByMember_Id(id);
 
-        if(reservationDetail==null){
-            throw new MemberException(MemberErrorResult.MEMBER_NOT_FOUND); // 예약 내역이 없습니다 처리
-        }
+        Optional<List<Reservation>> reservationDetail = memberReservationRepository.findReservationListByMemberId(id);
+        System.out.println(reservationDetail.get());
+//
+//        if(reservationDetail==null){
+//            throw new MemberException(MemberErrorResult.MEMBER_NOT_FOUND); // 예약 내역이 없습니다 처리
+//        }
+//
+//        List<Reservation> reservations = reservationDetail.get();
+//
+//        List<MemberReservationResponseDto> responseDto = reservations.stream().map(reservation -> modelMapper.map(reservation, MemberReservationResponseDto.class))
+//                .collect(Collectors.toList());
 
-        List<MemberReservationResponseDto> responseDto = reservationDetail.stream().map(room -> modelMapper.map(reservationDetail, MemberReservationResponseDto.class))
-                .collect(Collectors.toList());
+//        System.out.println(responseDto.get(0).getPlaceId());
 
-        System.out.println(responseDto);
 
 //        Map< Object, Object > reservationMap = new HashMap<>();
 
@@ -145,7 +152,7 @@ public class MemberInfoService {
 //        }
 
 
-        System.out.println(reservationDetail.get(0).getMember().getId());
+//        System.out.println(reservationDetail.get(0).getMember().getId());
 //
 //        System.out.println(reservationDetail.get().get(0));
 //        .orElseThrow(()-> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND)); //존재하지 않는 아이디 예외처리
