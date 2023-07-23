@@ -42,7 +42,7 @@ public class Member extends BaseEntity implements UserDetails {
 	@Column(name = "MEMBER_ID", nullable = false)
 	private Long id;
 
-	@Column(name = "MEMBER_EMAIL", nullable = false, length = 30)
+	@Column(name = "MEMBER_EMAIL", nullable = false, length = 30, unique = true)
 	private String email;
 
 	@Column(name = "MEMBER_EMAIL", nullable = false, length = 10)

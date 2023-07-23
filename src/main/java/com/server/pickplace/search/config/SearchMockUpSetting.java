@@ -5,6 +5,7 @@ import com.server.pickplace.member.entity.MemberRole;
 import com.server.pickplace.place.entity.*;
 import com.server.pickplace.reservation.entity.Reservation;
 import com.server.pickplace.reservation.entity.ReservationStatus;
+import com.server.pickplace.search.repository.SearchRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -28,48 +29,11 @@ import java.util.*;
 public class SearchMockUpSetting {
 
     @Autowired EntityManager em;
+    @Autowired SearchRepository searchRepository;
 
     @EventListener(ApplicationReadyEvent.class)
     public void initialize() {
 
-        Member host = hostSetting();
-
-        Member user = userSetting();
-
-        List<Place> placeList = placeSetting(host);
-
-        List<Room> roomList = RoomSetting();
-
-        List<Unit> unitList = UnitSetting();
-
-        List<Category> categoryList = CategorySetting();
-
-        List<Tag> tagList = tagSetting();
-
-        List<CategoryPlace> categoryPlaceList = categoryPlaceSetting(placeList, categoryList);
-
-        List<TagPlace> tagPlaceList = tagPlaceSetting(placeList, tagList);
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-
-        roomSet(placeList, roomList);
-
-        unitSet(roomList, unitList);
-
-        List<Reservation> reservationList = reservationSetting(unitList, user);
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////
-
-        em.persist(host);
-        em.persist(user);
-        placeList.stream().forEach(o -> em.persist(o));
-        roomList.stream().forEach(o -> em.persist(o));
-        unitList.stream().forEach(o -> em.persist(o));
-        categoryList.stream().forEach(o -> em.persist(o));
-        tagList.stream().forEach(o -> em.persist(o));
-        categoryPlaceList.stream().forEach(o -> em.persist(o));
-        tagPlaceList.stream().forEach(o -> em.persist(o));
-        reservationList.stream().forEach(o -> em.persist(o));
     }
 
     private List<Reservation> reservationSetting(List<Unit> unitList, Member user) {
