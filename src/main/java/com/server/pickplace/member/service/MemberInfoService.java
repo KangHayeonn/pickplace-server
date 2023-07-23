@@ -1,27 +1,31 @@
 package com.server.pickplace.member.service;
 
+import com.server.pickplace.host.dto.ReservationResponse;
 import com.server.pickplace.member.dto.InfoNicknameRequestDto;
 import com.server.pickplace.member.dto.InfoPhoneRequestDto;
 import com.server.pickplace.member.dto.InfoResponseDto;
 import com.server.pickplace.member.dto.LoginResponseDto;
+import com.server.pickplace.member.dto.mypageDto.MemberReservationResponseDto;
 import com.server.pickplace.member.entity.Member;
 import com.server.pickplace.member.error.MemberErrorResult;
 import com.server.pickplace.member.error.MemberException;
 import com.server.pickplace.member.repository.MemberRepository;
+import com.server.pickplace.member.repository.MemberReservationRepository;
 import com.server.pickplace.member.service.jwt.JwtTokenProvider;
+import com.server.pickplace.reservation.entity.Reservation;
 import io.jsonwebtoken.io.Decoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.json.BasicJsonParser;
 import org.springframework.boot.json.JsonParser;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
-
+import org.modelmapper.ModelMapper;
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.Base64.getUrlDecoder;
 
@@ -33,6 +37,8 @@ public class MemberInfoService {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
+    private final MemberReservationRepository memberReservationRepository;
+    private final ModelMapper modelMapper;
 
     public Map<String, Object> info(HttpServletRequest httpServletRequest, Long memberId){
 
@@ -115,9 +121,53 @@ public class MemberInfoService {
             if(!memberRepository.findById(id).get().getEmail().equals(email)){
                 throw new MemberException(MemberErrorResult.NOT_AUTHENTICATION);
             }
+        }
     }
 
-}
+    public String reservationDetails (HttpServletRequest httpServletRequest, Long id){
+        List<Reservation> reservationDetail = memberReservationRepository.findByMember_Id(id);
+
+        if(reservationDetail==null){
+            throw new MemberException(MemberErrorResult.MEMBER_NOT_FOUND); // 예약 내역이 없습니다 처리
+        }
+
+        List<MemberReservationResponseDto> responseDto = reservationDetail.stream().map(room -> modelMapper.map(reservationDetail, MemberReservationResponseDto.class))
+                .collect(Collectors.toList());
+
+        System.out.println(responseDto);
+
+//        Map< Object, Object > reservationMap = new HashMap<>();
+
+//        reservationMap.put("reservationDetails",)
+//        for(int i=0 ; i<reservationDetail.size();i++){
+//            reservationMap.put(i,reser)
+//
+//        }
+
+
+        System.out.println(reservationDetail.get(0).getMember().getId());
+//
+//        System.out.println(reservationDetail.get().get(0));
+//        .orElseThrow(()-> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND)); //존재하지 않는 아이디 예외처리
+//        List<Object[]> reservationAndNames = reservationDetail.
+//
+//        for (Object[] reservationsAndName : reservationAndNames) {
+//
+//            Reservation reservation = (Reservation) reservationsAndName[0];
+//            String key = (String) reservationsAndName[1];
+//            ReservationResponse reservationResponse = modelMapper.map(reservation, ReservationResponse.class);
+//
+//            List<ReservationResponse> reservations = map.getOrDefault(key, new ArrayList<>());
+//            reservations.add(reservationResponse);
+//
+//            map.put(key, reservations);
+//
+//        }
+//        System.out.println(reservationDetail);
+
+        return "goof";
+
+    }
 }
 
 
