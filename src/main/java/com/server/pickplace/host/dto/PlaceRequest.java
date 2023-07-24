@@ -21,7 +21,7 @@ public class PlaceRequest {
     @JsonProperty("placeName")
     private String name;
 
-    @Pattern(regexp = "^\\d{9,11}$")
+    @Pattern(message = "형식에 맞는 전화번호를 입력해주세요.", regexp = "^\\d{9,13}$")
     @JsonProperty("placePhone")
     private String number;
 
