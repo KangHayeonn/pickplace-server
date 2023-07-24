@@ -100,6 +100,7 @@ public class MemberService {
 				.nickname(memberRepository.findByEmail(jwtRequestDto.getEmail()).get().getName())
 				.accessToken(tokenInfo.getAccessToken())
 				.refreshToken(tokenInfo.getRefreshToken())
+				.role(String.valueOf(memberRepository.findByEmail(jwtRequestDto.getEmail()).get().getRole()))
 				.build();
 
 		loginMap.put("member", loginResponseDtoDto);

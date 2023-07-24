@@ -173,6 +173,7 @@ public class KakaoUserService {
                 .nickname(kakaoUser.getName())
                 .accessToken(tokenInfo.getAccessToken())
                 .refreshToken(tokenInfo.getRefreshToken())
+                .role("USER")
                 .build();
 
         loginMap.put("member", loginResponseDtoDto);
