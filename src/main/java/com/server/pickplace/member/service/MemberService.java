@@ -28,6 +28,7 @@ import com.server.pickplace.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -171,6 +172,11 @@ public class MemberService {
 		String token = jwtTokenProvider.resolveToken((HttpServletRequest) request); //access Token 가져옴
 		ValueOperations<String, String> logoutValueOperations = redisTemplate.opsForValue(); //access Token 블랙리스트에 등록
 		logoutValueOperations.set(token, token);
+
+//		HttpSession session = request.getSession();
+//		if (session != null) {
+//			session.invalidate();
+//		}
 
 
 		String payloadJWT = token.split("\\.")[1];
