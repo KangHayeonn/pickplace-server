@@ -14,6 +14,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
@@ -36,12 +40,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-//    @Bean
-//    @Override
-//    public AuthenticationManager authenticationManagerBean() throws Exception {
-//        return super.authenticationManagerBean();
-//    }
-
     private static final String[] AUTH_WHITELIST = {
             //정적인 파일에 대한 요청들 작성 (추후)
     };
@@ -50,22 +48,26 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
             //이 부분은 정리 필요,,
             http
-                    .httpBasic().disable()
-                    .csrf().disable() //postman test 위한 설정 변경
+                    .httpBasic().disable();
+            http.csrf().disable() //postman test 위한 설정 변경
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                     .authorizeRequests()
-//                    .anyRequest().authenticated() //어떤 url이든 접근 인증 필요
                     .anyRequest().permitAll()
-//                    .antMatchers("/api/v1/members/**","/send-mail/pwd").permitAll() // /members 관련 api 허락
-                .and()
-                    .formLogin()
-//                    .loginPage("/view/login") //로그인 페이지 연결
-                    .loginProcessingUrl("/login") //해당 주소를 어디로 처리할지 정해줌
-                    .usernameParameter("id")
-                    .passwordParameter("pw")
-                    .defaultSuccessUrl("/view/dashboard", true) //성공시 이동할 url
-                    .permitAll()
+//                    .antMatchers("/api/**").permitAll()
+//                   .antMatchers("/api/v1/members/signup","/api/v1/members/login","/view/dashboard").permitAll() // /members 관련 api 허락
+//                   .antMatchers("/api/v1/members/host").hasRole("HOST") // /members 관련 api 허락
+//                     .antMatchers("/api/v1/members/user").hasRole("USER") // /members 관련 api 허락
+
+//                    .anyRequest().authenticated() // 아닌건 오류
+//                    .and()
+////                    .formLogin()
+////                    .loginPage("/view/login") //로그인 페이지 연결
+////                    .loginProcessingUrl("/api/v1/members/login") //해당 주소를 어디로 처리할지 정해줌
+//                    .usernameParameter("id")
+//                    .passwordParameter("pw")
+//                    .defaultSuccessUrl("/view/dashboard", true)
+//                    .permitAll()
                 .and()
                     .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -89,10 +91,19 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring()
                 .antMatchers(AUTH_WHITELIST);    }
 
-//    @Override
-//    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.userDetailsService(loginIdPwValidator);
-//    }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
 
+        configuration.addAllowedOrigin("http://locakhost:3000/");
+        configuration.addAllowedOriginPattern("*");
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
 }
