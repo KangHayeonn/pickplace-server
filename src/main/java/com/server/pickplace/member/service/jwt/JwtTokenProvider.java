@@ -139,7 +139,7 @@ public class JwtTokenProvider {
             throw new MemberException(MemberErrorResult.INVALID_TOKEN);
 //            log.info("Invalid JWT Token", e);
         } catch (ExpiredJwtException e) {
-            throw new MemberException(MemberErrorResult.INVALID_TOKEN);
+            throw new MemberException(MemberErrorResult.EXPIRED_TOKEN);
 //            log.info("Expired JWT Token", e);
         } catch (UnsupportedJwtException e) {
             throw new MemberException(MemberErrorResult.INVALID_TOKEN);
