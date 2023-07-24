@@ -119,7 +119,7 @@ public class HostController {
 
     @ApiOperation(tags = "2. Host", value = "공간 등록", notes = "신규 공간을 등록한다.") // 방만 추가하는 페이지도 필요할듯
     @PostMapping("/place")
-    public ResponseEntity<Void> placeRegister(@RequestHeader("accessToken") String accessToken,
+    public ResponseEntity placeRegister(@RequestHeader("accessToken") String accessToken,
                                               @Validated @RequestBody PlaceRoomReqeuest placeRoomReqeuest) {
 
         String email = hostService.getPayloadMapAndGetEmail(accessToken);
@@ -127,7 +127,7 @@ public class HostController {
 
         hostService.savePlaceAndRoomsByDto(placeRoomReqeuest, host);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
     }
 
 

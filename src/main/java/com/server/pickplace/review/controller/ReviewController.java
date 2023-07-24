@@ -65,6 +65,7 @@ public class ReviewController {
         ReviewDetailResponse reviewDetailResponse = reviewRepository.getReviewDetailDtoByReviewId(reviewId);
 
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), reviewDetailResponse));
+        
     }
 
     @ApiOperation(tags = "5. Review", value = "리뷰 생성", notes = "리뷰를 생성한다.")
@@ -76,7 +77,7 @@ public class ReviewController {
 
         reviewService.createReviewByEmailAndRequest(email, createReviewRequest);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
     }
 
     @ApiOperation(tags = "5. Review", value = "리뷰 변경", notes = "리뷰를 수정한다.")
@@ -89,7 +90,7 @@ public class ReviewController {
 
         reviewRepository.updateReview(email, updateReviewRequest, reviewId);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
     }
 
     @ApiOperation(tags = "5. Review", value = "리뷰 삭제", notes = "리뷰를 삭제한다.")
@@ -101,7 +102,7 @@ public class ReviewController {
 
         reviewRepository.deleteReview(email, reviewId);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
 
     }
 
