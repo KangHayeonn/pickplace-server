@@ -6,12 +6,15 @@ import com.server.pickplace.member.dto.InfoPhoneRequestDto;
 import com.server.pickplace.member.dto.InfoResponseDto;
 import com.server.pickplace.member.dto.LoginResponseDto;
 import com.server.pickplace.member.dto.mypageDto.MemberReservationResponseDto;
+import com.server.pickplace.member.dto.mypageDto.MemberRoomDto;
 import com.server.pickplace.member.entity.Member;
 import com.server.pickplace.member.error.MemberErrorResult;
 import com.server.pickplace.member.error.MemberException;
 import com.server.pickplace.member.repository.MemberRepository;
 import com.server.pickplace.member.repository.MemberReservationRepository;
+import com.server.pickplace.member.repository.MemberRoomRepository;
 import com.server.pickplace.member.service.jwt.JwtTokenProvider;
+import com.server.pickplace.place.entity.Room;
 import com.server.pickplace.reservation.entity.Reservation;
 import io.jsonwebtoken.io.Decoder;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +42,8 @@ public class MemberInfoService {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final MemberReservationRepository memberReservationRepository;
+    private final MemberRoomRepository memberRoomRepository;
+
     private final ModelMapper modelMapper;
 
     public Map<String, Object> info(HttpServletRequest httpServletRequest, Long memberId){
@@ -135,14 +140,21 @@ public class MemberInfoService {
         }
 
         List<Reservation> reservations = reservationDetail.get();
+
+//        List<MemberReservationResponseDto> a = reservato
+
 //
         List<MemberReservationResponseDto> responseDto = reservations.stream().map(reservation -> modelMapper.map(reservation, MemberReservationResponseDto.class))
                 .collect(Collectors.toList());
+
+//        responseDto.add(1,place);
 
 
         return responseDto;
 
     }
+
+
 }
 
 

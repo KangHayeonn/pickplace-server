@@ -35,6 +35,7 @@ public class MemberMyPageController {
 
         Map<String, Object> memberReservationDtos = new HashMap<>();
 
+
         memberReservationDtos.put("reservation", reservationDtos);
 
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), memberReservationDtos)); // 성공

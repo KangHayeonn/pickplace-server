@@ -15,7 +15,14 @@ import java.util.Optional;
 @Repository
 public interface MemberReservationRepository extends JpaRepository<Reservation, Long> {
 
+//    @Query(value = "select r from Reservation r join r.room rm join rm.place p where p.id = :id and r.endDate >= :today")
+//    Optional<List<Reservation>> findOptionalReservationListByPlaceId(@Param("id") Long id, @Param("today") LocalDate today);
+
+
+
     @Query(value = "select r from Reservation r join r.member p where p.id = :id")
     Optional<List<Reservation>> findReservationListByMemberId(@Param("id") Long id);
+
+
 
 }
