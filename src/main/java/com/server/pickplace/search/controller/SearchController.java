@@ -30,6 +30,7 @@ public class SearchController {
                                                           @PathVariable Long placeId) {
 
         searchService.dateNullCheck(detailPageRequest);
+        searchService.timeNullCheck(detailPageRequest, placeId);
 
         Map<String, Object> detailPageMap = searchService.getDetailPageMap(detailPageRequest, placeId);
 
