@@ -68,14 +68,14 @@ public class ReservationController {
     @ApiOperation(tags = "4. Reservation", value = "카드 결제 및 예약", notes = "신용/체크카드 결제와 실제 예약이 이루어진다.")
     @PostMapping("/card")
     public ResponseEntity cardPay(@RequestHeader("accessToken") String accessToken,
-                                  @RequestBody @Validated CardPayRequest cardPayRequest) {
+                                  @RequestBody CardPayRequest cardPayRequest) {
 
         String email = reservationService.getPayloadMapAndGetEmail(accessToken);
 
         // 결제 + 예약( 단일 트랜잭션 )
         reservationService.payByCardAndReservation(email, cardPayRequest);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
 
     }
 
@@ -108,7 +108,7 @@ public class ReservationController {
 
         reservationService.payByAccountAndReservation(email, accountPayRequest);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
 
     }
 
@@ -159,7 +159,7 @@ public class ReservationController {
 
         reservationRepository.changeQREntityStatus(qrPaymentInfomation, QRStatus.APPROVAL);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
 
     }
 
@@ -178,7 +178,7 @@ public class ReservationController {
         reservationRepository.makeReservation(email, qrPayRequest);
         reservationRepository.changeQREntityStatus(qrPaymentInfomation, QRStatus.PAYMENT);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
     }
 
 

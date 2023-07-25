@@ -4,12 +4,12 @@ import com.server.pickplace.common.common.BaseEntity;
 import com.server.pickplace.member.entity.Member;
 import com.server.pickplace.place.entity.Room;
 import com.server.pickplace.place.entity.Unit;
+import com.server.pickplace.review.entity.Review;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -18,6 +18,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "RESERVATION_TB")
+@ToString
 public class Reservation extends BaseEntity {
 
     @Id
@@ -58,5 +59,8 @@ public class Reservation extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UNIT_ID")
     private Unit unit;
+
+    @OneToOne(mappedBy = "reservation")
+    private Review review;
 
 }

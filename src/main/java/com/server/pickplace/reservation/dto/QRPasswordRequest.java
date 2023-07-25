@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank;
 @Getter
 public class QRPasswordRequest {
 
-    @NotBlank
+    @NotBlank(message = "비밀번호값을 입력해주세요.")
     private String qrPassword;
 
 }

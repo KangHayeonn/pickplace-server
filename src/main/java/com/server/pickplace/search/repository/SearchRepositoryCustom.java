@@ -1,5 +1,6 @@
 package com.server.pickplace.search.repository;
 
+import com.server.pickplace.place.entity.CategoryStatus;
 import com.server.pickplace.search.dto.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -18,4 +19,6 @@ public interface SearchRepositoryCustom {
     Map<Long, Integer> getUnableRoomCountMap(DetailPageRequest detailPageRequest, Long placeId, List<Long> roomIdList);
 
     Map<Long, Integer> getRoomUnitCountMap(DetailPageRequest detailPageRequest, Long placeId);
+
+    CategoryStatus findCategoryStatusByPlaceId(Long placeId);
 }
