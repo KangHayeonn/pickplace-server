@@ -112,7 +112,7 @@ public class HostController {
         String email = hostService.getPayloadMapAndGetEmail(accessToken);
         hostService.hostCheck(email);
 
-        Map<String, Object> memberReservationPlaceDtos = hostService.getMemberReservationPlaceDtoMapByReservationId(reservationId);
+        Map<String, Object> memberReservationPlaceDtos = hostService.getMemberReservationPlaceDtoMapByReservationId(reservationId, email);
 
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), memberReservationPlaceDtos));
     }

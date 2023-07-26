@@ -24,8 +24,8 @@ public interface HostRepository extends JpaRepository<Member, Long>, HostReposit
     @Query(value = "select p from Place p join fetch p.member where p.id = :id")
     Optional<Place> findOptionalPlaceByPlaceId(@Param("id") Long id);
 
-    @Query(value = "select r from Reservation r join r.room rm join rm.place p where p.id = :id and r.endDate >= :today")
-    Optional<List<Reservation>> findOptionalReservationListByPlaceId(@Param("id") Long id, @Param("today") LocalDate today);
+    @Query(value = "select r from Reservation r join r.room rm join rm.place p where p.id = :id")
+    Optional<List<Reservation>> findOptionalReservationListByPlaceId(@Param("id") Long id);
 
     @Query(value = "select r, p.name from Reservation r join r.room rm join rm.place p join p.member m where m.email = :email")
     Optional<List<Object[]>> findOptionalReservationAndNamesByEmail(@Param("email") String email);

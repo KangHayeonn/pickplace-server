@@ -16,7 +16,6 @@ import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -83,7 +82,7 @@ public class HostService extends CommonService {
 
     public List<ReservationResponse> findReservationDtoListByPlaceId(Long placeId) {
 
-        Optional<List<Reservation>> optionalReservations = hostRepository.findOptionalReservationListByPlaceId(placeId, LocalDate.now());
+        Optional<List<Reservation>> optionalReservations = hostRepository.findOptionalReservationListByPlaceId(placeId);
 
         if (optionalReservations.isPresent()) {
 
@@ -143,7 +142,7 @@ public class HostService extends CommonService {
 
         return new HashMap<>();
     }
-    public Map<String, Object> getMemberReservationPlaceDtoMapByReservationId(Long reservationId) {
+    public Map<String, Object> getMemberReservationPlaceDtoMapByReservationId(Long reservationId, String email) {
 
         Optional<List<Object[]>> optionalMemberReservationPlaceList = hostRepository.findOptionalMemberReservationPlaceListByReservationId(reservationId); // reservationId만 유효하다면, 셋 다 존재해야함
 
@@ -156,8 +155,8 @@ public class HostService extends CommonService {
         Member member = (Member) memberReservationPlaceList[0];
         Reservation reservation = (Reservation) memberReservationPlaceList[1];
         Place place = (Place) memberReservationPlaceList[2];
-        reservationMemberCheck(member, place);
 
+        reservationMemberCheck(member, email);
 
         MemberResponse MemberDto = MemberResponse.builder()
                 .name(member.getName()).build();
@@ -176,8 +175,8 @@ public class HostService extends CommonService {
 
     }
 
-    private void reservationMemberCheck(Member member, Place place) {
-        if (!place.getMember().equals(member)) {
+    private void reservationMemberCheck(Member member, String email) {
+        if (!member.getEmail().equals(email)) {
             throw new HostException(HostErrorResult.NO_PERMISSION);
         }
     }
@@ -208,6 +207,7 @@ public class HostService extends CommonService {
 
         for (Room room : rooms) {
             hostRepository.saveRoom(room);
+            hostRepository.saveUnitByRoom(room);
         }
 
         Category category = hostRepository.findCategoryByCategoryStatus(categoryStatus);

@@ -18,4 +18,6 @@ public interface HostRepositoryCustom {
     List<Tag> findTagListByTagStatusList(List<TagStatus> tagStatusList);
 
     void saveTagPlace(TagPlace build);
+
+    void saveUnitByRoom(Room room);
 }

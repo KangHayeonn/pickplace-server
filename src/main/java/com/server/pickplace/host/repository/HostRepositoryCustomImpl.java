@@ -64,4 +64,13 @@ public class HostRepositoryCustomImpl implements HostRepositoryCustom {
     public void saveTagPlace(TagPlace tagPlace) {
         em.persist(tagPlace);
     }
+
+
+    @Override
+    public void saveUnitByRoom(Room room) {
+        for (int i = 1; i < room.getAmount() + 1; i++) {
+            Unit unit = Unit.builder().room(room).name(String.format("%d번방", i)).build();
+            em.persist(unit);
+        }
+    }
 }
