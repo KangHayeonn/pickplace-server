@@ -6,10 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 @Getter
 @Builder
@@ -17,23 +14,25 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 public class PlaceRequest {
 
-    @NotBlank  // Null, 빈 문자열, 스페이스만 있는 문자열 불가
+    @NotBlank(message = "{place.name.NotBlank}")
     @JsonProperty("placeName")
     private String name;
 
-    @Pattern(message = "형식에 맞는 전화번호를 입력해주세요.", regexp = "^\\d{9,13}$")
+    @Pattern(message = "형식에 맞는 전화번호를 입력해주세요.", regexp = "^\\d{9,12}$")
     @JsonProperty("placePhone")
     private String number;
 
-    @NotBlank
+    @NotBlank(message = "{address.NotBlank}")
     @JsonProperty("placeAddress")
     private String address;
 
     @Positive
+    @NotNull(message = "{x.NotNull}")
     @JsonProperty("placeXaxis")
     private Double x;
 
     @Positive
+    @NotNull(message = "{y.NotNull}")
     @JsonProperty("placeYaxis")
     private Double y;
 

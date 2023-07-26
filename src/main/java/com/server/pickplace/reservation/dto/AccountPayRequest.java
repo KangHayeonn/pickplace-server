@@ -8,13 +8,13 @@ import javax.validation.constraints.NotBlank;
 @Getter
 public class AccountPayRequest extends PayRequest {
 
-    @NotBlank
+    @NotBlank(message = "은행 이름을 입력해주세요.")
     private String bankName;
 
-    @NotBlank
+    @NotBlank(message = "계좌번호를 입력해주세요.")
     private String bankNum;
 
-    @NotBlank
+    @NotBlank(message = "비밀번호를 입력해주세요.")
     private String accountPassword;
 
 }

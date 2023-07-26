@@ -1,5 +1,6 @@
 package com.server.pickplace.common.common;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.persistence.EntityListeners;
@@ -28,6 +29,7 @@ import lombok.Setter;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
+
 	@CreatedDate
 	private LocalDateTime createdDate; // 생성시간
 
