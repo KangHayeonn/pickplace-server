@@ -9,8 +9,10 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.server.pickplace.place.entity.Place;
+import com.server.pickplace.place.entity.*;
 import com.server.pickplace.search.dto.*;
+import com.server.pickplace.search.error.SearchErrorResult;
+import com.server.pickplace.search.error.SearchException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -166,6 +168,23 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
         boolean hasNext = getPageableByPlaceResponseList(pageable, placeResponseList);
 
         return new SliceImpl<>(placeResponseList, pageable, hasNext);
+
+    }
+
+
+    @Override
+    public CategoryStatus findCategoryStatusByPlaceId(Long placeId) {
+        Optional<Category> optionalCategoryPlaceList = Optional.ofNullable(queryFactory
+                .select(category)
+                .from(categoryPlace)
+                .join(categoryPlace.place, place).on(place.id.eq(placeId))
+                .join(categoryPlace.category, category)
+                .fetchOne());
+
+        Category category1 = optionalCategoryPlaceList.orElseThrow(() -> new SearchException(SearchErrorResult.NOT_EXIST_PLACE));
+        CategoryStatus status = category1.getStatus();
+
+        return status;
 
     }
 
@@ -373,7 +392,7 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
     private OrderSpecifier<Float> eqRecommend(NormalSearchRequest request) {
 
-        if (request.getSearchType().equals("추천 순")) {
+        if (request.getSearchType().equals("추천순")) {
             return place.rating.desc();
         }
 
@@ -383,7 +402,7 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
     private OrderSpecifier<Integer> eqLowPrice(NormalSearchRequest request) {
 
-        if (request.getSearchType().equals("낮은 가격순")) {
+        if (request.getSearchType().equals("낮은가격순")) {
             return room.price.asc();
         }
 
@@ -392,7 +411,7 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
     private OrderSpecifier<Integer> eqHighPrice(NormalSearchRequest request) {
 
-        if (request.getSearchType().equals("높은 가격순")) {
+        if (request.getSearchType().equals("높은가격순")) {
             return room.price.desc();
         }
 
@@ -512,8 +531,6 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
         if ((request.getStartTime() == null) || (request.getEndTime() == null)) {
             return null;
         }
-
-        log.info("request.getstartTime = {}", request.getStartTime());
 
         BooleanExpression cond1 = reservation.startTime.goe(request.getStartTime()).and(reservation.startTime.lt(request.getEndTime()));
         BooleanExpression cond2 = reservation.endTime.gt(request.getStartTime()).and(reservation.endTime.loe(request.getEndTime()));

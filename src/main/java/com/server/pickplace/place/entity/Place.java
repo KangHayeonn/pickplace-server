@@ -33,7 +33,7 @@ public class Place extends BaseEntity {
     @Column(name = "PLACE_PHONE", nullable = true, length = 13)
     private String number;
 
-    @Column(name = "PLACE_NAME", nullable = false, length = 20)
+    @Column(name = "PLACE_NAME", nullable = false, length = 30)
     private String name;
 
     @Column(name = "PLACE_TOTAL_RATING", nullable = false)
