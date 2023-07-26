@@ -12,18 +12,14 @@ import com.server.pickplace.reservation.service.ReservationService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.json.BasicJsonParser;
-import org.springframework.boot.json.JsonParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Base64;
 import java.util.Map;
 import java.util.Optional;
 
-import static java.util.Base64.getUrlDecoder;
 
 @RestController
 @RequiredArgsConstructor
@@ -81,8 +77,7 @@ public class ReservationController {
 
     @ApiOperation(tags = "4. Reservation", value = "은행 별 가상계좌 받아오기", notes = "은행 별 가상계좌번호를 반환한다.")
     @PostMapping("/account/number")
-    public ResponseEntity<SingleResponse> accountReturn(@RequestHeader("accessToken") String accessToken,
-                                                        @RequestBody BankRequest bankRequest) {
+    public ResponseEntity<SingleResponse> accountReturn(@RequestBody BankRequest bankRequest) {
 
         String bankName = bankRequest.getBankName();
         String bankNum = reservationService.getBankNumByBankName(bankName);
@@ -118,7 +113,6 @@ public class ReservationController {
                                                       @Validated @RequestBody QRImageReqeust qrImageReqeust) {
 
         String email = reservationService.getPayloadMapAndGetEmail(accessToken);
-
 
         String uuid = reservationRepository.saveQRPaymentInformation(email, qrImageReqeust.getRoomPrice());
 
