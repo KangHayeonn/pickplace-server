@@ -59,7 +59,7 @@ public class ReviewController {
     }
 
     @ApiOperation(tags = "5. Review", value = "리뷰 상세 조회", notes = "reviewId를 수단으로, 리뷰를 상세 조회한다.")
-    @GetMapping("{reviewId}")
+    @GetMapping("/detail/{reviewId}")
     public ResponseEntity<SingleResponse<ReviewDetailResponse>> reviewDetailPage(@PathVariable("reviewId") Long reviewId) {
 
         ReviewDetailResponse reviewDetailResponse = reviewRepository.getReviewDetailDtoByReviewId(reviewId);
