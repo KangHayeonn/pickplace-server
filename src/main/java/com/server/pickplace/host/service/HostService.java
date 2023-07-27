@@ -238,4 +238,62 @@ public class HostService extends CommonService {
 
 
     }
+
+    // 본인 소유 플레이스Id 아님, 존재하지 않는 플레이스Id
+    public void updatePlaceByDto(Long placeId, PlaceUpdateRequest placeUpdateRequest, String email) {
+
+        // 1. placeId로 place 조회
+        // 2. 널이면, 에러  + place.getemail != email -> 권한없음
+
+        Optional<Place> optionalPlace = hostRepository.findOptionalPlaceByPlaceIdFetchCategoryAndTag(placeId);
+        Place place = optionalPlace.orElseThrow(() -> new HostException(HostErrorResult.NOT_EXIST_PLACE));
+        if (!place.getMember().getEmail().equals(email)) {
+            throw new HostException(HostErrorResult.NO_PERMISSION);
+        }
+
+        Category category = hostRepository.findCategoryByCategoryStatus(placeUpdateRequest.getCategory());
+        List<Tag> tagList = hostRepository.findTagListByTagStatusList(placeUpdateRequest.getTagList());
+
+
+        // 3. 수정
+
+        hostRepository.updatePlaceByDto(place, category, tagList, placeUpdateRequest);
+
+
+
+    }
+
+    public void deletePlace(Long placeId, String email) {
+
+        Optional<Place> optionalPlace = hostRepository.findOptionalPlaceByPlaceId(placeId);
+        Place place = optionalPlace.orElseThrow(() -> new HostException(HostErrorResult.NOT_EXIST_PLACE));
+        if (!place.getMember().getEmail().equals(email)) {
+            throw new HostException(HostErrorResult.NO_PERMISSION);
+        }
+
+        hostRepository.deletePlace(place);
+
+
+    }
+
+    public void updateRoomByDto(RoomReqeust roomReqeust, Long roomId, String email) {
+        Optional<Room> optionalRoom = hostRepository.findRoomByRoomId(roomId);
+        Room room = optionalRoom.orElseThrow(() -> new HostException(HostErrorResult.NOT_EXIST_ROOM));
+        if (!room.getPlace().getMember().getEmail().equals(email)) {
+            throw new HostException(HostErrorResult.NO_PERMISSION);
+        }
+
+        hostRepository.updateRoom(room, roomReqeust);
+
+    }
+
+    public void deleteRoomByRoomId(Long roomId, String email) {
+        Optional<Room> optionalRoom = hostRepository.findRoomByRoomId(roomId);
+        Room room = optionalRoom.orElseThrow(() -> new HostException(HostErrorResult.NOT_EXIST_ROOM));
+        if (!room.getPlace().getMember().getEmail().equals(email)) {
+            throw new HostException(HostErrorResult.NO_PERMISSION);
+        }
+
+        hostRepository.deleteRoom(room);
+    }
 }

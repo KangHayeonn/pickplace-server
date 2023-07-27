@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,4 +34,11 @@ public interface HostRepository extends JpaRepository<Member, Long>, HostReposit
     Optional<List<Object[]>> findOptionalMemberReservationPlaceListByReservationId(@Param("id") Long reservationId);
 
     Member findByEmail(String email);
+
+    @Query(value = "select p from Place p join fetch p.member where p.id = :id")
+    Optional<Place> findOptionalPlaceByPlaceIdFetchCategoryAndTag(@Param("id") Long id);
+
+    @Query(value = "select r from Room r join fetch r.place p join fetch p.member m where r.id = :id")
+    Optional<Room> findRoomByRoomId(@Param("id") Long roomId);
+
 }
