@@ -375,7 +375,7 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
             PlaceResponse placeResponse = PlaceResponse.builder()
                     .id(place.getId())
                     .name(place.getName())
-                    .rating(place.getRating() / place.getReviewCount())
+                    .rating(place.getReviewCount().equals(0) ? 0 : place.getRating() / place.getReviewCount())
                     .reviewCount(place.getReviewCount())
                     .address(
                             new HashMap<>() {
