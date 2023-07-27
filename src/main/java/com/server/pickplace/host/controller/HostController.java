@@ -127,7 +127,7 @@ public class HostController {
 
         hostService.savePlaceAndRoomsByDto(placeRoomReqeuest, host);
 
-        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
     }
 
     @ApiOperation(tags = "2. Host", value = "공간 수정", notes = "기존 공간 정보를 수정한다.")
@@ -140,7 +140,7 @@ public class HostController {
 
         hostService.updatePlaceByDto(placeId, placeUpdateRequest, email);
 
-        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
 
     }
 
@@ -153,7 +153,7 @@ public class HostController {
 
         hostService.deletePlace(placeId, email);
 
-        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
 
     }
 
@@ -167,7 +167,7 @@ public class HostController {
 
         hostService.updateRoomByDto(roomReqeust, roomId, email);
 
-        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
     }
 
     @ApiOperation(tags = "2. Host", value = "방 삭제", notes = "기존 방 정보를 삭제한다.")
@@ -179,9 +179,13 @@ public class HostController {
 
         hostService.deleteRoomByRoomId(roomId, email);
 
-        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
     }
 
+    @GetMapping("/test")
+    public ResponseEntity test() {
 
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
+    }
 
-}
+    }

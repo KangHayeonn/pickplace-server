@@ -71,7 +71,7 @@ public class ReservationController {
         // 결제 + 예약( 단일 트랜잭션 )
         reservationService.payByCardAndReservation(email, cardPayRequest);
 
-        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
 
     }
 
@@ -103,7 +103,7 @@ public class ReservationController {
 
         reservationService.payByAccountAndReservation(email, accountPayRequest);
 
-        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
 
     }
 
@@ -153,7 +153,7 @@ public class ReservationController {
 
         reservationRepository.changeQREntityStatus(qrPaymentInfomation, QRStatus.APPROVAL);
 
-        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
 
     }
 
@@ -172,7 +172,7 @@ public class ReservationController {
         reservationRepository.makeReservation(email, qrPayRequest);
         reservationRepository.changeQREntityStatus(qrPaymentInfomation, QRStatus.PAYMENT);
 
-        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
     }
 
 
