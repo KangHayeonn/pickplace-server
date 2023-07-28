@@ -78,35 +78,41 @@ public class KakaoUserService {
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-//        body.add("client_id", "17daada2a5511b9f5ad422950ad1c268");
-        body.add("client_id", client_id);
+        body.add("client_id", "17daada2a5511b9f5ad422950ad1c268");
         body.add("redirect_uri", "http://localhost:3000/redirect");
-        body.add("client_secret", client_secret);
+        body.add("client_secret", "VODb154UxG9n1uWAJ3UFvpEpfeT3vK3Y");
         body.add("code", code);
-
-        System.out.println(body);
 
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(body, headers);
+
+
+
         RestTemplate rt = new RestTemplate();
 
-        try{
-            ResponseEntity<String> response = rt.exchange(
-                    "https://kauth.kakao.com/oauth/token",
-                    HttpMethod.POST,
-                    kakaoTokenRequest,
-                    String.class
-            );
+        String response = rt.postForObject("https://kauth.kakao.com/oauth/token",kakaoTokenRequest, String.class);
 
-            // HTTP 응답 (JSON) -> 액세스 토큰 파싱
-            String responseBody = response.getBody();
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(responseBody);
-            return jsonNode.get("access_token").asText();
 
-        }catch(Exception e){
-            throw new MemberException(MemberErrorResult.UNKNOWN_EXCEPTION);
-        }
+        assert response!=null ;
+        return response;
+
+//        try{
+//            ResponseEntity<String> response = rt.exchange(
+//                    "https://kauth.kakao.com/oauth/token",
+//                    HttpMethod.POST,
+//                    kakaoTokenRequest,
+//                    String.class
+//            );
+//
+//            // HTTP 응답 (JSON) -> 액세스 토큰 파싱
+//            String responseBody = response.getBody();
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            JsonNode jsonNode = objectMapper.readTree(responseBody);
+//            return jsonNode.get("access_token").asText();
+//
+//        }catch(Exception e){
+//            throw new MemberException(MemberErrorResult.UNKNOWN_EXCEPTION);
+//        }
 
 
 
