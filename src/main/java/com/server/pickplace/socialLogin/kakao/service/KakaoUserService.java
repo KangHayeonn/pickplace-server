@@ -18,6 +18,9 @@ import com.server.pickplace.member.service.jwt.RefreshToken;
 import com.server.pickplace.socialLogin.kakao.dto.SocialUserInfoDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -52,6 +55,12 @@ public class KakaoUserService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
 
+    @Value("${kakao.client_id}")
+    private String client_id;
+
+    @Value("${kakao.client_secret}")
+    private String client_secret;
+
     public Map<String, Object> kakaoLogin(String code, HttpServletRequest request, HttpServletResponse response) throws JsonProcessingException {
 
         String accessToken = getAccessToken(code); // 1. "인가 코드"로 "액세스 토큰" 요청
@@ -59,6 +68,7 @@ public class KakaoUserService {
         Member kakaoUser = registerKakaoUserIfNeed(kakaoUserInfo); // 3. 카카오ID로 회원가입 처리
         return forceLogin(kakaoUser, request); //4. 강제 로그인 처리
     }
+
 
     private String getAccessToken(String code) throws JsonProcessingException {
         // HTTP Header 생성
@@ -68,13 +78,11 @@ public class KakaoUserService {
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", "17daada2a5511b9f5ad422950ad1c268");
-        body.add("redirect_uri", "https://pick-place.kr/api/v1/members/user/kakao/callback");
-        body.add("client_secret", "VODb154UxG9n1uWAJ3UFvpEpfeT3vK3Y");
+//        body.add("client_id", "17daada2a5511b9f5ad422950ad1c268");
+        body.add("client_id", client_id);
+        body.add("redirect_uri", "https://localhost:3000/redirect");
+        body.add("client_secret", client_secret);
         body.add("code", code);
-
-        log.info(code);
-        log.info("hello");
 
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(body, headers);
@@ -131,7 +139,8 @@ public class KakaoUserService {
         Member kakaoUser = memberRepository.findByEmail(kakaoEmail)
                 .orElse(null);
 
-        if (kakaoUser == null) {
+        //|| !kakaoUser.getType().equals("kakao") 카카오 일때만 보는 로직 추가해야할듯
+        if (kakaoUser == null ) {
             // 회원가입
             // password: random UUID
             String password = UUID.randomUUID().toString();
@@ -144,7 +153,7 @@ public class KakaoUserService {
                     .role(USER)//USER용
                     .number("0")//default
                     .type("kakao")
-                    .password(encodedPassword)
+                    .password("kakao")  // 저장 X
                     .build());
 
         }

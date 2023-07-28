@@ -169,6 +169,7 @@ public class MemberService {
 
 
 	public void logout(HttpServletRequest request) {
+
 		String token = jwtTokenProvider.resolveToken((HttpServletRequest) request); //access Token 가져옴
 		ValueOperations<String, String> logoutValueOperations = redisTemplate.opsForValue(); //access Token 블랙리스트에 등록
 		logoutValueOperations.set(token, token);
@@ -186,6 +187,10 @@ public class MemberService {
 		JsonParser jsonParser = new BasicJsonParser();
 		Map<String, Object> jsonArray = jsonParser.parseMap(payload);
 		String email = (String) jsonArray.get("sub"); // id 담아옴
+
+
+
+
 
 		// refreshToken 삭제
 		refreshTokenRedisRepository.findById(email)
