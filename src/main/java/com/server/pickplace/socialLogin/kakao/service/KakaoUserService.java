@@ -98,10 +98,6 @@ public class KakaoUserService {
             bw.write(sb.toString());
             bw.flush();
 
-            //결과 코드가 200이라면 성공
-            int responseCode = conn.getResponseCode();
-            System.out.println("responseCode : " + responseCode);
-
             //요청을 통해 얻은 JSON타입의 Response 메세지 읽어오기
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line = "";
@@ -110,7 +106,6 @@ public class KakaoUserService {
             while ((line = br.readLine()) != null) {
                 result += line;
             }
-            System.out.println("response body : " + result);
 
             //Gson 라이브러리에 포함된 클래스로 JSON파싱 객체 생성
             JsonParser parser = new JsonParser();
@@ -118,9 +113,6 @@ public class KakaoUserService {
 
             access_Token = element.getAsJsonObject().get("access_token").getAsString();
             refresh_Token = element.getAsJsonObject().get("refresh_token").getAsString();
-
-//            System.out.println("access_token : " + access_Token);
-//            System.out.println("refresh_token : " + refresh_Token);
 
             br.close();
             bw.close();
@@ -131,62 +123,6 @@ public class KakaoUserService {
         return access_Token;
     }
 
-
-//    private String getAccessToken(String code) throws JsonProcessingException {
-//        // HTTP Header 생성
-//        HttpHeaders headers = new HttpHeaders();
-////        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-//
-//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-//
-//        // HTTP Body 생성
-//        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-//        body.add("grant_type", "authorization_code");
-//        body.add("client_id", "17daada2a5511b9f5ad422950ad1c268");
-//        body.add("redirect_uri", "http://localhost:3000/redirect");
-//        body.add("client_secret", "VODb154UxG9n1uWAJ3UFvpEpfeT3vK3Y");
-//        body.add("code", code);
-//
-//        // HTTP 요청 보내기
-//        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(body, headers);
-//
-//
-//
-//        RestTemplate rt = new RestTemplate();
-//
-//        String response = rt.postForObject("https://kauth.kakao.com/oauth/token",kakaoTokenRequest, String.class);
-//
-//        assert response!=null ;
-//
-//        String responseBody = response.getBody();
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            JsonNode jsonNode = objectMapper.readTree(responseBody);
-//            return jsonNode.get("access_token").asText();
-//
-//
-//
-//
-////        try{
-////            ResponseEntity<String> response = rt.exchange(
-////                    "https://kauth.kakao.com/oauth/token",
-////                    HttpMethod.POST,
-////                    kakaoTokenRequest,
-////                    String.class
-////            );
-////
-////            // HTTP 응답 (JSON) -> 액세스 토큰 파싱
-////            String responseBody = response.getBody();
-////            ObjectMapper objectMapper = new ObjectMapper();
-////            JsonNode jsonNode = objectMapper.readTree(responseBody);
-////            return jsonNode.get("access_token").asText();
-////
-////        }catch(Exception e){
-////            throw new MemberException(MemberErrorResult.UNKNOWN_EXCEPTION);
-////        }
-//
-//
-//
-//    }
 
     // 2. 토큰으로 카카오 API 호출
     private SocialUserInfoDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
@@ -213,7 +149,7 @@ public class KakaoUserService {
         Long id = jsonNode.get("id").asLong();
         String email = jsonNode.get("kakao_account").get("email").asText();
         String nickname = jsonNode.get("properties")
-                .get("nickname").asText();
+                .get("nickname").asText().substring(0,10);
 
         return new SocialUserInfoDto(id, nickname, email);
     }

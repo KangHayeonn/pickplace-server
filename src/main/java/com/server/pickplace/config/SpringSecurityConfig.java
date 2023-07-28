@@ -7,6 +7,7 @@ import com.server.pickplace.member.service.jwt.JwtTokenProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -72,19 +73,16 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     .exceptionHandling()
 //                    .authenticationEntryPoint(unauthorizedEntryPoint) // 403 에러 예외처리
                     .and()
-
                     .csrf().disable()
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                     .authorizeRequests()
-//                    .anyRequest().permitAll() //모든 request
-                    .antMatchers("/api/**").permitAll()
-//                   .antMatchers("/api/v1/members/signup","/api/v1/members/login"
-//                           ,"/reservations/qrcode/**" ,"/reviews/{reviewId}","/reviews/places/**","/api/v1/members/user/kakao/**"
-//                           , "/search/**").permitAll() // 누구나 접근 가능한 url
-//                    .antMatchers("/api/v1/members/logout","/api/v1/host/**").hasRole("HOST") // Only Host
-//                    .antMatchers("/api/v1/members/logout","/api/v1/members/user/**").hasRole("USER") // Only Member
-//                    .anyRequest().authenticated() // 나머지는 403 에러 -> 에러 형식 200으로 보내야..
+                    .antMatchers(HttpMethod.GET, "/api/v1/review/places/*","/api/v1/review/*").permitAll()
+                    .antMatchers(HttpMethod.POST, "/api/v1/members/signup","/api/v1/members/login","/api/v1/members/emailCheck"
+                            ,"/api/v1/search/**","/api/v1/members/kakaoLogin").permitAll()
+                    .antMatchers(HttpMethod.GET, "/api/v1/host/**").hasRole("HOST")
+                    .antMatchers(HttpMethod.POST, "/api/v1/host/**").hasRole("HOST")
+                    .anyRequest().authenticated() // 나머지는 403 에러 -> 에러 형식 200으로 보내야..
                     .and()
                     .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -108,22 +106,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring()
                 .antMatchers(AUTH_WHITELIST);    }
 
-
-
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//
-//        configuration.addAllowedOrigin("http://locakhost:3000/");
-//        configuration.addAllowedOriginPattern("*");
-//        configuration.addAllowedHeader("*");
-//        configuration.addAllowedMethod("*");
-//        configuration.setAllowCredentials(true);
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//        return source;
-//    }
 
     //시큐리티에서 발생할 403에러 예외처리
 //    private final AuthenticationEntryPoint unauthorizedEntryPoint =

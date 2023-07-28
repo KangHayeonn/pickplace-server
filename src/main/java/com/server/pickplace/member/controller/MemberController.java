@@ -170,7 +170,7 @@ public class MemberController {
 	}
 
 	@ApiOperation(tags = "1. Member", value = "내 정보 조회", notes = "내 정보 조회한다")
-	@GetMapping("/{memberId}")
+	@GetMapping("info/{memberId}")
 	public ResponseEntity getInfo(@ApiIgnore HttpServletRequest httpServletRequest, @PathVariable Long memberId) {
 
 		Map<String, Object> infoResponseDto = memberInfoService.info(httpServletRequest, memberId);
@@ -178,7 +178,7 @@ public class MemberController {
 	}
 
 	@ApiOperation(tags = "1. Member", value = "내 정보 수정 - 전화번호 ", notes = "내 정보 : 전화번호를 수정한다")
-	@PutMapping("/phone")
+	@PutMapping("info/phone")
 	public ResponseEntity putPhoneInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody InfoPhoneRequestDto requestDto) {
 
 		memberInfoService.phoneUpdate(httpServletRequest, requestDto);
@@ -186,30 +186,12 @@ public class MemberController {
 	}
 
 	@ApiOperation(tags = "1. Member", value = "내 정보 수정 - 닉네임 ", notes = "내 정보 : 내 닉네임을 수정한다")
-	@PutMapping("/nickname")
+	@PutMapping("info/nickname")
 	public ResponseEntity putNicknameInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody InfoNicknameRequestDto requestDto) {
 
 		memberInfoService.nicknameUpdate(httpServletRequest, requestDto);
 		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), "닉네임 수정 완료"));
 	}
-
-	//테스트 잠시 후 삭제
-//	@ApiOperation(tags = "1. Member", value = "내 정보 수정 - 닉네임 ", notes = "내 정보 : 내 닉네임을 수정한다")
-//	@GetMapping("/host")
-//	public String test(@ApiIgnore HttpServletRequest httpServletRequest) {
-//
-//		return "host 입니다";
-//	}
-//
-//	@ApiOperation(tags = "1. Member", value = "내 정보 수정 - 닉네임 ", notes = "내 정보 : 내 닉네임을 수정한다")
-//	@GetMapping("/user/{memberId}")
-//	public ResponseEntity test1(@ApiIgnore HttpServletRequest httpServletRequest ,@PathVariable Long memberId) {
-////		System.out.println("gogo");
-////		Long memberId = 21L;
-//		Map<String, Object> infoResponseDto = memberInfoService.info(httpServletRequest, memberId);
-//		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), infoResponseDto)); // 성공
-//	}
-
 
 
 }
