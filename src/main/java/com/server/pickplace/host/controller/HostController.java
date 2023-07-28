@@ -182,10 +182,5 @@ public class HostController {
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
     }
 
-    @GetMapping("/test")
-    public ResponseEntity test() {
-
-        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
-    }
 
     }

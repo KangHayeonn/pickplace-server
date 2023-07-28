@@ -2,16 +2,18 @@ package com.server.pickplace.host.error;
 
 
 import com.server.pickplace.common.dto.ErrorResponse;
+import com.server.pickplace.common.handler.DomainAdvice;
 import com.server.pickplace.common.service.ResponseService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @Slf4j
-@RestControllerAdvice
+@DomainAdvice
 public class HostExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Autowired ResponseService responseService;
