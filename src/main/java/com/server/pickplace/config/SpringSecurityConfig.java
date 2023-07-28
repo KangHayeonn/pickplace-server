@@ -49,6 +49,16 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
 
+    //Cor 해결
+    @Bean // 확인 ->
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowedMethods("*")
+                .allowedHeaders("*")
+                .maxAge(3000);
+    }
+
     private static final String[] AUTH_WHITELIST = {
             //정적인 파일에 대한 요청들 작성 (추후)
     };
@@ -98,13 +108,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring()
                 .antMatchers(AUTH_WHITELIST);    }
 
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedMethods("*")
-                .allowedHeaders("*")
-                .maxAge(3000);
-    }
+
 
 //    @Bean
 //    public CorsConfigurationSource corsConfigurationSource() {
