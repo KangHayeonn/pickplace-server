@@ -62,7 +62,7 @@ public class HostController {
 
         PlaceResponse placeDto = hostService.findPlaceDtoByPlaceId(email, placeId);
 
-        List<RoomResponse> roomDtos = hostService.findRoomDtoListByPlaceId(placeId);
+        List<RoomInfoResponse> roomDtos = hostService.findRoomDtoListByPlaceId(placeId);
 
         Map<String, Object> roomPlaceDtos = new HashMap<>();
         roomPlaceDtos.put("room", roomDtos);

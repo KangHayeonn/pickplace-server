@@ -48,7 +48,7 @@ public class HostService extends CommonService {
 
     }
 
-    public List<RoomResponse> findRoomDtoListByPlaceId(Long placeId) {
+    public List<RoomInfoResponse> findRoomDtoListByPlaceId(Long placeId) {
 
         Optional<List<Room>> optionalRooms = hostRepository.findOptionalRoomListByPlaceId(placeId);
 
@@ -56,7 +56,7 @@ public class HostService extends CommonService {
 
             List<Room> rooms = optionalRooms.get();
 
-            List<RoomResponse> roomDtos = rooms.stream().map(room -> modelMapper.map(room, RoomResponse.class))
+            List<RoomInfoResponse> roomDtos = rooms.stream().map(room -> modelMapper.map(room, RoomInfoResponse.class))
                     .collect(Collectors.toList());
 
             return roomDtos;
