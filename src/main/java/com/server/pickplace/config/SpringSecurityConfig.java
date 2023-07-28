@@ -50,26 +50,17 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
 
-    //Cor 해결
-//    @Bean // 확인 ->
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedMethods("*")
-                .allowedHeaders("*")
-                .maxAge(3000);
-    }
-
     private static final String[] AUTH_WHITELIST = {
             //정적인 파일에 대한 요청들 작성 (추후)
     };
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-            //이 부분은 정리 필요,,
             http
                     .httpBasic().disable();
             http
+                    .cors().and()
                     .exceptionHandling()
 //                    .authenticationEntryPoint(unauthorizedEntryPoint) // 403 에러 예외처리
                     .and()
@@ -77,11 +68,11 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                     .authorizeRequests()
-                    .antMatchers(HttpMethod.GET, "/api/v1/review/places/*","/api/v1/review/*").permitAll()
-                    .antMatchers(HttpMethod.POST, "/api/v1/members/signup","/api/v1/members/login","/api/v1/members/emailCheck"
+                    .mvcMatchers(HttpMethod.GET, "/api/v1/review/places/*","/api/v1/review/*","/swagger-ui.html").permitAll()
+                    .mvcMatchers(HttpMethod.POST, "/api/v1/members/signup","/api/v1/members/login","/api/v1/members/emailCheck"
                             ,"/api/v1/search/**","/api/v1/members/kakaoLogin").permitAll()
-                    .antMatchers(HttpMethod.GET, "/api/v1/host/**").hasRole("HOST")
-                    .antMatchers(HttpMethod.POST, "/api/v1/host/**").hasRole("HOST")
+                    .mvcMatchers(HttpMethod.GET, "/api/v1/host/**").hasRole("HOST")
+                    .mvcMatchers(HttpMethod.POST, "/api/v1/host/**").hasRole("HOST")
                     .anyRequest().authenticated() // 나머지는 403 에러 -> 에러 형식 200으로 보내야..
                     .and()
                     .sessionManagement()
