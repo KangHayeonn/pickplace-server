@@ -33,7 +33,7 @@ public class SocialLoginController {
     }
 
     @ApiOperation(tags = "1. Member", value = "소셜로그인(카카오)", notes = "소셜 로그인 코드를 받아 처리한다")
-    @GetMapping("/kakaoLogin")
+    @PostMapping("/kakaoLogin")
     public ResponseEntity kakaoLogin(HttpServletRequest request, HttpServletResponse response, @RequestBody KakaoCodeDto code) throws JsonProcessingException {
 
         Map<String, Object> loginResponseDto = kakaoUserService.kakaoLogin(code.getCode(), request ,response);
