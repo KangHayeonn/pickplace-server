@@ -71,18 +71,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return this.makeErrorResponseEntity(exception.getErrorResult());
 	}
 
-//	@ExceptionHandler({HttpRequestMethodNotSupportedException.class})
-//	public ResponseEntity handleMethodNotSupportedException(final HttpRequestMethodNotSupportedException exception) {
-//		return ResponseEntity.ok(responseService.getErrorResponse(HttpStatus.OK.value(), "지원하지 않는 요청입니다."));
+
+//	@ExceptionHandler({Exception.class})
+//	public ResponseEntity handleException(final Exception exception) {
+//
+//		return ResponseEntity.ok(responseService.getErrorResponse(HttpStatus.OK.value(), "알 수 없는 오류입니다."));
 //
 //	}
-
-	@ExceptionHandler({Exception.class})
-	public ResponseEntity handleException(final Exception exception) {
-
-		return ResponseEntity.ok(responseService.getErrorResponse(HttpStatus.OK.value(), "알 수 없는 오류입니다."));
-
-	}
 
 	private ResponseEntity<ErrorResponse> makeErrorResponseEntity(final MemberErrorResult errorResult) {
 		return ResponseEntity.status(errorResult.getHttpStatus())
