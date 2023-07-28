@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -54,6 +55,11 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             //정적인 파일에 대한 요청들 작성 (추후)
     };
 
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui/index.html", "/swagger-ui.html","/webjars/**", "/swagger/**");
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -68,7 +74,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                     .authorizeRequests()
-                    .mvcMatchers(HttpMethod.GET, "/api/v1/review/places/*","/api/v1/review/*","/swagger-ui.html").permitAll()
+                    .mvcMatchers(HttpMethod.GET, "/api/v1/review/places/*","/api/v1/review/*").permitAll()
                     .mvcMatchers(HttpMethod.POST, "/api/v1/members/signup","/api/v1/members/login","/api/v1/members/emailCheck"
                             ,"/api/v1/search/**","/api/v1/members/kakaoLogin").permitAll()
                     .mvcMatchers(HttpMethod.GET, "/api/v1/host/**").hasRole("HOST")
