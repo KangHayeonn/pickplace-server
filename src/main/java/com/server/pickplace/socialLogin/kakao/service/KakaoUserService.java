@@ -80,7 +80,7 @@ public class KakaoUserService {
         body.add("grant_type", "authorization_code");
 //        body.add("client_id", "17daada2a5511b9f5ad422950ad1c268");
         body.add("client_id", client_id);
-        body.add("redirect_uri", "https://pick-place.kr");
+        body.add("redirect_uri", "http://localhost:3000/redirect");
         body.add("client_secret", client_secret);
         body.add("code", code);
 
