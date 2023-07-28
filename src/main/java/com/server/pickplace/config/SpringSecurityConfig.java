@@ -50,7 +50,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private final ObjectMapper objectMapper;
 
     //Cor 해결
-    @Bean // 확인 ->
+//    @Bean // 확인 ->
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("*")
