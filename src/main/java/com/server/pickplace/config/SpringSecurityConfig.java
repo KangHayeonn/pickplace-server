@@ -1,19 +1,33 @@
 package com.server.pickplace.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.server.pickplace.common.dto.ErrorResponse;
 import com.server.pickplace.member.service.jwt.JwtAuthenticationFilter;
 import com.server.pickplace.member.service.jwt.JwtTokenProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+
+import java.io.PrintWriter;
+
 import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
@@ -35,44 +49,45 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
-
-//    @Bean
-//    @Override
-//    public AuthenticationManager authenticationManagerBean() throws Exception {
-//        return super.authenticationManagerBean();
-//    }
+    private final ObjectMapper objectMapper;
 
     private static final String[] AUTH_WHITELIST = {
             //정적인 파일에 대한 요청들 작성 (추후)
     };
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui/index.html", "/swagger-ui.html","/webjars/**", "/swagger/**");
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-            //이 부분은 정리 필요,,
             http
-                    .httpBasic().disable()
-                    .csrf().disable() //postman test 위한 설정 변경
+                    .httpBasic().disable();
+            http
+                    .cors().and()
+                    .exceptionHandling()
+//                    .authenticationEntryPoint(unauthorizedEntryPoint) // 403 에러 예외처리
+                    .and()
+                    .csrf().disable()
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                     .authorizeRequests()
-//                    .anyRequest().authenticated() //어떤 url이든 접근 인증 필요
-                    .antMatchers("/api/v1/members/**","/send-mail/pwd").permitAll() // /members 관련 api 허락
-                .and()
-                    .formLogin()
-//                    .loginPage("/view/login") //로그인 페이지 연결
-                    .loginProcessingUrl("/login") //해당 주소를 어디로 처리할지 정해줌
-                    .usernameParameter("id")
-                    .passwordParameter("pw")
-                    .defaultSuccessUrl("/view/dashboard", true) //성공시 이동할 url
-                    .permitAll()
-                .and()
+                    .mvcMatchers(HttpMethod.GET, "/api/v1/review/places/*","/api/v1/review/*").permitAll()
+                    .mvcMatchers(HttpMethod.POST, "/api/v1/members/signup","/api/v1/members/login","/api/v1/members/emailCheck"
+                            ,"/api/v1/search/**","/api/v1/members/kakaoLogin").permitAll()
+                    .mvcMatchers(HttpMethod.GET, "/api/v1/host/**").hasRole("HOST")
+                    .mvcMatchers(HttpMethod.POST, "/api/v1/host/**").hasRole("HOST")
+                    .anyRequest().authenticated() // 나머지는 403 에러 -> 에러 형식 200으로 보내야..
+                    .and()
                     .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                     // JwtAuthenticationFilter 는 UsernamePasswordAuthenticationFilter 전에 넣음
                     .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                     .logout()
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/logoutProc")); //로그아웃조건 -> 다시 로그인 페이지로 자동 이동
+                    .logoutRequestMatcher(new AntPathRequestMatcher("/api/v1/members/logout")); //로그아웃조건 -> 다시 로그인 페이지로 자동 이동
 
 
  }
@@ -88,10 +103,19 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring()
                 .antMatchers(AUTH_WHITELIST);    }
 
-//    @Override
-//    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.userDetailsService(loginIdPwValidator);
-//    }
 
+    //시큐리티에서 발생할 403에러 예외처리
+//    private final AuthenticationEntryPoint unauthorizedEntryPoint =
+//            (request, response, authException) -> {
+//
+//                ErrorResponse fail = new ErrorResponse(true, 403, "권한 인증 발생"); // Custom error response.
+//                response.setStatus(
+//                        HttpStatus.UNAUTHORIZED.value());
+//                String json = objectMapper.writeValueAsString(fail);
+//                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+//                PrintWriter writer = response.getWriter();
+//                writer.write(json);
+//                writer.flush();
+//            };
 
 }

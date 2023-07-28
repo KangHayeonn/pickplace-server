@@ -21,7 +21,6 @@ public class MemberSignupRequestDto {
     @NotBlank(message = "전화번호는 필수 입력사항 입니다.")
     private String phone;
 
-    @Size(min=2, max=10) //길이 제한
     @NotBlank(message = "닉네임은 필수 입력사항 입니다.")
     private String nickname;
 
