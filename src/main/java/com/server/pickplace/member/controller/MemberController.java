@@ -193,5 +193,23 @@ public class MemberController {
 		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), "닉네임 수정 완료"));
 	}
 
+	//테스트 잠시 후 삭제
+//	@ApiOperation(tags = "1. Member", value = "내 정보 수정 - 닉네임 ", notes = "내 정보 : 내 닉네임을 수정한다")
+//	@GetMapping("/host")
+//	public String test(@ApiIgnore HttpServletRequest httpServletRequest) {
+//
+//		return "host 입니다";
+//	}
+//
+//	@ApiOperation(tags = "1. Member", value = "내 정보 수정 - 닉네임 ", notes = "내 정보 : 내 닉네임을 수정한다")
+//	@GetMapping("/user/{memberId}")
+//	public ResponseEntity test1(@ApiIgnore HttpServletRequest httpServletRequest ,@PathVariable Long memberId) {
+////		System.out.println("gogo");
+////		Long memberId = 21L;
+//		Map<String, Object> infoResponseDto = memberInfoService.info(httpServletRequest, memberId);
+//		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), infoResponseDto)); // 성공
+//	}
+
+
 
 }
