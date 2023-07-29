@@ -28,6 +28,7 @@ import com.server.pickplace.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -70,6 +71,10 @@ public class MemberService {
 		if (memberRepository.findByEmail(jwtRequestDto.getEmail()).orElse(null) == null)
 			throw new MemberException(MemberErrorResult.MEMBER_NOT_ID); //없는 아이디
 
+//		if (!passwordEncoder.matches(memberRepository.findByEmail(jwtRequestDto.getEmail()).get().getPassword(), jwtRequestDto.getPassword())) {
+//			throw new MemberException(MemberErrorResult.MEMBER_NOT_PW); // 비밀번호 틀린 경우
+//		}
+
 		if (!memberRepository.findByEmail(jwtRequestDto.getEmail()).get().getPassword().equals(jwtRequestDto.getPassword())) {
 			throw new MemberException(MemberErrorResult.MEMBER_NOT_PW); // 비밀번호 틀린 경우
 		}
@@ -96,6 +101,7 @@ public class MemberService {
 				.nickname(memberRepository.findByEmail(jwtRequestDto.getEmail()).get().getName())
 				.accessToken(tokenInfo.getAccessToken())
 				.refreshToken(tokenInfo.getRefreshToken())
+				.role(String.valueOf(memberRepository.findByEmail(jwtRequestDto.getEmail()).get().getRole()))
 				.build();
 
 		loginMap.put("member", loginResponseDtoDto);
@@ -138,12 +144,16 @@ public class MemberService {
 	@Transactional
 	public String signup(MemberSignupRequestDto request) {
 
+//		String encodedPassword = passwordEncoder.encode(request.getPassword());
+
+
 		//db에 저장
 		Member member = Member.builder()
 				.email(request.getEmail())
 				.password(request.getPassword())
 				.number(request.getPhone())
 				.name(request.getNickname())
+				.type("common")
 				.role(MemberRole.valueOf(request.getMemberRole()))
 				.type("일반")
 				.build();
@@ -160,9 +170,15 @@ public class MemberService {
 
 
 	public void logout(HttpServletRequest request) {
+
 		String token = jwtTokenProvider.resolveToken((HttpServletRequest) request); //access Token 가져옴
 		ValueOperations<String, String> logoutValueOperations = redisTemplate.opsForValue(); //access Token 블랙리스트에 등록
 		logoutValueOperations.set(token, token);
+
+//		HttpSession session = request.getSession();
+//		if (session != null) {
+//			session.invalidate();
+//		}
 
 
 		String payloadJWT = token.split("\\.")[1];
@@ -172,6 +188,10 @@ public class MemberService {
 		JsonParser jsonParser = new BasicJsonParser();
 		Map<String, Object> jsonArray = jsonParser.parseMap(payload);
 		String email = (String) jsonArray.get("sub"); // id 담아옴
+
+
+
+
 
 		// refreshToken 삭제
 		refreshTokenRedisRepository.findById(email)

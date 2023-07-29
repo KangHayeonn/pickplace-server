@@ -1,13 +1,12 @@
 package com.server.pickplace.host.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 @Getter
 @Builder
@@ -15,15 +14,29 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 public class PlaceRequest {
 
-    @NotBlank  // Null, 빈 문자열, 스페이스만 있는 문자열 불가
-    @Size(max = 20)
-    private String placeName;
+    @NotBlank(message = "{place.name.NotBlank}")
+    @JsonProperty("placeName")
+    private String name;
 
-    @Pattern(regexp = "^\\d{9,11}$")
-    private String placePhone;
+    @Pattern(message = "형식에 맞는 전화번호를 입력해주세요.", regexp = "^\\d{9,13}$")
+    @JsonProperty("placePhone")
+    private String number;
 
-    @NotBlank
-    @Size(max = 255)
-    private String placeAddress;
+    @NotBlank(message = "{address.NotBlank}")
+    @JsonProperty("placeAddress")
+    private String address;
+
+    @Positive
+    @NotNull(message = "{x.NotNull}")
+    @JsonProperty("placeXaxis")
+    private Double x;
+
+    @Positive
+    @NotNull(message = "{y.NotNull}")
+    @JsonProperty("placeYaxis")
+    private Double y;
+
+
+
 
 }

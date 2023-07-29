@@ -56,14 +56,14 @@ public class MemberController {
 	private final MemberInfoService memberInfoService;
 	private final ResponseService responseService;
 	private final MemberRepository memberRepository;
-	;
+
 	private final JwtTokenProvider jwtTokenProvider;
 
 	@Value("${jwt.secret}")
 	String secretKey;
 
 
-	@ApiOperation(tags = "1. Member", value = "로그인", notes = "로그인 시도한다")
+	@ApiOperation(tags = "1. Member", value = "로그인", notes = "로그인 시도한다!!")
 	@PostMapping(value = "login", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity login(@ApiIgnore HttpServletRequest httpServletRequest, @ApiParam(required = true) @RequestBody @Valid JwtRequestDto jwtRequestDto, @ApiIgnore Errors errors) throws Exception {
 
@@ -80,8 +80,8 @@ public class MemberController {
 	@PostMapping(value = "signup", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity signUp(@RequestBody @Valid MemberSignupRequestDto request, @ApiIgnore Errors errors) throws Exception {
 
-		String signUpResponse = memberService.signup(request);
 
+		String signUpResponse = memberService.signup(request);
 
 		if (errors.hasErrors()) {
 			String errorDetail = errors.getFieldErrors().toString();
@@ -170,7 +170,7 @@ public class MemberController {
 	}
 
 	@ApiOperation(tags = "1. Member", value = "내 정보 조회", notes = "내 정보 조회한다")
-	@GetMapping("/{memberId}")
+	@GetMapping("info/{memberId}")
 	public ResponseEntity getInfo(@ApiIgnore HttpServletRequest httpServletRequest, @PathVariable Long memberId) {
 
 		Map<String, Object> infoResponseDto = memberInfoService.info(httpServletRequest, memberId);
@@ -178,7 +178,7 @@ public class MemberController {
 	}
 
 	@ApiOperation(tags = "1. Member", value = "내 정보 수정 - 전화번호 ", notes = "내 정보 : 전화번호를 수정한다")
-	@PutMapping("/phone")
+	@PutMapping("info/phone")
 	public ResponseEntity putPhoneInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody InfoPhoneRequestDto requestDto) {
 
 		memberInfoService.phoneUpdate(httpServletRequest, requestDto);
@@ -186,7 +186,7 @@ public class MemberController {
 	}
 
 	@ApiOperation(tags = "1. Member", value = "내 정보 수정 - 닉네임 ", notes = "내 정보 : 내 닉네임을 수정한다")
-	@PutMapping("/nickname")
+	@PutMapping("info/nickname")
 	public ResponseEntity putNicknameInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody InfoNicknameRequestDto requestDto) {
 
 		memberInfoService.nicknameUpdate(httpServletRequest, requestDto);

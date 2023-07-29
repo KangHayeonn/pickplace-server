@@ -28,12 +28,12 @@ public class Place extends BaseEntity {
     private Long id;
 
     @Column(name = "PLACE_ADDRESS", nullable = false, length = 255)
-    private String address;  // 나중에 값 타입
+    private String address;
 
     @Column(name = "PLACE_PHONE", nullable = true, length = 13)
     private String number;
 
-    @Column(name = "PLACE_NAME", nullable = false, length = 20)
+    @Column(name = "PLACE_NAME", nullable = false, length = 30)
     private String name;
 
     @Column(name = "PLACE_TOTAL_RATING", nullable = false)
