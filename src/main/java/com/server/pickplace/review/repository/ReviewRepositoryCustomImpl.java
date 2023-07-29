@@ -101,7 +101,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
 
         Optional<ReviewDetailResponse> optionalReviewDetailResponse = Optional.ofNullable(
                 queryFactory
-                .select(new QReviewDetailResponse(review.id, member.name, review.updatedDate, place.address, reservation.updatedDate, review.rating, review.content))
+                .select(new QReviewDetailResponse(review.id, place.name, member.name, review.updatedDate, place.address, reservation.updatedDate, review.rating, review.content))
                 .from(review)
                 .join(review.reservation, reservation)
                 .join(reservation.room, room)
