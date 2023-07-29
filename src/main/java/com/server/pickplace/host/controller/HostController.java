@@ -145,6 +145,7 @@ public class HostController {
 
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
 
+
     }
 
     @ApiOperation(tags = "2. Host", value = "공간 삭제", notes = "기존 공간 정보를 삭제한다.")
