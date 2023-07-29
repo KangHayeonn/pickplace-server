@@ -28,6 +28,8 @@ public class MyPageReservationMoreResponseDto {
     String startDate;
     String endDate;
     String startTime;
+    String endTime;
+
 
     Number personnel;
     String reservationStatus;
