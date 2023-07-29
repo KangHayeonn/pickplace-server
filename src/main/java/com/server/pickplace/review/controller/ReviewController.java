@@ -59,7 +59,7 @@ public class ReviewController {
     }
 
     @ApiOperation(tags = "5. Review", value = "리뷰 상세 조회", notes = "reviewId를 수단으로, 리뷰를 상세 조회한다.")
-    @GetMapping("{reviewId}")
+    @GetMapping("/detail/{reviewId}")
     public ResponseEntity<SingleResponse<ReviewDetailResponse>> reviewDetailPage(@PathVariable("reviewId") Long reviewId) {
 
         ReviewDetailResponse reviewDetailResponse = reviewRepository.getReviewDetailDtoByReviewId(reviewId);
@@ -77,7 +77,7 @@ public class ReviewController {
 
         reviewService.createReviewByEmailAndRequest(email, createReviewRequest);
 
-        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
     }
 
     @ApiOperation(tags = "5. Review", value = "리뷰 변경", notes = "리뷰를 수정한다.")
@@ -90,7 +90,7 @@ public class ReviewController {
 
         reviewRepository.updateReview(email, updateReviewRequest, reviewId);
 
-        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
     }
 
     @ApiOperation(tags = "5. Review", value = "리뷰 삭제", notes = "리뷰를 삭제한다.")
@@ -102,7 +102,7 @@ public class ReviewController {
 
         reviewRepository.deleteReview(email, reviewId);
 
-        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
 
     }
 

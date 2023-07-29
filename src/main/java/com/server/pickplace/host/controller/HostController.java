@@ -62,7 +62,7 @@ public class HostController {
 
         PlaceResponse placeDto = hostService.findPlaceDtoByPlaceId(email, placeId);
 
-        List<RoomResponse> roomDtos = hostService.findRoomDtoListByPlaceId(placeId);
+        List<RoomInfoResponse> roomDtos = hostService.findRoomDtoListByPlaceId(placeId);
 
         Map<String, Object> roomPlaceDtos = new HashMap<>();
         roomPlaceDtos.put("room", roomDtos);
@@ -112,12 +112,12 @@ public class HostController {
         String email = hostService.getPayloadMapAndGetEmail(accessToken);
         hostService.hostCheck(email);
 
-        Map<String, Object> memberReservationPlaceDtos = hostService.getMemberReservationPlaceDtoMapByReservationId(reservationId);
+        Map<String, Object> memberReservationPlaceDtos = hostService.getMemberReservationPlaceDtoMapByReservationId(reservationId, email);
 
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), memberReservationPlaceDtos));
     }
 
-    @ApiOperation(tags = "2. Host", value = "공간 등록", notes = "신규 공간을 등록한다.") // 방만 추가하는 페이지도 필요할듯
+    @ApiOperation(tags = "2. Host", value = "공간 등록", notes = "신규 공간을 등록한다.")
     @PostMapping("/place")
     public ResponseEntity placeRegister(@RequestHeader("accessToken") String accessToken,
                                               @Validated @RequestBody PlaceRoomReqeuest placeRoomReqeuest) {
@@ -125,11 +125,66 @@ public class HostController {
         String email = hostService.getPayloadMapAndGetEmail(accessToken);
         Member host = hostService.hostCheck(email);
 
-        hostService.savePlaceAndRoomsByDto(placeRoomReqeuest, host);
+        Long placeId = hostService.savePlaceAndRoomsByDto(placeRoomReqeuest, host);
 
-        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), null));
+        Map<String, Long> placeIdMap = new HashMap<>(){{put("placeId", placeId);}};
+
+
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), placeIdMap));
+    }
+
+    @ApiOperation(tags = "2. Host", value = "공간 수정", notes = "기존 공간 정보를 수정한다.")
+    @PutMapping("/place/{placeId}")
+    public ResponseEntity placeUpdate(@RequestHeader("accessToken") String accessToken,
+                                      @PathVariable("placeId") Long placeId,
+                                      @Validated @RequestBody PlaceUpdateRequest placeUpdateRequest) {
+
+        String email = hostService.getPayloadMapAndGetEmail(accessToken);
+
+        hostService.updatePlaceByDto(placeId, placeUpdateRequest, email);
+
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
+
+
+    }
+
+    @ApiOperation(tags = "2. Host", value = "공간 삭제", notes = "기존 공간 정보를 삭제한다.")
+    @DeleteMapping("/place/{placeId}")
+    public ResponseEntity placeDelete(@RequestHeader("accessToken") String accessToken,
+                                      @PathVariable("placeId") Long placeId) {
+
+        String email = hostService.getPayloadMapAndGetEmail(accessToken);
+
+        hostService.deletePlace(placeId, email);
+
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
+
+    }
+
+    @ApiOperation(tags = "2. Host", value = "방 수정", notes = "기존 방 정보를 수정한다.")
+    @PutMapping("/room/{roomId}")
+    public ResponseEntity roomUpdate(@RequestHeader("accessToken") String accessToken,
+                                     @PathVariable("roomId") Long roomId,
+                                     @RequestBody @Validated RoomReqeust roomReqeust) {
+
+        String email = hostService.getPayloadMapAndGetEmail(accessToken);
+
+        hostService.updateRoomByDto(roomReqeust, roomId, email);
+
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
+    }
+
+    @ApiOperation(tags = "2. Host", value = "방 삭제", notes = "기존 방 정보를 삭제한다.")
+    @DeleteMapping("/room/{roomId}")
+    public ResponseEntity roomDelete(@RequestHeader("accessToken") String accessToken,
+                                     @PathVariable("roomId") Long roomId) {
+
+        String email = hostService.getPayloadMapAndGetEmail(accessToken);
+
+        hostService.deleteRoomByRoomId(roomId, email);
+
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
     }
 
 
-
-}
+    }
