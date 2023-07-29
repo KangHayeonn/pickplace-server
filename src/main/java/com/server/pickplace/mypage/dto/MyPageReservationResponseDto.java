@@ -21,6 +21,9 @@ public class MyPageReservationResponseDto {
     String startTime;
     String endTime;
     String reservationStatus;
+
+    Boolean reviewExistence;
+
     @JsonProperty("reservationDate")
     String updateDate;
 

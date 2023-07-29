@@ -1,4 +1,4 @@
-package com.server.pickplace.mypage;
+package com.server.pickplace.mypage.service;
 
 import com.server.pickplace.member.error.MemberErrorResult;
 import com.server.pickplace.member.error.MemberException;
@@ -37,7 +37,7 @@ public class MyPageService {
     public List<MyPageReservationResponseDto> reservationDetails (HttpServletRequest httpServletRequest, Long id){
         Optional<List<Reservation>> reservationDetail = reservationRepository.findReservationListByMemberId(id);
 
-        if(reservationDetail==null){
+        if(reservationDetail.isEmpty()){
             throw new MemberException(MemberErrorResult.NOT_RESERVATION);
         }
 
@@ -45,24 +45,24 @@ public class MyPageService {
                 .collect(Collectors.toList());
 
         for (int i =0 ; i< responseDto.size() ; i ++ ){
+
+            Long reservationId = reservationDetail.get().get(i).getId();
+
+            responseDto.get(i).setReviewExistence(!reviewRepository.findReviewListByReservationId(reservationId).get().isEmpty());
             responseDto.get(i).setUpdateDate(reservationDetail.get().get(i).getUpdatedDate().toString());
             responseDto.get(i).setPlaceName(reservationDetail.get().get(i).getRoom().getPlace().getName());
             responseDto.get(i).setPlaceId(reservationDetail.get().get(i).getRoom().getPlace().getId());
         }
 
         return responseDto;
-
     }
 
     public List<MyPageReservationMoreResponseDto> reservationDetailsMore (HttpServletRequest httpServletRequest, Long id){
         Optional<List<Reservation>> reservationDetailsMore = reservationRepository.findReservationListById(id);
 
-        if(reservationDetailsMore==null){
+        if(reservationDetailsMore.isEmpty()){
             throw new MemberException(MemberErrorResult.NOT_RESERVATION);
         }
-
-
-        System.out.println();
 
         List<MyPageReservationMoreResponseDto> responseDto = reservationDetailsMore.get().stream().map(reservation -> modelMapper.map(reservation, MyPageReservationMoreResponseDto.class))
                 .collect(Collectors.toList());
@@ -85,20 +85,11 @@ public class MyPageService {
             responseDto.get(i).setPlaceRating(data.getRoom().getPlace().getRating());
             responseDto.get(i).setPlaceAddress(place);
 
-
-            Long reservationId = reservationDetailsMore.get().get(i).getId();
-
-            //리뷰 갯수
-            responseDto.get(i).setPlaceReviewCnt(reviewRepository.findReviewListByReservationId(reservationId).get().size());
-            responseDto.get(i).setReviewExistence(!reviewRepository.findReviewListByReservationId(reservationId).get().isEmpty());
-
-
-
+            responseDto.get(i).setPlaceReviewCnt(reviewRepository.findReviewListByReservationId(id).get().size());
+            responseDto.get(i).setReviewExistence(!reviewRepository.findReviewListByReservationId(id).get().isEmpty());
             responseDto.get(i).setPersonnel(reservationDetailsMore.get().get(i).getRoom().getPeopleNum());
 
         }
-
         return responseDto;
-
     }
 }

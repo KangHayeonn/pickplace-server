@@ -1,6 +1,7 @@
-package com.server.pickplace.mypage;
+package com.server.pickplace.mypage.controller;
 
 import com.server.pickplace.common.service.ResponseService;
+import com.server.pickplace.mypage.service.MyPageService;
 import com.server.pickplace.mypage.dto.MyPageReservationMoreResponseDto;
 import com.server.pickplace.mypage.dto.MyPageReservationResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +20,12 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/v1")
+@RequestMapping(value = "/api/v1/reservation")
 public class MyPageController {
     private final MyPageService myPageService;
     private final ResponseService responseService;
 
-    @GetMapping("/reservation/members/{memberId}")
+    @GetMapping("/info/{memberId}")
     public ResponseEntity memberReservation(@ApiIgnore HttpServletRequest httpServletRequest, @PathVariable Long memberId) throws Exception {
 
         List<MyPageReservationResponseDto> reservationDtos = myPageService.reservationDetails(httpServletRequest, memberId);
@@ -35,7 +36,7 @@ public class MyPageController {
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), memberReservationDtos)); // 성공
     }
 
-    @GetMapping("/reservation/detail/{reservationId}")
+    @GetMapping("/info/details/{reservationId}")
     public ResponseEntity memberReservationDetails(@ApiIgnore HttpServletRequest httpServletRequest, @PathVariable Long reservationId) throws Exception {
 
         List<MyPageReservationMoreResponseDto> reservationDtos = myPageService.reservationDetailsMore(httpServletRequest, reservationId);
