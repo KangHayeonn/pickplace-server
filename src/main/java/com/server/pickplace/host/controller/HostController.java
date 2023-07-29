@@ -125,9 +125,12 @@ public class HostController {
         String email = hostService.getPayloadMapAndGetEmail(accessToken);
         Member host = hostService.hostCheck(email);
 
-        hostService.savePlaceAndRoomsByDto(placeRoomReqeuest, host);
+        Long placeId = hostService.savePlaceAndRoomsByDto(placeRoomReqeuest, host);
 
-        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
+        Map<String, Long> placeIdMap = new HashMap<>(){{put("placeId", placeId);}};
+
+
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), placeIdMap));
     }
 
     @ApiOperation(tags = "2. Host", value = "공간 수정", notes = "기존 공간 정보를 수정한다.")

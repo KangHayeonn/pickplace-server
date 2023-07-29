@@ -193,7 +193,7 @@ public class HostService extends CommonService {
         }
     }
 
-    public void savePlaceAndRoomsByDto(PlaceRoomReqeuest placeRoomReqeuest, Member host) {
+    public Long savePlaceAndRoomsByDto(PlaceRoomReqeuest placeRoomReqeuest, Member host) {
 
         // 같은 트랜잭션
 
@@ -207,7 +207,7 @@ public class HostService extends CommonService {
         place.setPoint(new Point(placeRequest.getX(), placeRequest.getY()));
         place.setMember(host);
 
-        hostRepository.savePlace(place);
+        Long placeId = hostRepository.savePlace(place);
 
         List<Room> rooms = new ArrayList<>();
 
@@ -230,7 +230,7 @@ public class HostService extends CommonService {
         List<Tag> tagList = hostRepository.findTagListByTagStatusList(tagStatusList);
         tagList.forEach(tag -> hostRepository.saveTagPlace(TagPlace.builder().tag(tag).place(place).build()));
 
-
+        return placeId;
     }
 
     private void memberPlaceIdCheck(String email, Place place) {

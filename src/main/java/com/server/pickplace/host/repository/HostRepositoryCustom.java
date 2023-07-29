@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface HostRepositoryCustom {
 
-    void savePlace(Place place);
+    Long savePlace(Place place);
 
     void saveRoom(Room room);
 

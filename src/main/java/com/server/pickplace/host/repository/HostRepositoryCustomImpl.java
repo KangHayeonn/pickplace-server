@@ -37,8 +37,10 @@ public class HostRepositoryCustomImpl implements HostRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public void savePlace(Place place) {
+    public Long savePlace(Place place) {
         em.persist(place);
+
+        return place.getId();
     }
 
     @Override
