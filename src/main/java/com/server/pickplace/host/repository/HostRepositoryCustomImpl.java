@@ -31,6 +31,7 @@ import static com.server.pickplace.reservation.entity.QReservation.*;
 import static com.server.pickplace.review.entity.QReview.*;
 
 @RequiredArgsConstructor
+@Slf4j
 public class HostRepositoryCustomImpl implements HostRepositoryCustom {
 
     private final EntityManager em;
@@ -127,10 +128,10 @@ public class HostRepositoryCustomImpl implements HostRepositoryCustom {
         List<Tuple> allLinkedDataList = queryFactory
                 .select(room, unit, reservation, review, categoryPlace, tagPlace)
                 .from(place)
-                .join(place.rooms, room).on(room.place.eq(targetPlace))
+                .leftJoin(place.rooms, room).on(room.place.eq(targetPlace))
                 .leftJoin(room.reservations, reservation)
                 .leftJoin(reservation.review, review)
-                .join(room.units, unit)
+                .leftJoin(room.units, unit)
                 .join(place.categories, categoryPlace)
                 .join(place.tags, tagPlace)
                 .fetch();
@@ -171,8 +172,18 @@ public class HostRepositoryCustomImpl implements HostRepositoryCustom {
             }
         }
 
-        unitList.forEach(em::remove);
-        roomList.forEach(em::remove);
+        for (Unit unit : unitList) {
+            if (unit != null) {
+                em.remove(unit);
+            }
+        }
+
+        for (Room room : roomList) {
+            if (room != null) {
+                em.remove(room);
+            }
+        }
+
         categoryPlaceList.forEach(em::remove);
         tagPlaceList.forEach(em::remove);
         em.remove(targetPlace);
@@ -278,7 +289,7 @@ public class HostRepositoryCustomImpl implements HostRepositoryCustom {
         List<Tuple> allLinkedDataList = queryFactory
                 .select(review, reservation, unit)
                 .from(room)
-                .join(room.units, unit).on(unit.room.eq(targetRoom))
+                .leftJoin(room.units, unit).on(unit.room.eq(targetRoom))
                 .leftJoin(unit.reservations, reservation)
                 .leftJoin(reservation.review, review)
                 .fetch();
@@ -312,7 +323,12 @@ public class HostRepositoryCustomImpl implements HostRepositoryCustom {
             }
         }
 
-        unitList.forEach(em::remove);
+        for (Unit unit : unitList) {
+            if (unit != null) {
+                em.remove(unit);
+            }
+        }
+
         em.remove(targetRoom);
 
     }
