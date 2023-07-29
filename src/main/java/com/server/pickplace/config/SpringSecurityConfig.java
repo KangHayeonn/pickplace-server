@@ -85,9 +85,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                     // JwtAuthenticationFilter 는 UsernamePasswordAuthenticationFilter 전에 넣음
-                    .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
-                    .logout()
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/api/v1/members/logout")); //로그아웃조건 -> 다시 로그인 페이지로 자동 이동
+                    .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+//                    .logout()
+//                    .logoutRequestMatcher(new AntPathRequestMatcher("/api/v1/members/logout")); //로그아웃조건 -> 다시 로그인 페이지로 자동 이동
 
 
  }

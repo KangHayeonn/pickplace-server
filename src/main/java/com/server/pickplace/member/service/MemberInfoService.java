@@ -1,33 +1,24 @@
 package com.server.pickplace.member.service;
 
-import com.server.pickplace.host.dto.ReservationResponse;
 import com.server.pickplace.member.dto.InfoNicknameRequestDto;
 import com.server.pickplace.member.dto.InfoPhoneRequestDto;
 import com.server.pickplace.member.dto.InfoResponseDto;
-import com.server.pickplace.member.dto.LoginResponseDto;
 import com.server.pickplace.member.dto.mypageDto.MemberReservationResponseDto;
-import com.server.pickplace.member.dto.mypageDto.MemberRoomDto;
 import com.server.pickplace.member.entity.Member;
 import com.server.pickplace.member.error.MemberErrorResult;
 import com.server.pickplace.member.error.MemberException;
 import com.server.pickplace.member.repository.MemberRepository;
 import com.server.pickplace.member.repository.MemberReservationRepository;
-import com.server.pickplace.member.repository.MemberRoomRepository;
 import com.server.pickplace.member.service.jwt.JwtTokenProvider;
-import com.server.pickplace.place.entity.Room;
 import com.server.pickplace.reservation.entity.Reservation;
-import io.jsonwebtoken.io.Decoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.json.BasicJsonParser;
 import org.springframework.boot.json.JsonParser;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.modelmapper.ModelMapper;
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,7 +33,6 @@ public class MemberInfoService {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final MemberReservationRepository memberReservationRepository;
-    private final MemberRoomRepository memberRoomRepository;
 
     private final ModelMapper modelMapper;
 
