@@ -36,9 +36,18 @@ public class HostService extends CommonService {
 
             List<Place> places = optionalPlaces.get();
 
+            List<CategoryStatus> categoryStatusList = places.stream().map(place -> place.getCategories().get(0).getCategory().getStatus())
+                    .collect(Collectors.toList());
+
             List<PlaceResponse> placeDtos = places.stream()
                     .map(place -> modelMapper.map(place, PlaceResponse.class))
                     .collect(Collectors.toList());
+
+            for (int i = 0; i < categoryStatusList.size(); i++) {
+                CategoryStatus categoryStatus = categoryStatusList.get(i);
+                PlaceResponse placeResponse = placeDtos.get(i);
+                placeResponse.setCategoryStatus(categoryStatus);
+            }
 
             return placeDtos;
 
@@ -75,6 +84,7 @@ public class HostService extends CommonService {
         memberPlaceIdCheck(email, place);
 
         PlaceResponse placeResponse = modelMapper.map(place, PlaceResponse.class);
+        placeResponse.setCategoryStatus(place.getCategories().get(0).getCategory().getStatus());
 
         return placeResponse;
 
@@ -103,7 +113,7 @@ public class HostService extends CommonService {
 
         Optional<List<Object[]>> optionalReservationsAndNames = hostRepository.findOptionalReservationAndNamesByEmail(email);
 
-        Map<String, List<ReservationResponse>> map = new HashMap<>();
+        Map<Place, List<ReservationResponse>> map = new HashMap<>();
         List<Object> placeList = new ArrayList<>();
 
         if (optionalReservationsAndNames.isPresent()) {
@@ -113,20 +123,21 @@ public class HostService extends CommonService {
             for (Object[] reservationsAndName : reservationAndNames) {
 
                 Reservation reservation = (Reservation) reservationsAndName[0];
-                String key = (String) reservationsAndName[1];
+                Place place = (Place) reservationsAndName[1];
                 ReservationResponse reservationResponse = modelMapper.map(reservation, ReservationResponse.class);
 
-                List<ReservationResponse> reservations = map.getOrDefault(key, new ArrayList<>());
+                List<ReservationResponse> reservations = map.getOrDefault(place, new ArrayList<>());
                 reservations.add(reservationResponse);
 
-                map.put(key, reservations);
+                map.put(place, reservations);
 
             }
 
-            for (Map.Entry<String, List<ReservationResponse>> localEntry : map.entrySet()) {
+            for (Map.Entry<Place, List<ReservationResponse>> localEntry : map.entrySet()) {
                 Map<String, Object> localMap = new HashMap<>();
 
-                localMap.put("placeName", localEntry.getKey());
+                localMap.put("placeName", localEntry.getKey().getName());
+                localMap.put("placeCategory", localEntry.getKey().getCategories().get(0).getCategory().getStatus());
                 localMap.put("reservations", localEntry.getValue());
 
                 placeList.add(localMap);
@@ -164,6 +175,7 @@ public class HostService extends CommonService {
         ReservationResponse reservationDto = modelMapper.map(reservation, ReservationResponse.class);
 
         PlaceResponse placeDto = modelMapper.map(place, PlaceResponse.class);
+        placeDto.setCategoryStatus(place.getCategories().get(0).getCategory().getStatus());
 
         Map<String, Object> map = new HashMap<>();
 
