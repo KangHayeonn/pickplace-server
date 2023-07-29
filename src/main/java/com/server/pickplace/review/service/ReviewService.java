@@ -5,6 +5,7 @@ import com.server.pickplace.common.service.CommonService;
 import com.server.pickplace.reservation.entity.Reservation;
 import com.server.pickplace.review.dto.CreateReviewRequest;
 import com.server.pickplace.review.dto.PlaceReviewResponse;
+import com.server.pickplace.review.dto.ReviewCategoryResponse;
 import com.server.pickplace.review.dto.ReviewResponse;
 import com.server.pickplace.review.error.ReviewErrorResult;
 import com.server.pickplace.review.error.ReviewException;
@@ -57,11 +58,11 @@ public class ReviewService extends CommonService {
     }
 
 
-    public Map<String, List<ReviewResponse>> getReviewListMapByEmail(String email) {
+    public Map<String, List<ReviewCategoryResponse>> getReviewListMapByEmail(String email) {
 
-        List<ReviewResponse> reviewResponse =  reviewRepository.getReviewDtosByEmail(email);
+        List<ReviewCategoryResponse> reviewResponse =  reviewRepository.getReviewDtosByEmail(email);
 
-        Map<String, List<ReviewResponse>> reviewListMap = new HashMap<>();
+        Map<String, List<ReviewCategoryResponse>> reviewListMap = new HashMap<>();
         reviewListMap.put("reviewList", reviewResponse);
 
         return reviewListMap;

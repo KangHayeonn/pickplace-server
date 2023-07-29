@@ -3,10 +3,7 @@ package com.server.pickplace.review.controller;
 
 import com.server.pickplace.common.dto.SingleResponse;
 import com.server.pickplace.common.service.ResponseService;
-import com.server.pickplace.review.dto.UpdateReviewRequest;
-import com.server.pickplace.review.dto.CreateReviewRequest;
-import com.server.pickplace.review.dto.ReviewDetailResponse;
-import com.server.pickplace.review.dto.ReviewResponse;
+import com.server.pickplace.review.dto.*;
 import com.server.pickplace.review.repository.ReviewRepository;
 import com.server.pickplace.review.service.ReviewService;
 import io.swagger.annotations.ApiOperation;
@@ -41,7 +38,7 @@ public class ReviewController {
 
         String email = reviewService.getPayloadMapAndGetEmail(accessToken);
 
-        Map<String, List<ReviewResponse>> reviewListMap = reviewService.getReviewListMapByEmail(email);
+        Map<String, List<ReviewCategoryResponse>> reviewListMap = reviewService.getReviewListMapByEmail(email);
 
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), reviewListMap));
 

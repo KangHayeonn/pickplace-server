@@ -2,6 +2,7 @@ package com.server.pickplace.review.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.querydsl.core.annotations.QueryProjection;
+import com.server.pickplace.place.entity.CategoryStatus;
 import lombok.Getter;
 
 import java.time.LocalDate;
@@ -13,6 +14,8 @@ public class ReviewDetailResponse {
     private Long reviewId;
 
     private String placeName;
+
+    private CategoryStatus placeCategory;
 
     private String memberName;
 
@@ -29,9 +32,10 @@ public class ReviewDetailResponse {
     private String reviewContent;
 
     @QueryProjection
-    public ReviewDetailResponse(Long reviewId, String placeName, String memberName, LocalDateTime reviewDate, String placeAddress, LocalDateTime reservationDate, Float reviewRating, String reviewContent) {
+    public ReviewDetailResponse(Long reviewId, String placeName, CategoryStatus categoryStatus, String memberName, LocalDateTime reviewDate, String placeAddress, LocalDateTime reservationDate, Float reviewRating, String reviewContent) {
         this.reviewId = reviewId;
         this.placeName = placeName;
+        this.placeCategory = categoryStatus;
         this.memberName = memberName;
         this.reviewDate = reviewDate.toLocalDate();
         this.placeAddress = placeAddress;

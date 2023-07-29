@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 public interface ReviewRepositoryCustom {
-    List<ReviewResponse> getReviewDtosByEmail(String email);
+    List<ReviewCategoryResponse> getReviewDtosByEmail(String email);
 
     PlaceReviewResponse getPlaceReviewDtoByPlaceId(Long placeId);
 
