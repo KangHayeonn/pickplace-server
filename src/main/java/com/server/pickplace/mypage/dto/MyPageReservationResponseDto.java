@@ -27,6 +27,8 @@ public class MyPageReservationResponseDto {
     @JsonProperty("reservationDate")
     String updateDate;
 
+    String category;
+
 
 
     }

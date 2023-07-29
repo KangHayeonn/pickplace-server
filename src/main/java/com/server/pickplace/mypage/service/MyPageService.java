@@ -7,6 +7,7 @@ import com.server.pickplace.member.service.jwt.JwtTokenProvider;
 import com.server.pickplace.mypage.dto.MyPageReservationMoreResponseDto;
 import com.server.pickplace.mypage.dto.MyPageReservationResponseDto;
 import com.server.pickplace.mypage.dto.PlaceAddressDto;
+import com.server.pickplace.mypage.repository.MyPageCategoryRepository;
 import com.server.pickplace.mypage.repository.MyPageReservationRepository;
 import com.server.pickplace.mypage.repository.MyPageReviewRepository;
 import com.server.pickplace.reservation.entity.Reservation;
@@ -31,6 +32,7 @@ public class MyPageService {
     private final MemberRepository memberRepository;
     private final MyPageReservationRepository reservationRepository;
     private final MyPageReviewRepository reviewRepository;
+    private final MyPageCategoryRepository categoryRepository;
 
     private final ModelMapper modelMapper;
 
@@ -47,11 +49,14 @@ public class MyPageService {
         for (int i =0 ; i< responseDto.size() ; i ++ ){
 
             Long reservationId = reservationDetail.get().get(i).getId();
+            Long placeId = reservationDetail.get().get(i).getRoom().getPlace().getId();
 
+            responseDto.get(i).setCategory(String.valueOf(categoryRepository.findCategoryPlaceByPlaceId(placeId).get().get(0).getCategory().getStatus()));
             responseDto.get(i).setReviewExistence(!reviewRepository.findReviewListByReservationId(reservationId).get().isEmpty());
             responseDto.get(i).setUpdateDate(reservationDetail.get().get(i).getUpdatedDate().toString());
             responseDto.get(i).setPlaceName(reservationDetail.get().get(i).getRoom().getPlace().getName());
             responseDto.get(i).setPlaceId(reservationDetail.get().get(i).getRoom().getPlace().getId());
+
         }
 
         return responseDto;
@@ -84,6 +89,8 @@ public class MyPageService {
             responseDto.get(i).setPlacePhone(data.getRoom().getPlace().getNumber());
             responseDto.get(i).setPlaceRating(data.getRoom().getPlace().getRating());
             responseDto.get(i).setPlaceAddress(place);
+
+            responseDto.get(i).setCategory(String.valueOf(categoryRepository.findCategoryPlaceByPlaceId(id).get().get(0).getCategory().getStatus()));
 
             responseDto.get(i).setPlaceReviewCnt(reviewRepository.findReviewListByReservationId(id).get().size());
             responseDto.get(i).setReviewExistence(!reviewRepository.findReviewListByReservationId(id).get().isEmpty());

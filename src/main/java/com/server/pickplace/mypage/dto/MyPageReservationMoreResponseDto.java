@@ -39,4 +39,6 @@ public class MyPageReservationMoreResponseDto {
     String updateDate;
 
     Long reservationId;
+
+    String category;
 }
