@@ -9,8 +9,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MyPagePlaceResponseDto {
-    Long reservationId;
+public class PlaceAddressDto {
+    String address;
+    Double latitude;
+    Double longitude;
 
-    Long placeId;
 }

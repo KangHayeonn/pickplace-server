@@ -1,6 +1,7 @@
 package com.server.pickplace.mypage;
 
 import com.server.pickplace.common.service.ResponseService;
+import com.server.pickplace.mypage.dto.MyPageReservationMoreResponseDto;
 import com.server.pickplace.mypage.dto.MyPageReservationResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,17 @@ public class MyPageController {
     public ResponseEntity memberReservation(@ApiIgnore HttpServletRequest httpServletRequest, @PathVariable Long memberId) throws Exception {
 
         List<MyPageReservationResponseDto> reservationDtos = myPageService.reservationDetails(httpServletRequest, memberId);
+
+        Map<String, Object> memberReservationDtos = new HashMap<>();
+        memberReservationDtos.put("reservation", reservationDtos);
+
+        return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), memberReservationDtos)); // 성공
+    }
+
+    @GetMapping("/reservation/detail/{reservationId}")
+    public ResponseEntity memberReservationDetails(@ApiIgnore HttpServletRequest httpServletRequest, @PathVariable Long reservationId) throws Exception {
+
+        List<MyPageReservationMoreResponseDto> reservationDtos = myPageService.reservationDetailsMore(httpServletRequest, reservationId);
 
         Map<String, Object> memberReservationDtos = new HashMap<>();
         memberReservationDtos.put("reservation", reservationDtos);

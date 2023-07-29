@@ -26,4 +26,8 @@ public interface MyPageReservationRepository extends JpaRepository<Reservation, 
     @Query("select r from Reservation r join r.member p join r.room d join d.place c where p.id = :id")
     Optional<List<Reservation>> findReservationListByMemberId(@Param("id") Long id);
 
+//    @Query("select r from Reservation r join r.member p join r.room d join d.place c where p.id = :id")
+    Optional<List<Reservation>> findReservationListById(Long id);
+
+
 }
