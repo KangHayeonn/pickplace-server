@@ -174,12 +174,6 @@ public class MemberService {
 		ValueOperations<String, String> logoutValueOperations = redisTemplate.opsForValue(); //access Token 블랙리스트에 등록
 		logoutValueOperations.set(token, token);
 
-//		HttpSession session = request.getSession();
-//		if (session != null) {
-//			session.invalidate();
-//		}
-
-
 		String payloadJWT = token.split("\\.")[1];
 		Base64.Decoder decoder = getUrlDecoder();
 
@@ -187,10 +181,6 @@ public class MemberService {
 		JsonParser jsonParser = new BasicJsonParser();
 		Map<String, Object> jsonArray = jsonParser.parseMap(payload);
 		String email = (String) jsonArray.get("sub"); // id 담아옴
-
-
-
-
 
 		// refreshToken 삭제
 		refreshTokenRedisRepository.findById(email)
