@@ -14,8 +14,8 @@ import java.util.Optional;
 
 public interface HostRepository extends JpaRepository<Member, Long>, HostRepositoryCustom {
 
-    @Query(value = "select p from Place p join p.member m where m.email = :email")
-    Optional<List<Place>> findPlaceListByEmail(@Param("email") String email);
+    @Query(value = "select p from Place p join p.member m where m.id = :id")
+    Optional<List<Place>> findPlaceListById(@Param("id") Long id);
 
     @Query(value = "select r from Room r join r.place p where p.id = :id")
     Optional<List<Room>> findOptionalRoomListByPlaceId(@Param("id") Long id);
@@ -26,8 +26,8 @@ public interface HostRepository extends JpaRepository<Member, Long>, HostReposit
     @Query(value = "select r from Reservation r join r.room rm join rm.place p where p.id = :id")
     Optional<List<Reservation>> findOptionalReservationListByPlaceId(@Param("id") Long id);
 
-    @Query(value = "select r, p from Reservation r join r.room rm join rm.place p join p.member m where m.email = :email")
-    Optional<List<Object[]>> findOptionalReservationAndNamesByEmail(@Param("email") String email);
+    @Query(value = "select r, p from Reservation r join r.room rm join rm.place p join p.member m where m.id = :id")
+    Optional<List<Object[]>> findOptionalReservationAndNamesById(@Param("id") Long id);
 
     // 예약, 고객, 플레이스
     @Query(value = "select m, r, p from Reservation r join r.room rm join rm.place p join p.member m where r.id = :id")

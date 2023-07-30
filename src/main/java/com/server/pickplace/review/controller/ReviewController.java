@@ -9,18 +9,13 @@ import com.server.pickplace.review.service.ReviewService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.json.BasicJsonParser;
-import org.springframework.boot.json.JsonParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-
-import static java.util.Base64.getUrlDecoder;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,11 +29,10 @@ public class ReviewController {
 
     @ApiOperation(tags = "5. Review", value = "작성한 리뷰 전체 조회", notes = "사용자 입장에서, 작성한 리뷰 전체를 조회한다.")
     @GetMapping("")
-    public ResponseEntity<SingleResponse<Map>> reviewPage(@RequestHeader("accessToken") String accessToken) {
+    public ResponseEntity<SingleResponse<Map>> reviewPage(@RequestParam("memberId") Long id) {
 
-        String email = reviewService.getPayloadMapAndGetEmail(accessToken);
 
-        Map<String, List<ReviewCategoryResponse>> reviewListMap = reviewService.getReviewListMapByEmail(email);
+        Map<String, List<ReviewCategoryResponse>> reviewListMap = reviewService.getReviewListMapById(id);
 
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), reviewListMap));
 
@@ -67,37 +61,32 @@ public class ReviewController {
 
     @ApiOperation(tags = "5. Review", value = "리뷰 생성", notes = "리뷰를 생성한다.")
     @PostMapping("")
-    public ResponseEntity createReview(@RequestHeader("accessToken") String accessToken,
+    public ResponseEntity createReview(@RequestParam("memberId") Long id,
                                        @RequestBody @Validated CreateReviewRequest createReviewRequest) {
 
-        String email = reviewService.getPayloadMapAndGetEmail(accessToken);
 
-        reviewService.createReviewByEmailAndRequest(email, createReviewRequest);
+        reviewService.createReviewByEmailAndRequest(id, createReviewRequest);
 
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
     }
 
     @ApiOperation(tags = "5. Review", value = "리뷰 변경", notes = "리뷰를 수정한다.")
     @PutMapping("/{reviewId}")
-    public ResponseEntity updateReview(@RequestHeader("accessToken") String accessToken,
+    public ResponseEntity updateReview(@RequestParam("memberId") Long id,
                                        @RequestBody @Validated UpdateReviewRequest updateReviewRequest,
                                        @PathVariable("reviewId") Long reviewId) {
 
-        String email = reviewService.getPayloadMapAndGetEmail(accessToken);
-
-        reviewRepository.updateReview(email, updateReviewRequest, reviewId);
+        reviewRepository.updateReview(id, updateReviewRequest, reviewId);
 
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
     }
 
     @ApiOperation(tags = "5. Review", value = "리뷰 삭제", notes = "리뷰를 삭제한다.")
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity deleteReview(@RequestHeader("accessToken") String accessToken,
+    public ResponseEntity deleteReview(@RequestParam("memberId") Long id,
                                       @PathVariable("reviewId") Long reviewId) {
 
-        String email = reviewService.getPayloadMapAndGetEmail(accessToken);
-
-        reviewRepository.deleteReview(email, reviewId);
+        reviewRepository.deleteReview(id, reviewId);
 
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
 

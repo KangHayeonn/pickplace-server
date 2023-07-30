@@ -28,6 +28,7 @@ import java.math.BigInteger;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static com.server.pickplace.member.entity.QMember.*;
 import static com.server.pickplace.member.entity.QMember.member;
 import static com.server.pickplace.place.entity.QPlace.*;
 import static com.server.pickplace.place.entity.QRoom.*;
@@ -43,7 +44,7 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
     private final EntityManager em;
 
     @Override
-    public Map<String, Object> getReservationPageMapByEmailAndRoomId(String email, Long roomId) {
+    public Map<String, Object> getReservationPageMapByEmailAndRoomId(Long id, Long roomId) {
 
         Map<String, Object> reservationPageMap = new HashMap<>();
 
@@ -69,7 +70,7 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
                         member.name,
                         member.number))
                 .from(member)
-                .where(member.email.eq(email))
+                .where(member.id.eq(id))
                 .fetchOne();
 
         reservationPageMap.put("place", placeInfoResponse);
@@ -80,7 +81,7 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
     }
 
     @Override
-    public void makeReservation(String email, PayRequest payRequest) {
+    public void makeReservation(Long id, PayRequest payRequest) {
 
         // 1. 모든 호실ID 리스트
         List<Long> allUnitIdList = queryFactory
@@ -120,7 +121,7 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
                 .where(QUnit.unit.id.eq(unitId))
                 .fetchOne();
         Room room = unit.getRoom();
-        Member member = getMember(email);
+        Member member = getMember(id);
 
         // 2. 예약 생성
 
@@ -143,13 +144,13 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
 
 
     @Override
-    public String saveQRPaymentInformation(String email, Integer roomPrice) {
+    public String saveQRPaymentInformation(Long id, Integer roomPrice) {
 
         String uuid = UUID.randomUUID().toString();
 
         QRPaymentInfomation qrPaymentInfomation = QRPaymentInfomation.builder()
                 .qrPaymentCode(uuid)
-                .email(email)
+                .memberId(id)
                 .status(QRStatus.WAITING)
                 .price(roomPrice)
                 .build();
@@ -178,11 +179,11 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
         room1.orElseThrow(() -> new ReservationException(ReservationErrorResult.NO_EXIST_ROOM_ID));
     }
 
-    private Member getMember(String email) {
+    private Member getMember(Long id) {
         return queryFactory
-                .select(QMember.member)
-                .from(QMember.member)
-                .where(QMember.member.email.eq(email))
+                .select(member)
+                .from(member)
+                .where(member.id.eq(id))
                 .fetchOne();
     }
 

@@ -33,7 +33,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
     private final EntityManager em;
 
     @Override
-    public List<ReviewCategoryResponse> getReviewDtosByEmail(String email) {
+    public List<ReviewCategoryResponse> getReviewDtosById(Long id) {
 
         List<ReviewCategoryResponse> reviewCateogryResponseList = queryFactory
                 .select(new QReviewCategoryResponse(
@@ -54,7 +54,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
                 .join(reservation.member, member)
                 .join(place.categories, categoryPlace)
                 .join(categoryPlace.category, category)
-                .where(member.email.eq(email))
+                .where(member.id.eq(id))
                 .fetch();
 
         return reviewCateogryResponseList;
@@ -144,12 +144,12 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
     }
 
     @Override
-    public void updateReview(String email, UpdateReviewRequest updateReviewRequest, Long reviewId) {
+    public void updateReview(Long id, UpdateReviewRequest updateReviewRequest, Long reviewId) {
 
         // 1. 리뷰ID null check + 리뷰ID와 토큰 정보 일치 체크
         // 2. 리뷰 수정
 
-        Review review = getReviewInUpdateAndDelete(email, reviewId);
+        Review review = getReviewInUpdateAndDelete(id, reviewId);
 
         Place place = getPlaceByReservationIdFetchedByReview(review);
 
@@ -164,12 +164,12 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
     }
 
     @Override
-    public void deleteReview(String email, Long reviewId) {
+    public void deleteReview(Long id, Long reviewId) {
 
         // 1. 리뷰ID null check + 리뷰ID와 토큰 정보 일치 체크
         // 2. 리뷰 삭제
 
-        Review review = getReviewInUpdateAndDelete(email, reviewId);
+        Review review = getReviewInUpdateAndDelete(id, reviewId);
 
         Place place1 = getPlaceByReservationIdFetchedByReview(review);
 
@@ -192,7 +192,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
     }
 
 
-    private Review getReviewInUpdateAndDelete(String email, Long reviewId) {
+    private Review getReviewInUpdateAndDelete(Long id, Long reviewId) {
 
         Review review1 = queryFactory
                 .select(review)
@@ -206,7 +206,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
 
         if (review1 == null) {
             throw new ReviewException(ReviewErrorResult.NO_EXIST_REVIEW_ID);
-        } else if (!review1.getReservation().getMember().getEmail().equals(email)) {
+        } else if (!review1.getReservation().getMember().getId().equals(id)) {
             throw new ReviewException(ReviewErrorResult.NO_PERMISSION);
         }
         return review1;

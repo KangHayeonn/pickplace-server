@@ -157,7 +157,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler({Exception.class})
 	public ResponseEntity<ErrorResponse> handleException(final Exception exception) {
 
-		log.info("Exception occurs : {}", exception.getStackTrace());
+		log.error("Exception occurs : {}", exception.getMessage(), exception);
 
 		return ResponseEntity.ok(responseService.getErrorResponse(HttpStatus.OK.value(), "알 수 없는 오류입니다."));
 

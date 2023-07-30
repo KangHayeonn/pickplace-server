@@ -14,18 +14,12 @@ import com.server.pickplace.reservation.error.ReservationException;
 import com.server.pickplace.reservation.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
-import org.springframework.boot.json.BasicJsonParser;
-import org.springframework.boot.json.JsonParser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Base64;
 import java.util.Map;
 import java.util.Optional;
-
-import static java.util.Base64.getUrlDecoder;
 
 
 @Slf4j
@@ -36,28 +30,28 @@ public class ReservationService extends CommonService {
 
     private final ReservationRepository reservationRepository;
 
-    public Map<String, Object> getReservationPageMapByEmailAndRoomId(String email, Long roomId) {
+    public Map<String, Object> getReservationPageMapByEmailAndRoomId(Long id, Long roomId) {
 
-        Map<String, Object> reservationPageMapByEmailAndRoomId = reservationRepository.getReservationPageMapByEmailAndRoomId(email, roomId);// 그냥 위임만
+        Map<String, Object> reservationPageMapByEmailAndRoomId = reservationRepository.getReservationPageMapByEmailAndRoomId(id, roomId);// 그냥 위임만
 
         return reservationPageMapByEmailAndRoomId;
     }
 
-    public CardInfoResponse getCardInfoDto(String email, String cardNum) {
+    public CardInfoResponse getCardInfoDto(Long id, String cardNum) {
 
-        String memberName = reservationRepository.findMemberNameByEmail(email);
+        String memberName = reservationRepository.findMemberNameById(id);
 
         CardInfoResponse cardInfoResponse = CardInfoResponse.builder().name(memberName).number(cardNum).build();
 
         return cardInfoResponse;
     }
 
-    public void payByCardAndReservation(String email, CardPayRequest cardPayRequest) {
+    public void payByCardAndReservation(Long id, CardPayRequest cardPayRequest) {
 
         // 결제
         String inputCardPassword = cardPayRequest.getCardPassword();
 
-        String memberPassword = reservationRepository.findMemberPasswordByEmail(email);
+        String memberPassword = reservationRepository.findMemberPasswordById(id);
 
         if (!inputCardPassword.equals(memberPassword)) {
             throw new ReservationException(ReservationErrorResult.WRONG_PASSWORD);
@@ -65,24 +59,24 @@ public class ReservationService extends CommonService {
 
 
         // 예약
-        reservationRepository.makeReservation(email, cardPayRequest);
+        reservationRepository.makeReservation(id, cardPayRequest);
 
     }
 
 
-    public void payByAccountAndReservation(String email, AccountPayRequest accountPayRequest) {
+    public void payByAccountAndReservation(Long id, AccountPayRequest accountPayRequest) {
 
         // 결제
         String inputAccountPassword = accountPayRequest.getAccountPassword();
 
-        String memberPassword = reservationRepository.findMemberPasswordByEmail(email);
+        String memberPassword = reservationRepository.findMemberPasswordById(id);
 
         if (!inputAccountPassword.equals(memberPassword)) {
             throw new ReservationException(ReservationErrorResult.WRONG_PASSWORD);
         }
 
         // 예약
-        reservationRepository.makeReservation(email, accountPayRequest);
+        reservationRepository.makeReservation(id, accountPayRequest);
 
     }
 
@@ -128,9 +122,9 @@ public class ReservationService extends CommonService {
         Optional<QRPaymentInfomation> optionalQREntity = reservationRepository.findQREntityByQRPaymentCode(qrPaymentCode);
         QRPaymentInfomation qrPaymentInfomation = optionalQREntity.orElseThrow(() -> new ReservationException(ReservationErrorResult.NON_EXIST_QR_PAYMENT_CODE));
 
-        String email = qrPaymentInfomation.getEmail();
+        Long id = qrPaymentInfomation.getMemberId();
 
-        String memberPassword = reservationRepository.findMemberPasswordByEmail(email);
+        String memberPassword = reservationRepository.findMemberPasswordById(id);
 
         if (!memberPassword.equals(qrPasswordRequest.getQrPassword())) {
             throw new ReservationException(ReservationErrorResult.WRONG_PASSWORD);
