@@ -17,6 +17,7 @@ public class PlaceUpdateRequest {
     @NotNull(message = "{category.NotNull}")
     private CategoryStatus category;
 
+    @NotNull(message = "{tag.NotNull}")
     private List<@NotNull(message = "{tag.NotNull}") TagStatus> tagList;
 
 }

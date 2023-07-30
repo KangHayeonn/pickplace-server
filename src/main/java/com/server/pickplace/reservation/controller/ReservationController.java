@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Map;
 import java.util.Optional;
 
@@ -64,7 +65,7 @@ public class ReservationController {
     @ApiOperation(tags = "4. Reservation", value = "카드 결제 및 예약", notes = "신용/체크카드 결제와 실제 예약이 이루어진다.")
     @PostMapping("/card")
     public ResponseEntity cardPay(@RequestHeader("accessToken") String accessToken,
-                                  @RequestBody CardPayRequest cardPayRequest) {
+                                  @RequestBody @Validated CardPayRequest cardPayRequest) {
 
         String email = reservationService.getPayloadMapAndGetEmail(accessToken);
 
@@ -77,7 +78,7 @@ public class ReservationController {
 
     @ApiOperation(tags = "4. Reservation", value = "은행 별 가상계좌 받아오기", notes = "은행 별 가상계좌번호를 반환한다.")
     @PostMapping("/account/number")
-    public ResponseEntity<SingleResponse> accountReturn(@RequestBody BankRequest bankRequest) {
+    public ResponseEntity<SingleResponse> accountReturn(@RequestBody @Validated BankRequest bankRequest) {
 
         String bankName = bankRequest.getBankName();
         String bankNum = reservationService.getBankNumByBankName(bankName);

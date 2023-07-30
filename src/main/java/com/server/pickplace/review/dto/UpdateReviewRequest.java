@@ -9,7 +9,7 @@ import javax.validation.constraints.Positive;
 @Getter
 public class UpdateReviewRequest {
 
-    @NotNull(message = "내용을 입력해주세요.")
+    @NotBlank(message = "내용을 입력해주세요.")
     private String content;
 
     @Positive

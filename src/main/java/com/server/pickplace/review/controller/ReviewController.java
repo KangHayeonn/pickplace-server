@@ -68,7 +68,7 @@ public class ReviewController {
     @ApiOperation(tags = "5. Review", value = "리뷰 생성", notes = "리뷰를 생성한다.")
     @PostMapping("")
     public ResponseEntity createReview(@RequestHeader("accessToken") String accessToken,
-                             @Validated @RequestBody CreateReviewRequest createReviewRequest) {
+                                       @RequestBody @Validated CreateReviewRequest createReviewRequest) {
 
         String email = reviewService.getPayloadMapAndGetEmail(accessToken);
 
@@ -80,7 +80,7 @@ public class ReviewController {
     @ApiOperation(tags = "5. Review", value = "리뷰 변경", notes = "리뷰를 수정한다.")
     @PutMapping("/{reviewId}")
     public ResponseEntity updateReview(@RequestHeader("accessToken") String accessToken,
-                                       @Validated @RequestBody UpdateReviewRequest updateReviewRequest,
+                                       @RequestBody @Validated UpdateReviewRequest updateReviewRequest,
                                        @PathVariable("reviewId") Long reviewId) {
 
         String email = reviewService.getPayloadMapAndGetEmail(accessToken);
@@ -102,30 +102,6 @@ public class ReviewController {
         return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), new Object()));
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-        private Map<String, Object> getPayloadMap(String accessToken) {
-
-        String payloadJWT = accessToken.split("\\.")[1];
-        Base64.Decoder decoder = getUrlDecoder();
-
-        String payload = new String(decoder.decode(payloadJWT));
-        JsonParser jsonParser = new BasicJsonParser();
-        Map<String, Object> jsonArray = jsonParser.parseMap(payload);
-        return jsonArray;
-    }
-
 
 
 
