@@ -134,6 +134,7 @@ public class HostRepositoryCustomImpl implements HostRepositoryCustom {
                 .leftJoin(room.units, unit)
                 .join(place.categories, categoryPlace)
                 .join(place.tags, tagPlace)
+                .where(place.eq(targetPlace))
                 .fetch();
 
         List<Room> roomList = new ArrayList<>();
