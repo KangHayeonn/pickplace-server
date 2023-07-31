@@ -25,4 +25,5 @@ public class Category extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private CategoryStatus status;
 
+
 }

@@ -40,4 +40,7 @@ public class Room extends BaseEntity {
 
     @OneToMany(mappedBy = "room")
     private List<Reservation> reservations;
+
+    @OneToMany(mappedBy = "room")
+    private List<Unit> units;
 }

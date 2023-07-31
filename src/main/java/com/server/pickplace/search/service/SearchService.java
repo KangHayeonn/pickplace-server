@@ -1,7 +1,6 @@
 package com.server.pickplace.search.service;
 
-import com.server.pickplace.place.entity.Place;
-import com.server.pickplace.place.entity.Room;
+import com.server.pickplace.place.entity.*;
 import com.server.pickplace.search.dto.*;
 import com.server.pickplace.search.error.SearchErrorResult;
 import com.server.pickplace.search.error.SearchException;
@@ -124,11 +123,49 @@ public class SearchService {
 
     }
 
+    public void dateNullCheck(SearchRequest request) {
+
+        if (request.getStartDate() == null || request.getEndDate() == null) {
+            throw new SearchException(SearchErrorResult.DATE_TIME_NULL_CHECK);
+        }
+    }
+
+    public void timeNullCheck(DetailPageRequest request, Long placeId) {
+
+        // 1. 플레이스 카테고리 가져오기
+        CategoryStatus categoryStatus = searchRepository.findCategoryStatusByPlaceId(placeId);
+
+        // 2.1. 카테고리가 호텔/리조트, 펜션, 게하면 -> 시간 값이 null 이어야함
+        // 2.2. 카테고리가 스터디룸, 파티룸이면 -> 시간 값이 null 아니어야 함
+
+        List<CategoryStatus> categoryStatusList = new ArrayList<>(Arrays.asList(CategoryStatus.Hotel, CategoryStatus.Pension, CategoryStatus.GuestHouse));
+
+        if (categoryStatusList.contains(categoryStatus)) { // 싱글톤 보장
+
+            if (request.getStartTime() != null || request.getEndTime() != null) {
+                throw new SearchException(SearchErrorResult.TIME_CONDITION_CHECK);
+            }
+
+        } else {
+
+            if (request.getStartTime() == null || request.getEndTime() == null) {
+                throw new SearchException(SearchErrorResult.TIME_CONDITION_CHECK);
+            }
+
+        }
+
+
+    }
+
+
     private PlaceResponse getPlaceResponseByPlace(Place place) {
+
+        List<TagStatus> tagStatusList = getTagStatusList(place);
+
         PlaceResponse placeResponse = PlaceResponse.builder()
                 .id(place.getId())
                 .name(place.getName())
-                .rating(place.getRating())
+                .rating(place.getReviewCount().equals(0) ? 0 : place.getRating() / place.getReviewCount())
                 .reviewCount(place.getReviewCount())
                 .address(
                         new HashMap<>() {
@@ -138,7 +175,24 @@ public class SearchService {
                                 put("longitude", place.getPoint().getY());
                             }
                         }
-                ).build();
+                )
+                .categoryStatus(place.getCategories().get(0).getCategory().getStatus())
+                .tagStatusList(tagStatusList)
+                .build();
+
         return placeResponse;
     }
+
+    private List<TagStatus> getTagStatusList(Place place) {
+        List<TagStatus> tagStatusList = new ArrayList<>();
+        for (TagPlace tagPlace : place.getTags()) {
+            TagStatus tagStatus = tagPlace.getTag().getTagStatus();
+            tagStatusList.add(tagStatus);
+        }
+        return tagStatusList;
+    }
+
+
+
+
 }

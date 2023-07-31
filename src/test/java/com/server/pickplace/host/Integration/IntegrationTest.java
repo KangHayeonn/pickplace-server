@@ -2,23 +2,13 @@ package com.server.pickplace.host.Integration;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.server.pickplace.host.dto.PlaceResponse;
-import com.server.pickplace.host.dto.ReservationResponse;
-import com.server.pickplace.member.entity.Member;
-import com.server.pickplace.member.entity.MemberRole;
-import com.server.pickplace.place.entity.Place;
-import com.server.pickplace.place.entity.Room;
-import com.server.pickplace.reservation.entity.Reservation;
-import com.server.pickplace.reservation.entity.ReservationStatus;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.geo.Point;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -26,10 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.time.LocalDate;
-import java.time.LocalTime;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -38,23 +25,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class IntegrationTest {
 
-//    @PersistenceContext EntityManager em;
+    @PersistenceContext EntityManager em;
     @Autowired MockMvc mvc;
     @Autowired ModelMapper modelMapper;
 
-    private final String hostJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJlbWFpbCI6ImFiY0BuYXZlci5jb20ifQ.QptS0V6x0RPP-MgXqKSYMaK-vIq0FTAaLGxeWIkNvo4";
-    private final String userJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJlbWFpbCI6ImRjZUBuYXRlLmNvbSJ9.lX3cyoaLodRv0VOab5DWYB_UKYvgPfMaCFPRIHouqNo";
     ObjectMapper objectMapper = new ObjectMapper();
 
 //    @Test
 //    void 공간관리페이지정상작동() throws Exception {
-//
+////
 //        //given
 //        MvcResult result = mvc.perform(get("/api/v1/host/place"
 //                        ).header(HttpHeaders.AUTHORIZATION, hostJwt)
 //                ).andExpect(status().isOk())
 //                .andReturn();
-//
+//    }
 //        //when
 //        String responseJson = result.getResponse().getContentAsString();
 //        JSONObject responseObject = new JSONObject(responseJson);
