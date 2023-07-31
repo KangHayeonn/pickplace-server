@@ -51,7 +51,7 @@ public class MyPageService {
             Long reservationId = reservationDetail.get().get(i).getId();
             Long placeId = reservationDetail.get().get(i).getRoom().getPlace().getId();
 
-            responseDto.get(i).setCategory(String.valueOf(categoryRepository.findCategoryPlaceByPlaceId(placeId).get().get(0).getCategory().getStatus()));
+            responseDto.get(i).setCategory(categoryRepository.findCategoryPlaceByPlaceId(placeId).get().get(0).getCategory().getStatus());
             responseDto.get(i).setReviewExistence(!reviewRepository.findReviewListByReservationId(reservationId).get().isEmpty());
             responseDto.get(i).setUpdateDate(reservationDetail.get().get(i).getUpdatedDate().toString());
             responseDto.get(i).setPlaceName(reservationDetail.get().get(i).getRoom().getPlace().getName());
@@ -90,7 +90,7 @@ public class MyPageService {
             responseDto.get(i).setPlaceRating(data.getRoom().getPlace().getRating());
             responseDto.get(i).setPlaceAddress(place);
 
-            responseDto.get(i).setCategory(String.valueOf(categoryRepository.findCategoryPlaceByPlaceId(id).get().get(0).getCategory().getStatus()));
+            responseDto.get(i).setCategory(categoryRepository.findCategoryPlaceByPlaceId(data.getRoom().getPlace().getId()).get().get(0).getCategory().getStatus());
 
             responseDto.get(i).setPlaceReviewCnt(reviewRepository.findReviewListByReservationId(id).get().size());
             responseDto.get(i).setReviewExistence(!reviewRepository.findReviewListByReservationId(id).get().isEmpty());
