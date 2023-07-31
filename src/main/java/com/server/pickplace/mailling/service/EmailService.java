@@ -1,6 +1,12 @@
 package com.server.pickplace.mailling.service;
 
 import com.server.pickplace.mailling.dto.EmailMessage;
+import com.server.pickplace.mailling.dto.PassWordEditDto;
+import com.server.pickplace.member.entity.Member;
+import com.server.pickplace.member.error.MemberErrorResult;
+import com.server.pickplace.member.error.MemberException;
+import com.server.pickplace.member.repository.MemberRepository;
+import com.server.pickplace.member.service.MemberInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -10,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Random;
 
 import static org.springframework.security.core.context.SecurityContextHolder.setContext;
@@ -21,6 +28,8 @@ import static org.springframework.security.core.context.SecurityContextHolder.se
 public class EmailService {
 
     private final JavaMailSender javaMailSender;
+    private final MemberRepository memberRepository;
+    private final MemberInfoService memberInfoService;
 
     public String sendMail(EmailMessage emailMessage, String type) {
         String authNum = createCode();
@@ -62,5 +71,15 @@ public class EmailService {
         return key.toString();
     }
 
+
+    public void updatePassword(HttpServletRequest httpServletRequest,PassWordEditDto passWordEditDto){
+        Long id = passWordEditDto.getMemberId();
+        String pw = passWordEditDto.getPassword();
+
+        Member member = memberRepository.findById(id).orElseThrow(()-> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
+        memberInfoService.checkInfoValid(httpServletRequest,id);
+        member.setNumber(pw);
+
+    }
 }
 

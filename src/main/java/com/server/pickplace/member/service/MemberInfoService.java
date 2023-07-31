@@ -79,7 +79,6 @@ public class MemberInfoService {
         Long id = requestDto.getMemberId();
         Member member = memberRepository.findById(requestDto.getMemberId()).orElseThrow(()-> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
         checkInfoValid(httpServletRequest,id);
-        //비밀번호만 변경
         member.setNumber(requestDto.getPhone());
 
     }
