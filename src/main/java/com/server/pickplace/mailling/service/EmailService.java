@@ -12,6 +12,8 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.util.Random;
 
+import static org.springframework.security.core.context.SecurityContextHolder.setContext;
+
 
 @Slf4j
 @Service
@@ -25,13 +27,12 @@ public class EmailService {
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
-//        if (type.equals("password")) userService.SetTempPassword(emailMessage.getTo(), authNum);
 
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
             mimeMessageHelper.setTo(emailMessage.getTo()); // 메일 수신자
             mimeMessageHelper.setSubject(emailMessage.getSubject()); // 메일 제목
-            mimeMessageHelper.setText("test",false); // 메일 본문 내용, HTML 여부
+            mimeMessageHelper.setText(authNum, true); //코드
             javaMailSender.send(mimeMessage);
 
             log.info("Success");
