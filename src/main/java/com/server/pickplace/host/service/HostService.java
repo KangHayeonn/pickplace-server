@@ -16,7 +16,6 @@ import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,17 +28,26 @@ public class HostService extends CommonService {
     private final HostRepository hostRepository;
     private final ModelMapper modelMapper;
 
-    public List<PlaceResponse> findPlaceDtoListByEmail(String email) {
+    public List<PlaceResponse> findPlaceDtoListById(Long id) {
 
-        Optional<List<Place>> optionalPlaces = hostRepository.findPlaceListByEmail(email);
+        Optional<List<Place>> optionalPlaces = hostRepository.findPlaceListById(id);
 
         if (optionalPlaces.isPresent()) {
 
             List<Place> places = optionalPlaces.get();
 
+            List<CategoryStatus> categoryStatusList = places.stream().map(place -> place.getCategories().get(0).getCategory().getStatus())
+                    .collect(Collectors.toList());
+
             List<PlaceResponse> placeDtos = places.stream()
                     .map(place -> modelMapper.map(place, PlaceResponse.class))
                     .collect(Collectors.toList());
+
+            for (int i = 0; i < categoryStatusList.size(); i++) {
+                CategoryStatus categoryStatus = categoryStatusList.get(i);
+                PlaceResponse placeResponse = placeDtos.get(i);
+                placeResponse.setCategoryStatus(categoryStatus);
+            }
 
             return placeDtos;
 
@@ -49,7 +57,7 @@ public class HostService extends CommonService {
 
     }
 
-    public List<RoomResponse> findRoomDtoListByPlaceId(Long placeId) {
+    public List<RoomInfoResponse> findRoomDtoListByPlaceId(Long placeId) {
 
         Optional<List<Room>> optionalRooms = hostRepository.findOptionalRoomListByPlaceId(placeId);
 
@@ -57,7 +65,7 @@ public class HostService extends CommonService {
 
             List<Room> rooms = optionalRooms.get();
 
-            List<RoomResponse> roomDtos = rooms.stream().map(room -> modelMapper.map(room, RoomResponse.class))
+            List<RoomInfoResponse> roomDtos = rooms.stream().map(room -> modelMapper.map(room, RoomInfoResponse.class))
                     .collect(Collectors.toList());
 
             return roomDtos;
@@ -68,14 +76,15 @@ public class HostService extends CommonService {
 
     }
 
-    public PlaceResponse findPlaceDtoByPlaceId(String email, Long placeId) {
+    public PlaceResponse findPlaceDtoByPlaceId(Long id, Long placeId) {
 
         Optional<Place> optionalPlace = hostRepository.findOptionalPlaceByPlaceId(placeId);
 
         Place place = optionalPlace.orElseThrow(() -> new HostException(HostErrorResult.NOT_EXIST_PLACE));
-        memberPlaceIdCheck(email, place);
+        memberPlaceIdCheck(id, place);
 
         PlaceResponse placeResponse = modelMapper.map(place, PlaceResponse.class);
+        placeResponse.setCategoryStatus(place.getCategories().get(0).getCategory().getStatus());
 
         return placeResponse;
 
@@ -83,7 +92,7 @@ public class HostService extends CommonService {
 
     public List<ReservationResponse> findReservationDtoListByPlaceId(Long placeId) {
 
-        Optional<List<Reservation>> optionalReservations = hostRepository.findOptionalReservationListByPlaceId(placeId, LocalDate.now());
+        Optional<List<Reservation>> optionalReservations = hostRepository.findOptionalReservationListByPlaceId(placeId);
 
         if (optionalReservations.isPresent()) {
 
@@ -100,11 +109,11 @@ public class HostService extends CommonService {
     }
 
 
-    public Map<String, Object> createReservationDtoMapByEmail(String email) {
+    public Map<String, Object> createReservationDtoMapByEmail(Long id) {
 
-        Optional<List<Object[]>> optionalReservationsAndNames = hostRepository.findOptionalReservationAndNamesByEmail(email);
+        Optional<List<Object[]>> optionalReservationsAndNames = hostRepository.findOptionalReservationAndNamesById(id);
 
-        Map<String, List<ReservationResponse>> map = new HashMap<>();
+        Map<Place, List<ReservationResponse>> map = new HashMap<>();
         List<Object> placeList = new ArrayList<>();
 
         if (optionalReservationsAndNames.isPresent()) {
@@ -114,20 +123,21 @@ public class HostService extends CommonService {
             for (Object[] reservationsAndName : reservationAndNames) {
 
                 Reservation reservation = (Reservation) reservationsAndName[0];
-                String key = (String) reservationsAndName[1];
+                Place place = (Place) reservationsAndName[1];
                 ReservationResponse reservationResponse = modelMapper.map(reservation, ReservationResponse.class);
 
-                List<ReservationResponse> reservations = map.getOrDefault(key, new ArrayList<>());
+                List<ReservationResponse> reservations = map.getOrDefault(place, new ArrayList<>());
                 reservations.add(reservationResponse);
 
-                map.put(key, reservations);
+                map.put(place, reservations);
 
             }
 
-            for (Map.Entry<String, List<ReservationResponse>> localEntry : map.entrySet()) {
+            for (Map.Entry<Place, List<ReservationResponse>> localEntry : map.entrySet()) {
                 Map<String, Object> localMap = new HashMap<>();
 
-                localMap.put("placeName", localEntry.getKey());
+                localMap.put("placeName", localEntry.getKey().getName());
+                localMap.put("placeCategory", localEntry.getKey().getCategories().get(0).getCategory().getStatus());
                 localMap.put("reservations", localEntry.getValue());
 
                 placeList.add(localMap);
@@ -143,7 +153,7 @@ public class HostService extends CommonService {
 
         return new HashMap<>();
     }
-    public Map<String, Object> getMemberReservationPlaceDtoMapByReservationId(Long reservationId) {
+    public Map<String, Object> getMemberReservationPlaceDtoMapByReservationId(Long reservationId, Long id) {
 
         Optional<List<Object[]>> optionalMemberReservationPlaceList = hostRepository.findOptionalMemberReservationPlaceListByReservationId(reservationId); // reservationId만 유효하다면, 셋 다 존재해야함
 
@@ -156,8 +166,8 @@ public class HostService extends CommonService {
         Member member = (Member) memberReservationPlaceList[0];
         Reservation reservation = (Reservation) memberReservationPlaceList[1];
         Place place = (Place) memberReservationPlaceList[2];
-        reservationMemberCheck(member, place);
 
+        reservationMemberCheck(member, id);
 
         MemberResponse MemberDto = MemberResponse.builder()
                 .name(member.getName()).build();
@@ -165,6 +175,7 @@ public class HostService extends CommonService {
         ReservationResponse reservationDto = modelMapper.map(reservation, ReservationResponse.class);
 
         PlaceResponse placeDto = modelMapper.map(place, PlaceResponse.class);
+        placeDto.setCategoryStatus(place.getCategories().get(0).getCategory().getStatus());
 
         Map<String, Object> map = new HashMap<>();
 
@@ -176,13 +187,13 @@ public class HostService extends CommonService {
 
     }
 
-    private void reservationMemberCheck(Member member, Place place) {
-        if (!place.getMember().equals(member)) {
+    private void reservationMemberCheck(Member member, Long id) {
+        if (!member.getId().equals(id)) {
             throw new HostException(HostErrorResult.NO_PERMISSION);
         }
     }
 
-    public void savePlaceAndRoomsByDto(PlaceRoomReqeuest placeRoomReqeuest, Member host) {
+    public Long savePlaceAndRoomsByDto(PlaceRoomReqeuest placeRoomReqeuest, Member host) {
 
         // 같은 트랜잭션
 
@@ -196,7 +207,7 @@ public class HostService extends CommonService {
         place.setPoint(new Point(placeRequest.getX(), placeRequest.getY()));
         place.setMember(host);
 
-        hostRepository.savePlace(place);
+        Long placeId = hostRepository.savePlace(place);
 
         List<Room> rooms = new ArrayList<>();
 
@@ -208,6 +219,7 @@ public class HostService extends CommonService {
 
         for (Room room : rooms) {
             hostRepository.saveRoom(room);
+            hostRepository.saveUnitByRoom(room);
         }
 
         Category category = hostRepository.findCategoryByCategoryStatus(categoryStatus);
@@ -218,18 +230,20 @@ public class HostService extends CommonService {
         List<Tag> tagList = hostRepository.findTagListByTagStatusList(tagStatusList);
         tagList.forEach(tag -> hostRepository.saveTagPlace(TagPlace.builder().tag(tag).place(place).build()));
 
-
+        return placeId;
     }
 
-    private void memberPlaceIdCheck(String email, Place place) {
-        if (!place.getMember().getEmail().equals(email)) {
+    private void memberPlaceIdCheck(Long id, Place place) {
+        if (!place.getMember().getId().equals(id)) {
             throw new HostException(HostErrorResult.NO_PERMISSION);
         }
     }
 
-    public Member hostCheck(String email) {
+    public Member hostCheck(Long id) {
 
-        Member host = hostRepository.findByEmail(email);
+        Optional<Member> optionalHost = hostRepository.findById(id);
+        Member host = optionalHost.get();
+
         if (host.getRole() != MemberRole.HOST) {
             throw new HostException(HostErrorResult.NO_PERMISSION);
         }
@@ -237,5 +251,63 @@ public class HostService extends CommonService {
         return host;
 
 
+    }
+
+    // 본인 소유 플레이스Id 아님, 존재하지 않는 플레이스Id
+    public void updatePlaceByDto(Long placeId, PlaceUpdateRequest placeUpdateRequest, Long id) {
+
+        // 1. placeId로 place 조회
+        // 2. 널이면, 에러  + place.getemail != email -> 권한없음
+
+        Optional<Place> optionalPlace = hostRepository.findOptionalPlaceByPlaceIdFetchCategoryAndTag(placeId);
+        Place place = optionalPlace.orElseThrow(() -> new HostException(HostErrorResult.NOT_EXIST_PLACE));
+        if (!place.getMember().getId().equals(id)) {
+            throw new HostException(HostErrorResult.NO_PERMISSION);
+        }
+
+        Category category = hostRepository.findCategoryByCategoryStatus(placeUpdateRequest.getCategory());
+        List<Tag> tagList = hostRepository.findTagListByTagStatusList(placeUpdateRequest.getTagList());
+
+
+        // 3. 수정
+
+        hostRepository.updatePlaceByDto(place, category, tagList, placeUpdateRequest);
+
+
+
+    }
+
+    public void deletePlace(Long placeId, Long id) {
+
+        Optional<Place> optionalPlace = hostRepository.findOptionalPlaceByPlaceId(placeId);
+        Place place = optionalPlace.orElseThrow(() -> new HostException(HostErrorResult.NOT_EXIST_PLACE));
+        if (!place.getMember().getId().equals(id)) {
+            throw new HostException(HostErrorResult.NO_PERMISSION);
+        }
+
+        hostRepository.deletePlace(place);
+
+
+    }
+
+    public void updateRoomByDto(RoomReqeust roomReqeust, Long roomId, Long id) {
+        Optional<Room> optionalRoom = hostRepository.findRoomByRoomId(roomId);
+        Room room = optionalRoom.orElseThrow(() -> new HostException(HostErrorResult.NOT_EXIST_ROOM));
+        if (!room.getPlace().getMember().getId().equals(id)) {
+            throw new HostException(HostErrorResult.NO_PERMISSION);
+        }
+
+        hostRepository.updateRoom(room, roomReqeust);
+
+    }
+
+    public void deleteRoomByRoomId(Long roomId, Long id) {
+        Optional<Room> optionalRoom = hostRepository.findRoomByRoomId(roomId);
+        Room room = optionalRoom.orElseThrow(() -> new HostException(HostErrorResult.NOT_EXIST_ROOM));
+        if (!room.getPlace().getMember().getId().equals(id)) {
+            throw new HostException(HostErrorResult.NO_PERMISSION);
+        }
+
+        hostRepository.deleteRoom(room);
     }
 }

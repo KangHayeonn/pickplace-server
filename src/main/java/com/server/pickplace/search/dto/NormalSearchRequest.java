@@ -26,7 +26,6 @@ public class NormalSearchRequest extends SearchRequest {
     private Integer countPerPage;
 
     @NotBlank(message = "{address.NotBlank}")
-    @Size(max = 255)
     private String address;
 
     @Positive

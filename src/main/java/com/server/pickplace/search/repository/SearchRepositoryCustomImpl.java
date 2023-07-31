@@ -31,6 +31,7 @@ import static com.server.pickplace.place.entity.QCategory.*;
 import static com.server.pickplace.place.entity.QCategoryPlace.*;
 import static com.server.pickplace.place.entity.QPlace.*;
 import static com.server.pickplace.place.entity.QRoom.room;
+import static com.server.pickplace.place.entity.QTag.*;
 import static com.server.pickplace.place.entity.QTagPlace.*;
 import static com.server.pickplace.place.entity.QUnit.*;
 import static com.server.pickplace.reservation.entity.QReservation.*;
@@ -368,10 +369,13 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
         }
 
         for (Place place : placeList) {
+
+            List<TagStatus> tagStatusList = getTagStatusList(place);
+
             PlaceResponse placeResponse = PlaceResponse.builder()
                     .id(place.getId())
                     .name(place.getName())
-                    .rating(place.getRating() / place.getReviewCount())
+                    .rating(place.getReviewCount().equals(0) ? 0 : place.getRating() / place.getReviewCount())
                     .reviewCount(place.getReviewCount())
                     .address(
                             new HashMap<>() {
@@ -381,13 +385,27 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
                                     put("longitude", place.getPoint().getY());
                                 }
                             }
-                    ).build();
+                    )
+                    .categoryStatus(place.getCategories().get(0).getCategory().getStatus())
+                    .tagStatusList(tagStatusList)
+                    .build();
+
+
 
             placeResponseList.add(placeResponse);
         }
 
 
         return placeResponseList;
+    }
+
+    private List<TagStatus> getTagStatusList(Place place) {
+        List<TagStatus> tagStatusList = new ArrayList<>();
+        for (TagPlace tagPlace : place.getTags()) {
+            TagStatus tagStatus = tagPlace.getTag().getTagStatus();
+            tagStatusList.add(tagStatus);
+        }
+        return tagStatusList;
     }
 
     private OrderSpecifier<Float> eqRecommend(NormalSearchRequest request) {

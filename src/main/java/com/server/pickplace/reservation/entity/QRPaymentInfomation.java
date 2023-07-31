@@ -22,8 +22,8 @@ public class QRPaymentInfomation extends BaseEntity {
     @Column(name = "QR_PAYMENT_CODE", nullable = false, length = 36)
     private String qrPaymentCode;
 
-    @Column(name = "QR_PAYMENT_EMAIL", nullable = false)
-    private String email;
+    @Column(name = "QR_PAYMENT_MEMBER_ID", nullable = false)
+    private Long memberId;
 
     @Column(name = "QR_PAYMENT_PRICE", nullable = false)
     private Integer price;

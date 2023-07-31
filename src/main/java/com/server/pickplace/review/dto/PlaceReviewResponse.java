@@ -19,7 +19,7 @@ public class PlaceReviewResponse {
     public PlaceReviewResponse(Long placeId, String placeName, Float placeRating, Integer placeReviewCount) {
         this.placeId = placeId;
         this.placeName = placeName;
-        this.placeRating = placeRating / placeReviewCount;
+        this.placeRating = placeReviewCount == 0 ? 0 : placeRating / placeReviewCount;
         this.placeReviewCount = placeReviewCount;
     }
 }

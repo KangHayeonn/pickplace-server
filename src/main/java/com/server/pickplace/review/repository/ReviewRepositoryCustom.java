@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 public interface ReviewRepositoryCustom {
-    List<ReviewResponse> getReviewDtosByEmail(String email);
+    List<ReviewCategoryResponse> getReviewDtosById(Long id);
 
     PlaceReviewResponse getPlaceReviewDtoByPlaceId(Long placeId);
 
@@ -18,8 +18,8 @@ public interface ReviewRepositoryCustom {
     void createReview(Reservation reservation, CreateReviewRequest createReviewRequest);
 
     @Transactional
-    void updateReview(String email, UpdateReviewRequest updateReviewRequest, Long reviewId);
+    void updateReview(Long id, UpdateReviewRequest updateReviewRequest, Long reviewId);
 
     @Transactional
-    void deleteReview(String email, Long reviewId);
+    void deleteReview(Long id, Long reviewId);
 }

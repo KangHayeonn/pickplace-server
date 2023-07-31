@@ -2,6 +2,8 @@ package com.server.pickplace.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.pickplace.common.dto.ErrorResponse;
+import com.server.pickplace.member.error.MemberErrorResult;
+import com.server.pickplace.member.error.MemberException;
 import com.server.pickplace.member.service.jwt.JwtAuthenticationFilter;
 import com.server.pickplace.member.service.jwt.JwtTokenProvider;
 import lombok.AllArgsConstructor;
@@ -49,7 +51,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String[] AUTH_WHITELIST = {
             //정적인 파일에 대한 요청들 작성 (추후)
@@ -68,7 +70,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             http
                     .cors().and()
                     .exceptionHandling()
-//                    .authenticationEntryPoint(unauthorizedEntryPoint) // 403 에러 예외처리
+                    .authenticationEntryPoint(unauthorizedEntryPoint) // 403 에러 예외처리
                     .and()
                     .csrf().disable()
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -99,19 +101,17 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring()
                 .antMatchers(AUTH_WHITELIST);    }
 
+    private final AuthenticationEntryPoint unauthorizedEntryPoint =
+            (request, response, authException) -> {
 
-    //시큐리티에서 발생할 403에러 예외처리
-//    private final AuthenticationEntryPoint unauthorizedEntryPoint =
-//            (request, response, authException) -> {
-//
-//                ErrorResponse fail = new ErrorResponse(true, 403, "권한 인증 발생"); // Custom error response.
-//                response.setStatus(
-//                        HttpStatus.UNAUTHORIZED.value());
-//                String json = objectMapper.writeValueAsString(fail);
-//                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-//                PrintWriter writer = response.getWriter();
-//                writer.write(json);
-//                writer.flush();
-//            };
+                ErrorResponse fail = new ErrorResponse(false, 403, "접근할 수 없습니다"); // Custom error response.
+                response.setStatus(
+                        HttpStatus.UNAUTHORIZED.value());
+                String json = objectMapper.writeValueAsString(fail);
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                PrintWriter writer = response.getWriter();
+                writer.write(json);
+                writer.flush();
+            };
 
 }

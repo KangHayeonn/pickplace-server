@@ -1,8 +1,12 @@
 package com.server.pickplace.search.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.server.pickplace.place.entity.CategoryStatus;
+import com.server.pickplace.place.entity.TagStatus;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -23,6 +27,14 @@ public class PlaceResponse {
 
     @JsonProperty("placeReviewCnt")
     private Integer reviewCount;
+
+    @JsonProperty("category")
+    private CategoryStatus categoryStatus;
+
+    @JsonProperty("tags")
+    private List<TagStatus> tagStatusList;
+
+
 
 
 }

@@ -1,6 +1,7 @@
 package com.server.pickplace.host.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.server.pickplace.place.entity.CategoryStatus;
 import lombok.*;
 
 @AllArgsConstructor
@@ -21,5 +22,7 @@ public class PlaceResponse {
     @JsonProperty("placeId")
     private Long id;
 
+    @JsonProperty("placeCategory")
+    private CategoryStatus categoryStatus;
 
 }
