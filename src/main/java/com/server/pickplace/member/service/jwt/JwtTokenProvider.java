@@ -166,9 +166,13 @@ public class JwtTokenProvider {
 
     public String resolveToken(HttpServletRequest request) {
 
-        if(request.getHeader("accessToken") != null )
+        if(request.getHeader("accessToken") != null ) // 기존 accessToken 접근 코드
             return request.getHeader("accessToken");
+
+        if(request.getHeader("authorization") != null )
+            return request.getHeader("authorization").substring(7);
         return null;
+
     }
 
     public String recreationAccessToken(final String id, final String role , final String refreshToken) {
