@@ -6,6 +6,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.server.pickplace.member.entity.Member;
 import com.server.pickplace.member.entity.QMember;
+import com.server.pickplace.place.entity.QUnit;
 import com.server.pickplace.place.entity.Room;
 import com.server.pickplace.place.entity.Unit;
 import com.server.pickplace.reservation.dto.MemberInfoResponse;
@@ -23,8 +24,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.math.BigInteger;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static com.server.pickplace.member.entity.QMember.*;
 import static com.server.pickplace.member.entity.QMember.member;
 import static com.server.pickplace.place.entity.QPlace.*;
 import static com.server.pickplace.place.entity.QRoom.*;
@@ -40,7 +44,7 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
     private final EntityManager em;
 
     @Override
-    public Map<String, Object> getReservationPageMapByEmailAndRoomId(String email, Long roomId) {
+    public Map<String, Object> getReservationPageMapByEmailAndRoomId(Long id, Long roomId) {
 
         Map<String, Object> reservationPageMap = new HashMap<>();
 
@@ -66,7 +70,7 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
                         member.name,
                         member.number))
                 .from(member)
-                .where(member.email.eq(email))
+                .where(member.id.eq(id))
                 .fetchOne();
 
         reservationPageMap.put("place", placeInfoResponse);
@@ -77,35 +81,47 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
     }
 
     @Override
-    public void makeReservation(String email, PayRequest payRequest) {
+    public void makeReservation(Long id, PayRequest payRequest) {
 
-        // 1. 비어있는 호실 체크 ( 비어있는 호실이 없다면, 빈 호실 없음 반환 )
+        // 1. 모든 호실ID 리스트
+        List<Long> allUnitIdList = queryFactory
+                .select(unit.id)
+                .from(room)
+                .join(room.units, unit).on(room.id.eq(payRequest.getRoomId()))
+                .fetch();
 
-        List<Tuple> tupleList =
-                queryFactory
-                        .select(room, unit)
-                        .from(unit)
-                        .join(unit.room, room)
-                        .join(room.reservations, reservation)
-                        .where(
-                                room.id.eq(payRequest.getRoomId()),
+        // 2. 시간조건 걸리는 unit 리스트
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String stringStartDateTime = payRequest.getCheckInTime().format(formatter);
+        String sql = String.format("""
+                    select distinct unit_id
+                    from
+                    		(
+                            select unit_tb.unit_id, CONCAT(start_date, ' ', start_time) AS start_datetime, CONCAT(end_date, ' ', end_time) AS end_datetime
+                    		from room_tb
+                    		join unit_tb on (room_tb.room_id = %d) and (room_tb.room_id = unit_tb.room_id)
+                    		join reservation_tb on room_tb.room_id = reservation_tb.room_id
+                            ) sub_query
+                    
+                    where '%s' between start_datetime and end_datetime
+                """, payRequest.getRoomId(), stringStartDateTime);
 
-                                dateCheckByRequest(payRequest).not().or(timeCheckByRequest(payRequest).not())
+        List<BigInteger> unableUnitIdList = em.createNativeQuery(sql).getResultList();
+        unableUnitIdList.forEach(o -> allUnitIdList.remove(o.longValue()));
 
-                        )
-                        .orderBy(unit.id.asc())
-                        .fetch();
-
-        Tuple tuple;
-        if (tupleList.isEmpty()) {
+        if (allUnitIdList.isEmpty()) {
             throw new ReservationException(ReservationErrorResult.NO_EMPTY_ROOM);
-        } else {
-            tuple = tupleList.get(0);
         }
 
-        Room room = tuple.get(0, Room.class);
-        Unit unit = tuple.get(1, Unit.class);
-        Member member = getMember(email);
+        // 3. 예약
+        Long unitId = allUnitIdList.get(0);
+        Unit unit = queryFactory
+                .select(QUnit.unit)
+                .from(QUnit.unit)
+                .where(QUnit.unit.id.eq(unitId))
+                .fetchOne();
+        Room room = unit.getRoom();
+        Member member = getMember(id);
 
         // 2. 예약 생성
 
@@ -128,13 +144,13 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
 
 
     @Override
-    public String saveQRPaymentInformation(String email, Integer roomPrice) {
+    public String saveQRPaymentInformation(Long id, Integer roomPrice) {
 
         String uuid = UUID.randomUUID().toString();
 
         QRPaymentInfomation qrPaymentInfomation = QRPaymentInfomation.builder()
                 .qrPaymentCode(uuid)
-                .email(email)
+                .memberId(id)
                 .status(QRStatus.WAITING)
                 .price(roomPrice)
                 .build();
@@ -163,11 +179,11 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
         room1.orElseThrow(() -> new ReservationException(ReservationErrorResult.NO_EXIST_ROOM_ID));
     }
 
-    private Member getMember(String email) {
+    private Member getMember(Long id) {
         return queryFactory
-                .select(QMember.member)
-                .from(QMember.member)
-                .where(QMember.member.email.eq(email))
+                .select(member)
+                .from(member)
+                .where(member.id.eq(id))
                 .fetchOne();
     }
 

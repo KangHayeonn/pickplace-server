@@ -5,6 +5,7 @@ import com.server.pickplace.common.service.CommonService;
 import com.server.pickplace.reservation.entity.Reservation;
 import com.server.pickplace.review.dto.CreateReviewRequest;
 import com.server.pickplace.review.dto.PlaceReviewResponse;
+import com.server.pickplace.review.dto.ReviewCategoryResponse;
 import com.server.pickplace.review.dto.ReviewResponse;
 import com.server.pickplace.review.error.ReviewErrorResult;
 import com.server.pickplace.review.error.ReviewException;
@@ -40,12 +41,12 @@ public class ReviewService extends CommonService {
         return placeReviewListMap;
     }
 
-    public void createReviewByEmailAndRequest(String email, CreateReviewRequest createReviewRequest) {
+    public void createReviewByEmailAndRequest(Long id, CreateReviewRequest createReviewRequest) {
 
         // 1. reservation 존재 + 본인꺼 + 아직 리뷰 없음
         Optional<Reservation> optionalReservation = reviewRepository.findReservationByReservationId(createReviewRequest.getReservationId());
         Reservation reservation = optionalReservation.orElseThrow(() -> new ReviewException(ReviewErrorResult.WRONG_RESERVATION_ID));
-        if (!(reservation.getMember().getEmail().equals(email))) {
+        if (!(reservation.getMember().getId().equals(id))) {
             throw new ReviewException(ReviewErrorResult.NO_PERMISSION);
         } else if (!(reservation.getReview() == null)) {
             throw new ReviewException(ReviewErrorResult.REVIEW_ALREADY_EXIST);
@@ -57,11 +58,11 @@ public class ReviewService extends CommonService {
     }
 
 
-    public Map<String, List<ReviewResponse>> getReviewListMapByEmail(String email) {
+    public Map<String, List<ReviewCategoryResponse>> getReviewListMapById(Long id) {
 
-        List<ReviewResponse> reviewResponse =  reviewRepository.getReviewDtosByEmail(email);
+        List<ReviewCategoryResponse> reviewResponse =  reviewRepository.getReviewDtosById(id);
 
-        Map<String, List<ReviewResponse>> reviewListMap = new HashMap<>();
+        Map<String, List<ReviewCategoryResponse>> reviewListMap = new HashMap<>();
         reviewListMap.put("reviewList", reviewResponse);
 
         return reviewListMap;

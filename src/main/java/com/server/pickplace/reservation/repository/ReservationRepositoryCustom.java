@@ -9,11 +9,11 @@ import java.util.Map;
 
 public interface ReservationRepositoryCustom {
 
-    Map<String, Object> getReservationPageMapByEmailAndRoomId(String email, Long roomId);
+    Map<String, Object> getReservationPageMapByEmailAndRoomId(Long id, Long roomId);
 
-    void makeReservation(String email, PayRequest cardPayRequest);
+    void makeReservation(Long id, PayRequest cardPayRequest);
 
-    String saveQRPaymentInformation(String email, Integer roomPrice);
+    String saveQRPaymentInformation(Long id, Integer roomPrice);
 
     void changeQREntityStatus(QRPaymentInfomation qrPaymentInfomation, QRStatus status);
 

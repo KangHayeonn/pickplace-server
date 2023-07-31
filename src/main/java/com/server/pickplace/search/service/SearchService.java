@@ -1,8 +1,6 @@
 package com.server.pickplace.search.service;
 
-import com.server.pickplace.place.entity.CategoryStatus;
-import com.server.pickplace.place.entity.Place;
-import com.server.pickplace.place.entity.Room;
+import com.server.pickplace.place.entity.*;
 import com.server.pickplace.search.dto.*;
 import com.server.pickplace.search.error.SearchErrorResult;
 import com.server.pickplace.search.error.SearchException;
@@ -161,10 +159,13 @@ public class SearchService {
 
 
     private PlaceResponse getPlaceResponseByPlace(Place place) {
+
+        List<TagStatus> tagStatusList = getTagStatusList(place);
+
         PlaceResponse placeResponse = PlaceResponse.builder()
                 .id(place.getId())
                 .name(place.getName())
-                .rating(place.getRating())
+                .rating(place.getReviewCount().equals(0) ? 0 : place.getRating() / place.getReviewCount())
                 .reviewCount(place.getReviewCount())
                 .address(
                         new HashMap<>() {
@@ -174,9 +175,23 @@ public class SearchService {
                                 put("longitude", place.getPoint().getY());
                             }
                         }
-                ).build();
+                )
+                .categoryStatus(place.getCategories().get(0).getCategory().getStatus())
+                .tagStatusList(tagStatusList)
+                .build();
+
         return placeResponse;
     }
+
+    private List<TagStatus> getTagStatusList(Place place) {
+        List<TagStatus> tagStatusList = new ArrayList<>();
+        for (TagPlace tagPlace : place.getTags()) {
+            TagStatus tagStatus = tagPlace.getTag().getTagStatus();
+            tagStatusList.add(tagStatus);
+        }
+        return tagStatusList;
+    }
+
 
 
 

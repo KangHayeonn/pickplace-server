@@ -13,8 +13,7 @@ public class CreateReviewRequest {
     @NotNull(message = "예약ID를 입력해주세요")
     private Long reservationId;
 
-    @NotBlank
-    @NotNull(message = "내용을 입력해주세요.")
+    @NotBlank(message = "내용을 입력해주세요.")
     private String content;
 
     @Positive
