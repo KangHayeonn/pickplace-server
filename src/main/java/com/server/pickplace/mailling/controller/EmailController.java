@@ -26,7 +26,7 @@ public class EmailController {
     private final EmailService emailService;
 
 
-    @ApiOperation(tags = "1. Member", value = "비밀번호 찾기/변경", notes = "비밀번호 변경한다")
+    @ApiOperation(tags = "1. Member", value = "비밀번호 찾기/변경", notes = "비밀번호를 찾기 위해 인증번호를 발급 받는다")
     @PostMapping("/pwd")
     public ResponseEntity sendPasswordMail(@RequestBody EmailPostDto emailPostDto) throws MessagingException {
 
@@ -45,22 +45,17 @@ public class EmailController {
 //        simpleMailMessage.setText("test");
 //        javaMailSender.send(simpleMailMessage);
 
-
-//        EmailMessage emailMessage = EmailMessage.builder()
-//                .to(emailPostDto.getEmail()) //수신자
-//                .subject("[SAVIEW] 임시 비밀번호 발급") // 제목
-//                .build();
-//
-//        emailService.sendMail(emailMessage, "password");
-
-//        MimeMessage message = javaMailSender.createMimeMessage();
-//        message.addRecipients(MimeMessage.RecipientType.TO, "rkdgkdus522@naver.com");
-//        message.setSubject("test");
-
-//        javaMailSender.send(message);
-
         return ResponseEntity.ok().build();
     }
+
+    @ApiOperation(tags = "1. Member", value = "비밀번호 찾기/변경", notes = "비밀번호를 찾기 위해 인증번호를 발급 받는다")
+    @PutMapping("/pwd")
+    public ResponseEntity editPasswordMail(@RequestBody EmailPostDto emailPostDto) throws MessagingException{
+
+        emailPostDto.
+        return ResponseEntity.ok().build();
+    }
+
 
     // 회원가입 이메일 인증 - 요청 시 body로 인증번호 반환하도록 작성하였음
 //    @PostMapping("/email")
