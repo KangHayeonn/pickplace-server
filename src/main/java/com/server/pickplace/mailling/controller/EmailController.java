@@ -49,7 +49,7 @@ public class EmailController {
         return ResponseEntity.ok(emailResponseDto);
     }
 
-    @ApiOperation(tags = "1. Member", value = "비밀번호 찾기/변경", notes = "비밀번호 변경한다")
+    @ApiOperation(tags = "1. Member", value = "비밀번호 찾기/변경", notes = "비밀번호 변경한다.")
     @PutMapping("/pwd")
     public ResponseEntity editPasswordMail(@ApiIgnore HttpServletRequest httpServletRequest , @RequestBody PassWordEditDto passWordEditDto) throws MessagingException{
 
