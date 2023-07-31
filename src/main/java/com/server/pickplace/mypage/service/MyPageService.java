@@ -90,7 +90,7 @@ public class MyPageService {
             responseDto.get(i).setPlaceRating(data.getRoom().getPlace().getRating());
             responseDto.get(i).setPlaceAddress(place);
 
-            responseDto.get(i).setCategory(String.valueOf(categoryRepository.findCategoryPlaceByPlaceId(id).get().get(0).getCategory().getStatus()));
+            responseDto.get(i).setCategory(String.valueOf(categoryRepository.findCategoryPlaceByPlaceId(data.getRoom().getPlace().getId()).get().get(0).getCategory().getStatus()));
 
             responseDto.get(i).setPlaceReviewCnt(reviewRepository.findReviewListByReservationId(id).get().size());
             responseDto.get(i).setReviewExistence(!reviewRepository.findReviewListByReservationId(id).get().isEmpty());
