@@ -30,7 +30,7 @@ public class EmailController {
     private final EmailService emailService;
 
 
-    @ApiOperation(tags = "1. Member", value = "비밀번호 찾기/변경", notes = "비밀번호를 찾기 위해 인증번호를 발급 받는다")
+    @ApiOperation(tags = "1. Member", value = "비밀번호 찾기/변경 메일 발송", notes = "비밀번호를 찾기 위해 인증번호를 발급 받는다")
     @PostMapping("/pwd")
     public ResponseEntity sendPasswordMail(@RequestBody EmailPostDto emailPostDto) throws MessagingException {
 
@@ -49,7 +49,7 @@ public class EmailController {
         return ResponseEntity.ok(emailResponseDto);
     }
 
-    @ApiOperation(tags = "1. Member", value = "비밀번호 찾기/변경", notes = "비밀번호 변경한다.")
+    @ApiOperation(tags = "1. Member", value = "비밀번호 변경", notes = "비밀번호 변경한다.")
     @PutMapping("/pwd")
     public ResponseEntity editPasswordMail(@ApiIgnore HttpServletRequest httpServletRequest , @RequestBody PassWordEditDto passWordEditDto) throws MessagingException{
 

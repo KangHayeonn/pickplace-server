@@ -77,7 +77,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     .and()
                     .authorizeRequests()
                     .mvcMatchers(HttpMethod.GET, "/api/v1/review/places/*","/api/v1/review/*").permitAll()
-                    .mvcMatchers(HttpMethod.POST, "/api/v1/members/signup","/api/v1/members/login","/api/v1/members/emailCheck"
+                    .mvcMatchers(HttpMethod.POST, "/api/v1/members/signup","/api/v1/members/login","/api/v1/members/emailCheck" , "/api/v1/members/pwd"
+                            , "/api/v1/members/email"
                             ,"/api/v1/search/**","/api/v1/members/kakaoLogin").permitAll()
                     .mvcMatchers(HttpMethod.GET, "/api/v1/host/**").hasRole("HOST")
                     .mvcMatchers(HttpMethod.POST, "/api/v1/host/**").hasRole("HOST")
