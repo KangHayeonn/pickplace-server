@@ -96,8 +96,7 @@ public class MemberInfoService {
     }
 
     public void checkInfoValid (HttpServletRequest httpServletRequest, Long id){
-        String token = jwtTokenProvider.resolveToken((HttpServletRequest) httpServletRequest); //access Token 가져옴
-
+        String token = jwtTokenProvider.resolveToken((HttpServletRequest) httpServletRequest);
 
         //유효한 토큰만 통과 // 아닌건 예외처리
         if (token != null && jwtTokenProvider.validateToken(token)) {

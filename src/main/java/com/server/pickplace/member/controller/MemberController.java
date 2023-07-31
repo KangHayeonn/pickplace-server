@@ -163,7 +163,7 @@ public class MemberController {
 	@DeleteMapping("/")
 	public ResponseEntity putNicknameInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody MemberIdRequestDto memberId) {
 
-		memberInfoService.checkInfoValid(httpServletRequest, memberId.getMemberId()); // 토큰 만료 , 존재하지 않는 회원 , 권한없음 처리
+//		memberInfoService.checkInfoValid(httpServletRequest, memberId.getMemberId()); // 토큰 만료 , 존재하지 않는 회원 , 권한없음 처리
 		memberService.logout(httpServletRequest); //로그아웃 후 회원 탈퇴 진행 (토큰 삭제 과정이라서)
 		memberService.deleteMember(memberId.getMemberId());
 		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), "탈퇴"));

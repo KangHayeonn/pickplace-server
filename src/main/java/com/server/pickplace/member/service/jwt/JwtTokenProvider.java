@@ -132,6 +132,7 @@ public class JwtTokenProvider {
 
     // 토큰 정보를 검증하는 메서드
     public boolean validateToken(String token) {
+
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
@@ -166,9 +167,10 @@ public class JwtTokenProvider {
 
     public String resolveToken(HttpServletRequest request) {
 
-        if(request.getHeader("accessToken") != null )
-            return request.getHeader("accessToken");
+        if(request.getHeader("authorization") != null )
+            return request.getHeader("authorization").substring(7);
         return null;
+
     }
 
     public String recreationAccessToken(final String id, final String role , final String refreshToken) {
