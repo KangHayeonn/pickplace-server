@@ -86,7 +86,7 @@ public class SearchService {
 
         Place place = optionalPlace.orElseThrow(() -> new SearchException(SearchErrorResult.NOT_EXIST_PLACE));
 
-        PlaceResponse placeResponse = getPlaceResponseByPlace(place);
+        PlaceAddNumberResponse placeResponse = getPlaceAddNumberResponseByPlace(place);
 
         detailPageMap.put("place", placeResponse);
 
@@ -158,11 +158,11 @@ public class SearchService {
     }
 
 
-    private PlaceResponse getPlaceResponseByPlace(Place place) {
+    private PlaceAddNumberResponse getPlaceAddNumberResponseByPlace(Place place) {
 
         List<TagStatus> tagStatusList = getTagStatusList(place);
 
-        PlaceResponse placeResponse = PlaceResponse.builder()
+        PlaceAddNumberResponse placeAddNumberResponse = PlaceAddNumberResponse.builder()
                 .id(place.getId())
                 .name(place.getName())
                 .rating(place.getReviewCount().equals(0) ? 0 : place.getRating() / place.getReviewCount())
@@ -176,11 +176,12 @@ public class SearchService {
                             }
                         }
                 )
+                .number(place.getNumber())
                 .categoryStatus(place.getCategories().get(0).getCategory().getStatus())
                 .tagStatusList(tagStatusList)
                 .build();
 
-        return placeResponse;
+        return placeAddNumberResponse;
     }
 
     private List<TagStatus> getTagStatusList(Place place) {
