@@ -100,11 +100,11 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
                             select unit_tb.unit_id, CONCAT(start_date, ' ', start_time) AS start_datetime, CONCAT(end_date, ' ', end_time) AS end_datetime
                     		from room_tb
                     		join unit_tb on (room_tb.room_id = %d) and (room_tb.room_id = unit_tb.room_id)
-                    		join reservation_tb on room_tb.room_id = reservation_tb.room_id
+                    		join reservation_tb on unit_tb.unit_id = reservation_tb.unit_id
                             ) sub_query
                     
-                    where '%s' between start_datetime and end_datetime
-                """, payRequest.getRoomId(), stringStartDateTime);
+                    where '%s' >= start_datetime and '%s' < end_datetime
+                """, payRequest.getRoomId(), stringStartDateTime, stringStartDateTime);
 
         List<BigInteger> unableUnitIdList = em.createNativeQuery(sql).getResultList();
         unableUnitIdList.forEach(o -> allUnitIdList.remove(o.longValue()));
