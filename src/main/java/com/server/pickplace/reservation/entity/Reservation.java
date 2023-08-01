@@ -59,7 +59,7 @@ public class Reservation extends BaseEntity {
     @JoinColumn(name = "UNIT_ID")
     private Unit unit;
 
-    @OneToOne(mappedBy = "reservation")
+    @OneToOne(mappedBy = "reservation", cascade = CascadeType.REMOVE)
     private Review review;
 
 }

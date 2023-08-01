@@ -125,68 +125,6 @@ public class HostRepositoryCustomImpl implements HostRepositoryCustom {
     @Override
     public void deletePlace(Place targetPlace) {
 
-        List<Tuple> allLinkedDataList = queryFactory
-                .select(room, unit, reservation, review, categoryPlace, tagPlace)
-                .from(place)
-                .leftJoin(place.rooms, room).on(room.place.eq(targetPlace))
-                .leftJoin(room.reservations, reservation)
-                .leftJoin(reservation.review, review)
-                .leftJoin(room.units, unit)
-                .join(place.categories, categoryPlace)
-                .join(place.tags, tagPlace)
-                .where(place.eq(targetPlace))
-                .fetch();
-
-        List<Room> roomList = new ArrayList<>();
-        List<Unit> unitList = new ArrayList<>();
-        List<Reservation> reservationList = new ArrayList<>();
-        List<Review> reviewList = new ArrayList<>();
-        List<CategoryPlace> categoryPlaceList = new ArrayList<>();
-        List<TagPlace> tagPlaceList = new ArrayList<>();
-
-        for (Tuple tuple : allLinkedDataList) {
-            Room room = tuple.get(0, Room.class);
-            Unit unit = tuple.get(1, Unit.class);
-            Reservation reservation = tuple.get(2, Reservation.class);
-            Review review = tuple.get(3, Review.class);
-            CategoryPlace categoryPlace = tuple.get(4, CategoryPlace.class);
-            TagPlace tagPlace = tuple.get(5, TagPlace.class);
-
-            roomList.add(room);
-            unitList.add(unit);
-            reservationList.add(reservation);
-            reviewList.add(review);
-            categoryPlaceList.add(categoryPlace);
-            tagPlaceList.add(tagPlace);
-        }
-
-
-        for (Review review : reviewList) {
-            if (review != null) {
-                em.remove(review);
-            }
-        }
-
-        for (Reservation reservation : reservationList) {
-            if (reservation != null) {
-                em.remove(reservation);
-            }
-        }
-
-        for (Unit unit : unitList) {
-            if (unit != null) {
-                em.remove(unit);
-            }
-        }
-
-        for (Room room : roomList) {
-            if (room != null) {
-                em.remove(room);
-            }
-        }
-
-        categoryPlaceList.forEach(em::remove);
-        tagPlaceList.forEach(em::remove);
         em.remove(targetPlace);
 
     }
@@ -286,49 +224,6 @@ public class HostRepositoryCustomImpl implements HostRepositoryCustom {
 
     @Override
     public void deleteRoom(Room targetRoom) {
-
-        List<Tuple> allLinkedDataList = queryFactory
-                .select(review, reservation, unit)
-                .from(room)
-                .leftJoin(room.units, unit).on(unit.room.eq(targetRoom))
-                .leftJoin(unit.reservations, reservation)
-                .leftJoin(reservation.review, review)
-                .fetch();
-
-        List<Review> reviewList = new ArrayList<>();
-        List<Reservation> reservationList = new ArrayList<>();
-        List<Unit> unitList = new ArrayList<>();
-
-
-        for (Tuple tuple : allLinkedDataList) {
-
-            Review review = tuple.get(0, Review.class);
-            Reservation reservation = tuple.get(1, Reservation.class);
-            Unit unit = tuple.get(2, Unit.class);
-
-            reviewList.add(review);
-            reservationList.add(reservation);
-            unitList.add(unit);
-
-        }
-
-        for (Review review : reviewList) {
-            if (review != null) {
-                em.remove(review);
-            }
-        }
-
-        for (Reservation reservation : reservationList) {
-            if (reservation != null) {
-                em.remove(reservation);
-            }
-        }
-
-        for (Unit unit : unitList) {
-            if (unit != null) {
-                em.remove(unit);
-            }
-        }
 
         em.remove(targetRoom);
 
