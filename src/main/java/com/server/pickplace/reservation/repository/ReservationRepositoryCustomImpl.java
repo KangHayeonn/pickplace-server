@@ -2,13 +2,9 @@ package com.server.pickplace.reservation.repository;
 
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.server.pickplace.member.entity.Member;
-import com.server.pickplace.member.entity.QMember;
-import com.server.pickplace.place.entity.QUnit;
-import com.server.pickplace.place.entity.Room;
-import com.server.pickplace.place.entity.Unit;
+import com.server.pickplace.place.entity.*;
 import com.server.pickplace.reservation.dto.MemberInfoResponse;
 import com.server.pickplace.reservation.dto.PayInfoResponse;
 import com.server.pickplace.reservation.dto.PayRequest;
@@ -25,15 +21,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.math.BigInteger;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static com.server.pickplace.member.entity.QMember.*;
 import static com.server.pickplace.member.entity.QMember.member;
+import static com.server.pickplace.place.entity.QCategoryPlace.*;
 import static com.server.pickplace.place.entity.QPlace.*;
 import static com.server.pickplace.place.entity.QRoom.*;
 import static com.server.pickplace.place.entity.QUnit.unit;
-import static com.server.pickplace.reservation.entity.QReservation.reservation;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -82,6 +78,9 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
 
     @Override
     public void makeReservation(Long id, PayRequest payRequest) {
+
+        // 0. 요청 검증
+        validTimeCondition(payRequest);
 
         // 1. 모든 호실ID 리스트
         List<Long> allUnitIdList = queryFactory
@@ -188,24 +187,75 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
     }
 
 
-    private BooleanExpression dateCheckByRequest(PayRequest request) {
+    private CategoryStatus getCategoryStatusByPayRequest(PayRequest payRequest) {
+        Category category = queryFactory
+                .select(QCategory.category)
+                .from(place)
+                .join(place.rooms, room).on(room.id.eq(payRequest.getRoomId()))
+                .join(place.categories, categoryPlace)
+                .join(categoryPlace.category, QCategory.category)
+                .fetchOne();
+        CategoryStatus status = category.getStatus();
 
-
-        BooleanExpression cond1 = reservation.startDate.goe(request.getStartDate()).and(reservation.startDate.lt(request.getEndDate()));
-        BooleanExpression cond2 = reservation.endDate.gt(request.getStartDate()).and(reservation.endDate.loe(request.getEndDate()));
-        BooleanExpression condition = cond1.or(cond2);
-
-        return condition;
+        return status;
     }
 
-    private BooleanExpression timeCheckByRequest(PayRequest request) {
+    
+    private void validTimeCondition(PayRequest payRequest) {
+
+        // 1. 플레이스의 카테고리
+        // 2. 카테고리가 날짜만 받는 형태라면, 1. 날짜가 이후일 것 2. 시간이 15시 ~ 10시일 것
+        // 3. 카테고리가 시간만 받는 형태라면(당일), 1. 날짜가 똑같음  2. 시작 시간이 15시거나 이후 3. 끝 시간이 시작 시간 이후 4. 1시간 단위
+        // 3. 카테고리가 시간만 받는 형태라면(다음날자정), 1. 끝 날짜가 다음날 자정 2. 2. 시작 시간이 15시거나 이후 3. 1시간 단위
 
 
-        BooleanExpression cond1 = reservation.startTime.goe(request.getStartTime()).and(reservation.startTime.lt(request.getEndTime()));
-        BooleanExpression cond2 = reservation.endTime.gt(request.getStartTime()).and(reservation.endTime.loe(request.getEndTime()));
-        BooleanExpression condition = cond1.or(cond2);
+        List<CategoryStatus> categoryStatusList = new ArrayList<>(Arrays.asList(CategoryStatus.Hotel, CategoryStatus.Pension, CategoryStatus.GuestHouse));
 
-        return condition;
+        CategoryStatus categoryStatus = getCategoryStatusByPayRequest(payRequest);
+
+        if (categoryStatusList.contains(categoryStatus)) {
+
+            datePlaceConditionCheck(payRequest);
+
+        } else {
+
+            timePlaceConditionCheck(payRequest);
+
+        }
+    }
+
+
+    private void datePlaceConditionCheck(PayRequest payRequest) {
+        if (payRequest.getStartDate().isEqual(payRequest.getEndDate()) || payRequest.getStartDate().isAfter(payRequest.getEndDate())) {
+            throw new ReservationException(ReservationErrorResult.WRONG_DATE_CONDITION);
+        } else if (!payRequest.getStartTime().equals(LocalTime.of(15, 00)) || !payRequest.getEndTime().equals(LocalTime.of(10, 00))) {
+            throw new ReservationException(ReservationErrorResult.WRONG_TIME_CONDITION);
+        }
+    }
+
+
+    private void timePlaceConditionCheck(PayRequest payRequest) {
+        if (payRequest.getStartDate().equals(payRequest.getEndDate())) {
+            // 날짜가 같은 경우
+            if (payRequest.getStartTime().isBefore(LocalTime.of(15, 00))) {
+                throw new ReservationException(ReservationErrorResult.WRONG_TIME_CONDITION);
+            } else if (!payRequest.getEndTime().isAfter(payRequest.getStartTime())) {
+                throw new ReservationException(ReservationErrorResult.WRONG_TIME_CONDITION);
+            } else if (payRequest.getStartTime().getMinute() != 0 || payRequest.getEndTime().getMinute() != 0) {
+                throw new ReservationException(ReservationErrorResult.WRONG_TIME_CONDITION);
+            }
+
+
+        } else {
+            if (!payRequest.getStartDate().plusDays(1).equals(payRequest.getEndDate()) || !payRequest.getEndTime().equals(LocalTime.MIDNIGHT)) {
+                throw new ReservationException(ReservationErrorResult.WRONG_DATE_CONDITION);
+            } else if (payRequest.getStartTime().isBefore(LocalTime.of(15, 00))) {
+                throw new ReservationException(ReservationErrorResult.WRONG_TIME_CONDITION);
+            } else if (payRequest.getStartTime().getMinute() != 0) {
+                throw new ReservationException(ReservationErrorResult.WRONG_TIME_CONDITION);
+            }
+
+        }
     }
 
 
