@@ -200,13 +200,12 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
         return status;
     }
 
-    
+
     private void validTimeCondition(PayRequest payRequest) {
 
         // 1. 플레이스의 카테고리
         // 2. 카테고리가 날짜만 받는 형태라면, 1. 날짜가 이후일 것 2. 시간이 15시 ~ 10시일 것
-        // 3. 카테고리가 시간만 받는 형태라면(당일), 1. 날짜가 똑같음  2. 시작 시간이 15시거나 이후 3. 끝 시간이 시작 시간 이후 4. 1시간 단위
-        // 3. 카테고리가 시간만 받는 형태라면(다음날자정), 1. 끝 날짜가 다음날 자정 2. 2. 시작 시간이 15시거나 이후 3. 1시간 단위
+        // 3. 카테고리가 시간만 받는 형태라면(당일), 1. 날짜가 똑같음  2. 시작 시간이 15시거나 이후 3. 끝 시간이 23시거나 이전 4. 1시간 단위
 
 
         List<CategoryStatus> categoryStatusList = new ArrayList<>(Arrays.asList(CategoryStatus.Hotel, CategoryStatus.Pension, CategoryStatus.GuestHouse));
@@ -233,27 +232,23 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
         }
     }
 
+    // 3. 카테고리가 시간만 받는 형태라면(당일), 1. 날짜가 똑같음  2. 시작 시간이 15시거나 이후 3. 끝 시간이 23시거나 이전 4. 시작 시간이 끝 시간 전 5. 1시간 단위
 
     private void timePlaceConditionCheck(PayRequest payRequest) {
-        if (payRequest.getStartDate().equals(payRequest.getEndDate())) {
-            // 날짜가 같은 경우
-            if (payRequest.getStartTime().isBefore(LocalTime.of(15, 00))) {
-                throw new ReservationException(ReservationErrorResult.WRONG_TIME_CONDITION);
-            } else if (!payRequest.getEndTime().isAfter(payRequest.getStartTime())) {
-                throw new ReservationException(ReservationErrorResult.WRONG_TIME_CONDITION);
-            } else if (payRequest.getStartTime().getMinute() != 0 || payRequest.getEndTime().getMinute() != 0) {
-                throw new ReservationException(ReservationErrorResult.WRONG_TIME_CONDITION);
-            }
 
+        //
+        if (!payRequest.getStartDate().equals(payRequest.getEndDate())) {
+            throw new ReservationException(ReservationErrorResult.WRONG_DATE_CONDITION);
+        } else if (payRequest.getStartTime().isBefore(LocalTime.of(15, 00))) {
+                throw new ReservationException(ReservationErrorResult.WRONG_TIME_CONDITION);
+        } else if (payRequest.getEndTime().isAfter(LocalTime.of(23, 00))) {
+            throw new ReservationException(ReservationErrorResult.WRONG_TIME_CONDITION);
+        } else if (!payRequest.getEndTime().isAfter(payRequest.getStartTime())) {
+            throw new ReservationException(ReservationErrorResult.WRONG_TIME_CONDITION);
+        } else if (payRequest.getStartTime().getMinute() != 0 || payRequest.getEndTime().getMinute() != 0) {
+            throw new ReservationException(ReservationErrorResult.WRONG_TIME_CONDITION);
+        }
 
-        } else {
-            if (!payRequest.getStartDate().plusDays(1).equals(payRequest.getEndDate()) || !payRequest.getEndTime().equals(LocalTime.MIDNIGHT)) {
-                throw new ReservationException(ReservationErrorResult.WRONG_DATE_CONDITION);
-            } else if (payRequest.getStartTime().isBefore(LocalTime.of(15, 00))) {
-                throw new ReservationException(ReservationErrorResult.WRONG_TIME_CONDITION);
-            } else if (payRequest.getStartTime().getMinute() != 0) {
-                throw new ReservationException(ReservationErrorResult.WRONG_TIME_CONDITION);
-            }
 
         }
     }
