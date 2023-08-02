@@ -176,7 +176,7 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
     }
 
     @Override
-    public void roomIdCheck(Long roomId) {
+    public void roomIdCheckAndNotSelfReservation(Long roomId, Long id) {
         Optional<Room> room1 = Optional.ofNullable(queryFactory
                 .select(room)
                 .from(room)
@@ -184,6 +184,19 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
                 .fetchOne());
 
         room1.orElseThrow(() -> new ReservationException(ReservationErrorResult.NO_EXIST_ROOM_ID));
+
+        Long placeHostId = queryFactory
+                .select(member.id)
+                .from(place)
+                .join(place.rooms, room).on(room.id.eq(roomId))
+                .join(place.member, member)
+                .fetchOne();
+
+        if (placeHostId.equals(id)) {
+            throw new ReservationException(ReservationErrorResult.WRONG_CUSTOMER);
+        }
+
+
     }
 
 
