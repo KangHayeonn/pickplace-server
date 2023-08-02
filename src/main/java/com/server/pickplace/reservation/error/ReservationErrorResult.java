@@ -19,6 +19,7 @@ public enum ReservationErrorResult {
     WRONG_DATE_CONDITION(HttpStatus.BAD_REQUEST, "날짜 조건을 확인해주세요."),
     WRONG_TIME_CONDITION(HttpStatus.BAD_REQUEST, "시간 조건을 확인해주세요"),
     WRONG_CUSTOMER(HttpStatus.BAD_REQUEST, "본인의 플레이스는 예약할 수 없습니다."),
+    TIME_OUT(HttpStatus.BAD_REQUEST, "인증 시간이 초과되었습니다."),
     QR_AUTH_NOT_COMPLETE(HttpStatus.BAD_REQUEST, "QR 인증이 완료되지 않았습니다.");
 
 

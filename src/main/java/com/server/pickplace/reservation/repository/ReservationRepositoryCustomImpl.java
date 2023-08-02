@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -170,6 +171,13 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
 
     @Override
     public void changeQREntityStatus(QRPaymentInfomation qrPaymentInfomation, QRStatus status) {
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime createdTime = qrPaymentInfomation.getCreatedDate();
+        if (createdTime.plusMinutes(5).isBefore(now)) {
+            throw new ReservationException(ReservationErrorResult.TIME_OUT);
+        }
+
         qrPaymentInfomation.setStatus(status);
 
         em.merge(qrPaymentInfomation);
