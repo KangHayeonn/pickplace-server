@@ -109,7 +109,7 @@ public class ReservationController {
 
         String uuid = reservationRepository.saveQRPaymentInformation(id, qrImageReqeust.getRoomPrice());
 
-        String url = "https://pickplace.kr/payment?code=" + uuid;  // 결제 비밀번호 입력하는 링크로...
+        String url = "http://localhost:3000/qrcode?code=" + uuid;  // 결제 비밀번호 입력하는 링크로...
 
         QRImageResponse qrImageResponse = reservationService.getQRImageResponse(qrImageReqeust, uuid, url);
 
