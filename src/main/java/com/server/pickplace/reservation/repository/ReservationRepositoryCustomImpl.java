@@ -4,6 +4,7 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.server.pickplace.member.entity.Member;
+import com.server.pickplace.member.entity.QMember;
 import com.server.pickplace.place.entity.*;
 import com.server.pickplace.reservation.dto.MemberInfoResponse;
 import com.server.pickplace.reservation.dto.PayInfoResponse;
@@ -123,6 +124,12 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
         Room room = unit.getRoom();
         Member member = getMember(id);
 
+        Member member1 = getMemberByRoom(room);
+        if (member == member1) {
+            throw new ReservationException(ReservationErrorResult.WRONG_CUSTOMER);
+        }
+
+
         // 2. 예약 생성
 
         Reservation reservation = Reservation.builder()
@@ -178,6 +185,17 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
 
         room1.orElseThrow(() -> new ReservationException(ReservationErrorResult.NO_EXIST_ROOM_ID));
     }
+
+
+    private Member getMemberByRoom(Room room) {
+        return queryFactory.select(QMember.member)
+                .from(QRoom.room)
+                .join(QRoom.room.place, place)
+                .join(place.member, QMember.member)
+                .where(QRoom.room.eq(room))
+                .fetchOne();
+    }
+
 
     private Member getMember(Long id) {
         return queryFactory
