@@ -16,9 +16,11 @@ public class PayRequest {
     @NotNull(message = "올바른 방 번호를 입력해주세요.")
     private Long roomId;
 
+    @NotNull(message = "{startDate.NotNull}")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일 HH:mm")
     private LocalDateTime checkInTime;
 
+    @NotNull(message = "{endDate.NotNull}")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일 HH:mm")
     private LocalDateTime checkOutTime;
 
