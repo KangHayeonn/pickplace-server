@@ -92,6 +92,7 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
         // 2. 시간조건 걸리는 unit 리스트
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String stringStartDateTime = payRequest.getCheckInTime().format(formatter);
+        String stringEndDateTime = payRequest.getCheckOutTime().format(formatter);
         String sql = String.format("""
                     select distinct unit_id
                     from
@@ -102,8 +103,8 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
                     		join reservation_tb on unit_tb.unit_id = reservation_tb.unit_id
                             ) sub_query
                     
-                    where '%s' >= start_datetime and '%s' < end_datetime
-                """, payRequest.getRoomId(), stringStartDateTime, stringStartDateTime);
+                    where '%s' > start_datetime and '%s' < end_datetime
+                """, payRequest.getRoomId(), stringEndDateTime, stringStartDateTime);
 
         List<BigInteger> unableUnitIdList = em.createNativeQuery(sql).getResultList();
         unableUnitIdList.forEach(o -> allUnitIdList.remove(o.longValue()));
