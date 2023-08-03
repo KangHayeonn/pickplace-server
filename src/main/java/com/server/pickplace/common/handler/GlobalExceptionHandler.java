@@ -159,7 +159,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 		log.error("Exception occurs : {}", exception.getMessage(), exception);
 
-		return ResponseEntity.ok(responseService.getErrorResponse(HttpStatus.OK.value(), "알 수 없는 오류입니다."));
+		return ResponseEntity.ok(responseService.getErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "알 수 없는 오류입니다."));
 
 	}
 
@@ -199,6 +199,26 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return ResponseEntity.ok(errorResponse);
 
 	}
+
+	@ExceptionHandler({MemberException.class})
+	public ResponseEntity<ErrorResponse> memberException(final MemberException exception) {
+
+		ErrorResponse errorResponse = getErrorResponse(exception);
+
+		return ResponseEntity.ok(errorResponse);
+
+	}
+
+
+	private ErrorResponse getErrorResponse(MemberException exception) {
+		int code = exception.getErrorResult().getHttpStatus().value();
+		String msg = exception.getErrorResult().getMessage();
+
+		ErrorResponse errorResponse = responseService.getErrorResponse(code, msg);
+
+		return errorResponse;
+	}
+
 
 	private ErrorResponse getErrorResponse(ReviewException exception) {
 

@@ -5,6 +5,8 @@ import javax.persistence.*;
 import com.server.pickplace.member.dto.MemberSignupRequestDto;
 import com.server.pickplace.common.common.BaseEntity;
 
+import com.server.pickplace.place.entity.Place;
+import com.server.pickplace.reservation.entity.Reservation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * description    :
@@ -61,6 +64,11 @@ public class Member extends BaseEntity implements UserDetails {
 	@Enumerated(EnumType.STRING)
 	private MemberRole role;
 
+	@OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+	private List<Place> places;
+
+	@OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+	private List<Reservation> reservations;
 
 	public Member(MemberSignupRequestDto request) {
 		email = request.getEmail();

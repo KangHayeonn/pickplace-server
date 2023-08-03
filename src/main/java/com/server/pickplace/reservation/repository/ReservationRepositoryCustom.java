@@ -17,5 +17,5 @@ public interface ReservationRepositoryCustom {
 
     void changeQREntityStatus(QRPaymentInfomation qrPaymentInfomation, QRStatus status);
 
-    void roomIdCheck(Long roomId);
+    void roomIdCheckAndNotSelfReservation(Long roomId, Long id);
 }
