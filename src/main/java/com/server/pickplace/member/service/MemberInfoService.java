@@ -89,7 +89,6 @@ public class MemberInfoService {
         Member member = memberRepository.findById(requestDto.getMemberId()).orElseThrow(()-> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
 
         checkInfoValid(httpServletRequest,id);
-        //비밀번호만 변경
         member.setName(requestDto.getNickname());
 
     }
