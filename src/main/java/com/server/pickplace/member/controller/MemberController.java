@@ -12,12 +12,14 @@ import com.server.pickplace.member.repository.MemberRepository;
 import com.server.pickplace.member.service.MemberInfoService;
 import com.server.pickplace.member.service.jwt.JwtTokenProvider;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.BasicJsonParser;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.Errors;
@@ -58,6 +60,8 @@ public class MemberController {
 	private final MemberRepository memberRepository;
 
 	private final JwtTokenProvider jwtTokenProvider;
+
+
 
 	@Value("${jwt.secret}")
 	String secretKey;

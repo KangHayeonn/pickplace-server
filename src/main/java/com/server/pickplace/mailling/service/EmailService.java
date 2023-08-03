@@ -9,8 +9,10 @@ import com.server.pickplace.member.repository.MemberRepository;
 import com.server.pickplace.member.service.MemberInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
@@ -19,6 +21,7 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.util.Random;
 
 
@@ -31,7 +34,8 @@ public class EmailService {
     private final MemberRepository memberRepository;
     private final MemberInfoService memberInfoService;
     private final SpringTemplateEngine templateEngine;
-
+    @Autowired
+    private PasswordEncoder pwEncoder;
 
     public String sendMail(EmailMessage emailMessage, String type) {
         String authNum = createCode();
@@ -70,14 +74,18 @@ public class EmailService {
         return key.toString();
     }
 
-
+    @Transactional
     public String updatePassword(HttpServletRequest httpServletRequest, PassWordEditDto passWordEditDto){
         Long id = passWordEditDto.getMemberId();
         String pw = passWordEditDto.getPassword();
 
         Member member = memberRepository.findById(id).orElseThrow(()-> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
         memberInfoService.checkInfoValid(httpServletRequest,id);
-        member.setPassword(pw);
+        String encodePw = pwEncoder.encode(pw);
+        System.out.println(member);
+        System.out.println(member.getPassword());
+        member.setPassword(encodePw);
+        System.out.println(member.getPassword());
 
         return pw;
     }

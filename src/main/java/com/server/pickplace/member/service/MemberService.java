@@ -146,8 +146,6 @@ public class MemberService {
 	@Transactional
 	public String signup(MemberSignupRequestDto request) {
 
-//		String encodedPassword = passwordEncoder.encode(request.getPassword());
-
 		String encodePw = pwEncoder.encode(request.getPassword());
 		//db에 저장
 		Member member = Member.builder()
