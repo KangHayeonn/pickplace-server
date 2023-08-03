@@ -88,7 +88,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                     // JwtAuthenticationFilter 는 UsernamePasswordAuthenticationFilter 전에 넣음
-                    .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+                    .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+            ;
  }
 
     //회원가입시 비밀번호 암호화에 사용할 인코더 빈 등록

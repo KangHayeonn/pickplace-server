@@ -67,7 +67,6 @@ public class MemberController {
 	@PostMapping(value = "login", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity login(@ApiIgnore HttpServletRequest httpServletRequest, @ApiParam(required = true) @RequestBody @Valid JwtRequestDto jwtRequestDto, @ApiIgnore Errors errors) throws Exception {
 
-
 		if (errors.hasErrors()) {
 			throw new MemberException(MemberErrorResult.HAS_NULL); //null 값 예외 처리
 		}

@@ -21,8 +21,6 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Random;
 
-import static org.springframework.security.core.context.SecurityContextHolder.setContext;
-
 
 @Slf4j
 @Service
@@ -47,18 +45,15 @@ public class EmailService {
             mimeMessageHelper.setSubject(emailMessage.getSubject()); // 메일 제목
             mimeMessageHelper.setText(setContext(authNum, type), true); //코드
             javaMailSender.send(mimeMessage);
-
-            log.info("Success");
-
             return authNum;
-
         } catch (MessagingException e) {
-            log.info("fail");
+
             throw new RuntimeException(e);
+
         }
     }
 
-    // 인증번호 및 임시 비밀번호 생성 메서드
+    // 인증번호 및 임시 비밀번호 생성
     public String createCode() {
         Random random = new Random();
         StringBuffer key = new StringBuffer();
@@ -76,14 +71,15 @@ public class EmailService {
     }
 
 
-    public void updatePassword(HttpServletRequest httpServletRequest,PassWordEditDto passWordEditDto){
+    public String updatePassword(HttpServletRequest httpServletRequest, PassWordEditDto passWordEditDto){
         Long id = passWordEditDto.getMemberId();
         String pw = passWordEditDto.getPassword();
 
         Member member = memberRepository.findById(id).orElseThrow(()-> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
         memberInfoService.checkInfoValid(httpServletRequest,id);
-        member.setNumber(pw);
+        member.setPassword(pw);
 
+        return pw;
     }
 
     public String setContext(String code, String type) {
