@@ -83,9 +83,6 @@ public class MemberController {
 	@PostMapping(value = "signup", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity signUp(@RequestBody @Valid MemberSignupRequestDto request, @ApiIgnore Errors errors) throws Exception {
 
-
-		String signUpResponse = memberService.signup(request);
-
 		if (errors.hasErrors()) {
 			String errorDetail = errors.getFieldErrors().toString();
 			Map<String, String> validateMap = new HashMap<>();
@@ -101,13 +98,16 @@ public class MemberController {
 				}
 			}
 		}
+
+		String signUpResponse = memberService.signup(request);
+
+
 		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), "회원가입 성공")); // 성공
 	}
 
 	@ApiOperation(tags = "1. Member", value = "이메일 중복 체크", notes = "이메일 중복 체크 한다")
 	@PostMapping(value = "emailCheck", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity emailCheck(@RequestBody @Valid EmailCheckRequestDto email, @ApiIgnore Errors errors) {
-		Boolean emailCheckResponse = memberService.emailCheck(email);
 
 		if (errors.hasErrors()) {
 			String errorDetail = errors.getFieldErrors().toString();
@@ -124,6 +124,9 @@ public class MemberController {
 				}
 			}
 		}
+
+		Boolean emailCheckResponse = memberService.emailCheck(email);
+
 		if (emailCheckResponse == true)
 			return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), "이메일 사용 가능"));
 		else {
