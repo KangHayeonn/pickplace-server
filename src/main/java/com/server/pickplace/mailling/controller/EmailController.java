@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.mail.MessagingException;
@@ -38,10 +40,10 @@ public class EmailController {
 
         EmailMessage emailMessage = EmailMessage.builder()
                 .to(emailPostDto.getEmail())
-                .subject("[PICKPLACE] 임시 비밀번호 발급")
+                .subject("[PICK PLACE] 임시 비밀번호 발급 ")
                 .build();
 
-        String code = emailService.sendMail(emailMessage,"password");
+        String code = emailService.sendMail(emailMessage,"mail");
 
         EmailResponseDto emailResponseDto = new EmailResponseDto();
         emailResponseDto.setCode(code);
@@ -67,7 +69,7 @@ public class EmailController {
 
         EmailMessage emailMessage = EmailMessage.builder()
                 .to(emailPostDto.getEmail())
-                .subject("[PICKPLACE] 이메일 인증을 위한 인증 코드 발송")
+                .subject("[PICK PLACE] 이메일 인증을 위한 인증 코드 발송")
                 .build();
 
         String code = emailService.sendMail(emailMessage, "email");
@@ -77,4 +79,6 @@ public class EmailController {
 
         return ResponseEntity.ok(emailResponseDto);
     }
+
+
 }

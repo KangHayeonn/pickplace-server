@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
 
 
 import javax.mail.MessagingException;
@@ -30,6 +32,8 @@ public class EmailService {
     private final JavaMailSender javaMailSender;
     private final MemberRepository memberRepository;
     private final MemberInfoService memberInfoService;
+    private final SpringTemplateEngine templateEngine;
+
 
     public String sendMail(EmailMessage emailMessage, String type) {
         String authNum = createCode();
@@ -41,7 +45,7 @@ public class EmailService {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
             mimeMessageHelper.setTo(emailMessage.getTo()); // 메일 수신자
             mimeMessageHelper.setSubject(emailMessage.getSubject()); // 메일 제목
-            mimeMessageHelper.setText(authNum, true); //코드
+            mimeMessageHelper.setText(setContext(authNum, type), true); //코드
             javaMailSender.send(mimeMessage);
 
             log.info("Success");
@@ -80,6 +84,12 @@ public class EmailService {
         memberInfoService.checkInfoValid(httpServletRequest,id);
         member.setNumber(pw);
 
+    }
+
+    public String setContext(String code, String type) {
+        Context context = new Context();
+        context.setVariable("code", code);
+        return templateEngine.process(type, context);
     }
 }
 
