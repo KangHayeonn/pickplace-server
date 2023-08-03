@@ -82,10 +82,7 @@ public class EmailService {
         Member member = memberRepository.findById(id).orElseThrow(()-> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
         memberInfoService.checkInfoValid(httpServletRequest,id);
         String encodePw = pwEncoder.encode(pw);
-        System.out.println(member);
-        System.out.println(member.getPassword());
         member.setPassword(encodePw);
-        System.out.println(member.getPassword());
 
         return pw;
     }
