@@ -195,7 +195,7 @@ public class MemberService {
 
 
 		memberRepository.findById(memberId)
-				.orElseThrow(() -> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND)); //존재하지 않는 회원 에외처리
+				.orElseThrow(() -> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND)); //존재하지 않는 회원 예외처리
 
 		memberRepository.deleteById(memberId);
 
