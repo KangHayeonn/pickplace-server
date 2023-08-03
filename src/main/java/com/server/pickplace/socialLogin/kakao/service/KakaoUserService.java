@@ -92,8 +92,8 @@ public class KakaoUserService {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
             StringBuilder sb = new StringBuilder();
             sb.append("grant_type=authorization_code");
-            sb.append("&client_id=17daada2a5511b9f5ad422950ad1c268"); // TODO REST_API_KEY 입력
-            sb.append("&redirect_uri=http://localhost:3000/redirect"); // TODO 인가코드 받은 redirect_uri 입력
+            sb.append("&client_id=17daada2a5511b9f5ad422950ad1c268");
+            sb.append("&redirect_uri=https://pickplace.site/redirect");
             sb.append("&code=" + code);
             bw.write(sb.toString());
             bw.flush();
