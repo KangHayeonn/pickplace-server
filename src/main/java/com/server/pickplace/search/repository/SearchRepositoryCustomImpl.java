@@ -129,7 +129,7 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
         HashMap<Long, Integer> roomCountMap = getRoomCountMapByRoomCountTupleList(roomCountTupleList);
 
-        List<Long> placeBeforeList = getPlaceBeforeListByRoomCountTupleList(roomCountTupleList);
+        List<Long> placeBeforeList = new ArrayList<>(roomCountMap.keySet());
 
         Map<Long, Integer> placeReservationCountMap = getPlaceReservationCountMapByCategoryDto(categorySearchRequest, placeBeforeList);
 
@@ -152,7 +152,7 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
 
         HashMap<Long, Integer> roomCountMap = getRoomCountMapByRoomCountTupleList(roomCountTupleList);
 
-        List<Long> placeBeforeList = getPlaceBeforeListByRoomCountTupleList(roomCountTupleList);
+        List<Long> placeBeforeList = new ArrayList<>(roomCountMap.keySet());
 
         Map<Long, Integer> placeReservationCountMap = getPlaceReservationCountMapByBasicSearchDto(basicSearchRequest, placeBeforeList);
 
@@ -487,18 +487,6 @@ public class SearchRepositoryCustomImpl implements SearchRepositoryCustom {
         }
 
         return placeReservationCountMap;
-    }
-
-    private List<Long> getPlaceBeforeListByRoomCountTupleList(List<Tuple> roomCountTupleList) {
-        List<Long> placeBeforeList = new ArrayList<>();
-
-        for (Tuple tuple : roomCountTupleList) {
-            Long placeId = tuple.get(0, Long.class);
-
-            placeBeforeList.add(placeId);
-
-        }
-        return placeBeforeList;
     }
 
     private HashMap<Long, Integer> getRoomCountMapByRoomCountTupleList(List<Tuple> roomCountTupleList) {
