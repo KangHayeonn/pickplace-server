@@ -166,7 +166,7 @@ public class MemberController {
 	}
 
 	@ApiOperation(tags = "1. Member", value = "회원 탈퇴 ", notes = "회원 탈퇴한다")
-	@DeleteMapping("/")
+	@DeleteMapping("")
 	public ResponseEntity putNicknameInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody MemberIdRequestDto memberId) {
 
 //		memberInfoService.checkInfoValid(httpServletRequest, memberId.getMemberId()); // 토큰 만료 , 존재하지 않는 회원 , 권한없음 처리
