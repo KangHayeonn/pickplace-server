@@ -31,11 +31,12 @@ public class CommonConfig implements WebMvcConfigurer {
         return new JPAQueryFactory(entityManager);
     }
 
+    /*
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("*");
-    }
+    }*/
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
