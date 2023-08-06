@@ -65,9 +65,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-            http
-                    .httpBasic().disable();
-            http
+            http.httpBasic().disable()
                     .cors().and()
                     .exceptionHandling()
                     .authenticationEntryPoint(unauthorizedEntryPoint) // 403 에러 예외처리
