@@ -7,6 +7,6 @@ import lombok.*;
 @Setter
 @Data
 public class PassWordEditDto {
-    Long memberId;
+    String email;
     String password ;
 }
