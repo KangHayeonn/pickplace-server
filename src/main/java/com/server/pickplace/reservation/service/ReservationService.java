@@ -127,9 +127,10 @@ public class ReservationService extends CommonService {
         Long id = qrPaymentInfomation.getMemberId();
 
         String memberPassword = reservationRepository.findMemberPasswordById(id);
+        String inputQrPassword = qrPasswordRequest.getQrPassword();
 
 
-        if (!pwEncoder.matches(memberPassword, qrPasswordRequest.getQrPassword())) {
+        if (!pwEncoder.matches(inputQrPassword, memberPassword)) {
             throw new ReservationException(ReservationErrorResult.WRONG_PASSWORD);
         }
 
