@@ -75,10 +75,10 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                     .authorizeRequests()
-                    .mvcMatchers(HttpMethod.GET, "/api/v1/review/places/*","/api/v1/review/*", "api/v1/review/detail/*").permitAll()
+                    .mvcMatchers(HttpMethod.GET, "/api/v1/review/places/*","/api/v1/review/*", "api/v1/review/detail/*", "api/v1/reservation/qrcode/*").permitAll()
                     .mvcMatchers(HttpMethod.POST, "/api/v1/members/signup","/api/v1/members/login","/api/v1/members/emailCheck" , "/api/v1/members/pwd"
                             , "/api/v1/members/email"
-                            ,"/api/v1/search/**","/api/v1/members/kakaoLogin").permitAll()
+                            ,"/api/v1/search/**","/api/v1/members/kakaoLogin", "/api/v1/reservation/account/number", "api/v1/reservation/qrcode/*").permitAll()
                     .mvcMatchers(HttpMethod.PUT, "/api/v1/members/pwd").permitAll()
                     .mvcMatchers(HttpMethod.GET, "/api/v1/host/**").hasRole("HOST")
                     .mvcMatchers(HttpMethod.POST, "/api/v1/host/**").hasRole("HOST")
