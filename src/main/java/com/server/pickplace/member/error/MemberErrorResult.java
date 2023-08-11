@@ -35,6 +35,7 @@ public enum MemberErrorResult {
 	INVALID_TOKEN(HttpStatus.NOT_FOUND,"존재하지 않는 access token 입니다"),
 	NOT_AUTHENTICATION(HttpStatus.NOT_FOUND,"권한이 없습니다"),
 	ALREADY_LOGOUT(HttpStatus.NOT_FOUND,"이미 로그아웃 되어있습니다"),
+	NOT_KAKAO(HttpStatus.NOT_FOUND,"카카오 사용자는 비밀번호 변경이 불가능 합니다"),
 
 	//my page error
 	NOT_RESERVATION(HttpStatus.NOT_FOUND,"예약 내역이 없습니다");

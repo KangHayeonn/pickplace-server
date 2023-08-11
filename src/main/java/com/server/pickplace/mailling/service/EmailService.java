@@ -21,7 +21,10 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 
@@ -76,11 +79,12 @@ public class EmailService {
 
     @Transactional
     public String updatePassword(HttpServletRequest httpServletRequest, PassWordEditDto passWordEditDto){
-        Long id = passWordEditDto.getMemberId();
+        String email = passWordEditDto.getEmail();
         String pw = passWordEditDto.getPassword();
 
-        Member member = memberRepository.findById(id).orElseThrow(()-> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
-        memberInfoService.checkInfoValid(httpServletRequest,id);
+
+        Member member = memberRepository.findByEmailAndType(email,"common").orElseThrow(()-> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
+        memberInfoService.checkInfoValid(httpServletRequest,member.getId());
         String encodePw = pwEncoder.encode(pw);
         member.setPassword(encodePw);
 
