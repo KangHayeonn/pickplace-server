@@ -76,6 +76,10 @@ dependencies {
     //smtp
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+    //thymeleaf
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
 }
 
 tasks.named('test') {
@@ -99,6 +103,7 @@ sourceSets {
 jar {
     enabled = false
 }
+
 
 
 // querydsl 컴파일 시 사용할 옵션 설정

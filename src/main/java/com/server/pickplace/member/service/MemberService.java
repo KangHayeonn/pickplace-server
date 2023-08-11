@@ -54,12 +54,14 @@ public class MemberService {
 
 
 	private final MemberRepository memberRepository;
-	private final PasswordEncoder passwordEncoder;
 
 	private final RefreshTokenRedisRepository refreshTokenRedisRepository;
 	private final ResponseService responseService;
 	private final AuthenticationManagerBuilder authenticationManagerBuilder;
 	private final JwtTokenProvider jwtTokenProvider;
+
+	@Autowired
+	private PasswordEncoder pwEncoder;
 
 	@Autowired
 	StringRedisTemplate redisTemplate;
@@ -71,16 +73,16 @@ public class MemberService {
 		if (memberRepository.findByEmail(jwtRequestDto.getEmail()).orElse(null) == null)
 			throw new MemberException(MemberErrorResult.MEMBER_NOT_ID); //없는 아이디
 
-//		if (!passwordEncoder.matches(memberRepository.findByEmail(jwtRequestDto.getEmail()).get().getPassword(), jwtRequestDto.getPassword())) {
-//			throw new MemberException(MemberErrorResult.MEMBER_NOT_PW); // 비밀번호 틀린 경우
-//		}
 
-		if (!memberRepository.findByEmail(jwtRequestDto.getEmail()).get().getPassword().equals(jwtRequestDto.getPassword())) {
-			throw new MemberException(MemberErrorResult.MEMBER_NOT_PW); // 비밀번호 틀린 경우
+		String encodingPw = memberRepository.findByEmail(jwtRequestDto.getEmail()).get().getPassword();
+		String type = memberRepository.findByEmail(jwtRequestDto.getEmail()).get().getType();
+
+		if ((!pwEncoder.matches(jwtRequestDto.getPassword(),encodingPw)) || type.equals("kakao")) {
+			throw new MemberException(MemberErrorResult.MEMBER_NOT_PW);
 		}
 
 		//email 과 password를 기반으로하는 Authentication 객체 생성
-		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(jwtRequestDto.getEmail(), jwtRequestDto.getPassword());
+		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(jwtRequestDto.getEmail(), encodingPw);
 		// 실제 검증 -> loadUserByUsername 메서드 실행
 		Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 		// 3. 인증 정보를 기반으로 JWT 토큰 생성
@@ -144,13 +146,11 @@ public class MemberService {
 	@Transactional
 	public String signup(MemberSignupRequestDto request) {
 
-//		String encodedPassword = passwordEncoder.encode(request.getPassword());
-
-
+		String encodePw = pwEncoder.encode(request.getPassword());
 		//db에 저장
 		Member member = Member.builder()
 				.email(request.getEmail())
-				.password(request.getPassword())
+				.password(encodePw)
 				.number(request.getPhone())
 				.name(request.getNickname())
 				.type("common")
@@ -195,7 +195,7 @@ public class MemberService {
 
 
 		memberRepository.findById(memberId)
-				.orElseThrow(() -> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND)); //존재하지 않는 회원 에외처리
+				.orElseThrow(() -> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND)); //존재하지 않는 회원 예외처리
 
 		memberRepository.deleteById(memberId);
 

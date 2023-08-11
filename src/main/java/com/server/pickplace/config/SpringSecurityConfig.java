@@ -54,7 +54,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String[] AUTH_WHITELIST = {
-            //정적인 파일에 대한 요청들 작성 (추후)
     };
 
     @Bean
@@ -76,23 +75,22 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                     .authorizeRequests()
-                    .mvcMatchers(HttpMethod.GET, "/api/v1/review/places/*","/api/v1/review/*").permitAll()
+                    .mvcMatchers(HttpMethod.GET, "/api/v1/review/places/*","/api/v1/review/*", "api/v1/review/detail/*", "api/v1/reservation/qrcode/*").permitAll()
                     .mvcMatchers(HttpMethod.POST, "/api/v1/members/signup","/api/v1/members/login","/api/v1/members/emailCheck" , "/api/v1/members/pwd"
                             , "/api/v1/members/email"
-                            ,"/api/v1/search/**","/api/v1/members/kakaoLogin").permitAll()
+                            ,"/api/v1/search/**","/api/v1/members/kakaoLogin", "/api/v1/reservation/account/number", "api/v1/reservation/qrcode/*").permitAll()
+                    .mvcMatchers(HttpMethod.PUT, "/api/v1/members/pwd").permitAll()
                     .mvcMatchers(HttpMethod.GET, "/api/v1/host/**").hasRole("HOST")
                     .mvcMatchers(HttpMethod.POST, "/api/v1/host/**").hasRole("HOST")
-                    .anyRequest().authenticated() // 나머지는 403 에러 -> 에러 형식 200으로 보내야..
+                    .anyRequest().authenticated()
                     .and()
                     .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
-                    // JwtAuthenticationFilter 는 UsernamePasswordAuthenticationFilter 전에 넣음
-                    .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+                    .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+            ;
  }
-
-    //회원가입시 비밀번호 암호화에 사용할 인코더 빈 등록
-    @Bean
+  @Bean
     public BCryptPasswordEncoder encodePassword() {  // 회원가입 시 비밀번호 암호화에 사용할 Encoder 빈 등록
         return new BCryptPasswordEncoder();
     }

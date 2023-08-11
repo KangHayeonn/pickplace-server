@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<div style="border-radius: 10px; margin: auto; width: 500px;">
+    <div style="background-color: #ECF2FF; height: 550px; width: 500px; border-radius: 10px">
+        <div>
+            <h2 style="color: #0D3471; padding: 50px 0; display:flex; justify-content: center;">
+                <span>PICK PLACE(픽플)</span>
+            </h2>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 0.2rem;">
+                <p style="padding: 0; margin: 0;">안녕하세요 <b>PICK PLACE(픽플)</b>입니다.</p>
+                <p style="padding: 0; margin: 0;">원하시는 서비스를 이용하시려면</p>
+                <p style="padding: 0; margin: 0;">아래에 있는 <b>인증번호</b>를 입력해주세요.</p>
+            </div>
+        </div>
+        <div style="margin: 70px 0 100px; padding: 0 0 0 0; text-align: center">
+            <h1 th:text="${code}">abcde </h1>
+        </div>
+        <div style="text-align: center">
+            <hr style="background: #BDBCBC; height: 1px; border: 0; width:400px;">
+            <p style="color: #BDBCBC">
+                Copyright ⓒ 2023 PICK PLACE
+                <br>
+                Made by PICK PLACE
+            </p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

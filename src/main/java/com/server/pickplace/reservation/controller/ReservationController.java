@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,7 +36,7 @@ public class ReservationController {
     public ResponseEntity<SingleResponse<Map>> reservationPage(@RequestParam("memberId") Long id,
                                                                @PathVariable("roomId") Long roomId) {
 
-        reservationRepository.roomIdCheck(roomId);
+        reservationRepository.roomIdCheckAndNotSelfReservation(roomId, id);
         
         Map<String, Object> reservationPageMapByEmailAndRoomId = reservationService.getReservationPageMapByEmailAndRoomId(id, roomId);
 
@@ -109,7 +108,7 @@ public class ReservationController {
 
         String uuid = reservationRepository.saveQRPaymentInformation(id, qrImageReqeust.getRoomPrice());
 
-        String url = "https://pickplace.kr/payment?code=" + uuid;  // 결제 비밀번호 입력하는 링크로...
+        String url = "https://pickplace.site/qrcode/password?code=" + uuid;  // 결제 비밀번호 입력하는 링크로...
 
         QRImageResponse qrImageResponse = reservationService.getQRImageResponse(qrImageReqeust, uuid, url);
 

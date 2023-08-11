@@ -12,12 +12,14 @@ import com.server.pickplace.member.repository.MemberRepository;
 import com.server.pickplace.member.service.MemberInfoService;
 import com.server.pickplace.member.service.jwt.JwtTokenProvider;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.BasicJsonParser;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.Errors;
@@ -59,6 +61,8 @@ public class MemberController {
 
 	private final JwtTokenProvider jwtTokenProvider;
 
+
+
 	@Value("${jwt.secret}")
 	String secretKey;
 
@@ -66,7 +70,6 @@ public class MemberController {
 	@ApiOperation(tags = "1. Member", value = "로그인", notes = "로그인 시도한다!!")
 	@PostMapping(value = "login", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity login(@ApiIgnore HttpServletRequest httpServletRequest, @ApiParam(required = true) @RequestBody @Valid JwtRequestDto jwtRequestDto, @ApiIgnore Errors errors) throws Exception {
-
 
 		if (errors.hasErrors()) {
 			throw new MemberException(MemberErrorResult.HAS_NULL); //null 값 예외 처리
@@ -79,9 +82,6 @@ public class MemberController {
 	@ApiOperation(tags = "1. Member", value = "회원가입", notes = "회원가입 시도한다!")
 	@PostMapping(value = "signup", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity signUp(@RequestBody @Valid MemberSignupRequestDto request, @ApiIgnore Errors errors) throws Exception {
-
-
-		String signUpResponse = memberService.signup(request);
 
 		if (errors.hasErrors()) {
 			String errorDetail = errors.getFieldErrors().toString();
@@ -98,13 +98,16 @@ public class MemberController {
 				}
 			}
 		}
+
+		String signUpResponse = memberService.signup(request);
+
+
 		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), "회원가입 성공")); // 성공
 	}
 
 	@ApiOperation(tags = "1. Member", value = "이메일 중복 체크", notes = "이메일 중복 체크 한다")
 	@PostMapping(value = "emailCheck", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity emailCheck(@RequestBody @Valid EmailCheckRequestDto email, @ApiIgnore Errors errors) {
-		Boolean emailCheckResponse = memberService.emailCheck(email);
 
 		if (errors.hasErrors()) {
 			String errorDetail = errors.getFieldErrors().toString();
@@ -121,6 +124,9 @@ public class MemberController {
 				}
 			}
 		}
+
+		Boolean emailCheckResponse = memberService.emailCheck(email);
+
 		if (emailCheckResponse == true)
 			return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), "이메일 사용 가능"));
 		else {
@@ -160,7 +166,7 @@ public class MemberController {
 	}
 
 	@ApiOperation(tags = "1. Member", value = "회원 탈퇴 ", notes = "회원 탈퇴한다")
-	@DeleteMapping("/")
+	@DeleteMapping("")
 	public ResponseEntity putNicknameInfo(@ApiIgnore HttpServletRequest httpServletRequest, @RequestBody MemberIdRequestDto memberId) {
 
 //		memberInfoService.checkInfoValid(httpServletRequest, memberId.getMemberId()); // 토큰 만료 , 존재하지 않는 회원 , 권한없음 처리

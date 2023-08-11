@@ -47,25 +47,25 @@ public class Place extends BaseEntity {
     @Column(name = "PLACE_POINT", nullable = false)
     private Point point;
 
-    @Column(name = "PLACE_X", nullable = true)
+    @Column(name = "PLACE_X", nullable = false)
     private Double x;
 
-    @Column(name = "PLACE_Y", nullable = true)
+    @Column(name = "PLACE_Y", nullable = false)
     private Double y;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-    @OneToMany(mappedBy = "place")
+    @OneToMany(mappedBy = "place", cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<CategoryPlace> categories = new ArrayList<>();
 
-    @OneToMany(mappedBy = "place")
+    @OneToMany(mappedBy = "place", cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<TagPlace> tags = new ArrayList<>();
 
-    @OneToMany(mappedBy = "place")
+    @OneToMany(mappedBy = "place", cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<Room> rooms = new ArrayList<>();
 

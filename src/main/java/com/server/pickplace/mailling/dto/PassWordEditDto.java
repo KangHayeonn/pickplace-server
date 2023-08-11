@@ -1,14 +1,12 @@
 package com.server.pickplace.mailling.dto;
 
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
-@Builder
+@Data
 public class PassWordEditDto {
-    Long memberId;
+    String email;
     String password ;
 }

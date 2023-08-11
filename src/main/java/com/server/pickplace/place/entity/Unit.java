@@ -29,7 +29,7 @@ public class Unit extends BaseEntity {
     @JoinColumn(name = "ROOM_ID")
     private Room room;
 
-    @OneToMany(mappedBy = "unit")
+    @OneToMany(mappedBy = "unit", cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<Reservation> reservations = new ArrayList<>();
 

@@ -14,6 +14,7 @@ import com.server.pickplace.reservation.error.ReservationException;
 import com.server.pickplace.reservation.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ import java.util.Optional;
 public class ReservationService extends CommonService {
 
     private final ReservationRepository reservationRepository;
+    private final PasswordEncoder pwEncoder;
 
     public Map<String, Object> getReservationPageMapByEmailAndRoomId(Long id, Long roomId) {
 
@@ -53,7 +55,7 @@ public class ReservationService extends CommonService {
 
         String memberPassword = reservationRepository.findMemberPasswordById(id);
 
-        if (!inputCardPassword.equals(memberPassword)) {
+        if (!pwEncoder.matches(inputCardPassword, memberPassword)) {
             throw new ReservationException(ReservationErrorResult.WRONG_PASSWORD);
         }
 
@@ -71,7 +73,7 @@ public class ReservationService extends CommonService {
 
         String memberPassword = reservationRepository.findMemberPasswordById(id);
 
-        if (!inputAccountPassword.equals(memberPassword)) {
+        if (!pwEncoder.matches(inputAccountPassword, memberPassword)) {
             throw new ReservationException(ReservationErrorResult.WRONG_PASSWORD);
         }
 
@@ -125,8 +127,10 @@ public class ReservationService extends CommonService {
         Long id = qrPaymentInfomation.getMemberId();
 
         String memberPassword = reservationRepository.findMemberPasswordById(id);
+        String inputQrPassword = qrPasswordRequest.getQrPassword();
 
-        if (!memberPassword.equals(qrPasswordRequest.getQrPassword())) {
+
+        if (!pwEncoder.matches(inputQrPassword, memberPassword)) {
             throw new ReservationException(ReservationErrorResult.WRONG_PASSWORD);
         }
 

@@ -16,6 +16,10 @@ public enum ReservationErrorResult {
     QR_CODE_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "QR코드 생성중 오류가 발생했습니다."),
     NON_EXIST_QR_PAYMENT_CODE(HttpStatus.BAD_REQUEST, "QR 결제 코드가 존재하지 않습니다."),
     NO_EXIST_ROOM_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 방 번호입니다."),
+    WRONG_DATE_CONDITION(HttpStatus.BAD_REQUEST, "날짜 조건을 확인해주세요."),
+    WRONG_TIME_CONDITION(HttpStatus.BAD_REQUEST, "시간 조건을 확인해주세요"),
+    WRONG_CUSTOMER(HttpStatus.BAD_REQUEST, "본인의 플레이스는 예약할 수 없습니다."),
+    TIME_OUT(HttpStatus.BAD_REQUEST, "인증 시간이 초과되었습니다."),
     QR_AUTH_NOT_COMPLETE(HttpStatus.BAD_REQUEST, "QR 인증이 완료되지 않았습니다.");
 
 

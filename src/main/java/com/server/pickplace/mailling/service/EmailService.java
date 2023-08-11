@@ -9,17 +9,23 @@ import com.server.pickplace.member.repository.MemberRepository;
 import com.server.pickplace.member.service.MemberInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
 
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.html.Option;
+import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
 import java.util.Random;
-
-import static org.springframework.security.core.context.SecurityContextHolder.setContext;
 
 
 @Slf4j
@@ -30,6 +36,9 @@ public class EmailService {
     private final JavaMailSender javaMailSender;
     private final MemberRepository memberRepository;
     private final MemberInfoService memberInfoService;
+    private final SpringTemplateEngine templateEngine;
+    @Autowired
+    private PasswordEncoder pwEncoder;
 
     public String sendMail(EmailMessage emailMessage, String type) {
         String authNum = createCode();
@@ -41,20 +50,17 @@ public class EmailService {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
             mimeMessageHelper.setTo(emailMessage.getTo()); // 메일 수신자
             mimeMessageHelper.setSubject(emailMessage.getSubject()); // 메일 제목
-            mimeMessageHelper.setText(authNum, true); //코드
+            mimeMessageHelper.setText(setContext(authNum, type), true); //코드
             javaMailSender.send(mimeMessage);
-
-            log.info("Success");
-
             return authNum;
-
         } catch (MessagingException e) {
-            log.info("fail");
+
             throw new RuntimeException(e);
+
         }
     }
 
-    // 인증번호 및 임시 비밀번호 생성 메서드
+    // 인증번호 및 임시 비밀번호 생성
     public String createCode() {
         Random random = new Random();
         StringBuffer key = new StringBuffer();
@@ -71,15 +77,24 @@ public class EmailService {
         return key.toString();
     }
 
-
-    public void updatePassword(HttpServletRequest httpServletRequest,PassWordEditDto passWordEditDto){
-        Long id = passWordEditDto.getMemberId();
+    @Transactional
+    public String updatePassword(HttpServletRequest httpServletRequest, PassWordEditDto passWordEditDto){
+        String email = passWordEditDto.getEmail();
         String pw = passWordEditDto.getPassword();
 
-        Member member = memberRepository.findById(id).orElseThrow(()-> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
-        memberInfoService.checkInfoValid(httpServletRequest,id);
-        member.setNumber(pw);
 
+        Member member = memberRepository.findByEmailAndType(email,"common").orElseThrow(()-> new MemberException(MemberErrorResult.MEMBER_NOT_FOUND));
+        memberInfoService.checkInfoValid(httpServletRequest,member.getId());
+        String encodePw = pwEncoder.encode(pw);
+        member.setPassword(encodePw);
+
+        return pw;
+    }
+
+    public String setContext(String code, String type) {
+        Context context = new Context();
+        context.setVariable("code", code);
+        return templateEngine.process(type, context);
     }
 }
 
