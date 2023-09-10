@@ -167,12 +167,10 @@ public class KakaoUserService {
         Member kakaoUser = memberRepository.findByEmail(kakaoEmail)
                 .orElse(null);
 
-        //|| !kakaoUser.getType().equals("kakao") 카카오 일때만 보는 로직 추가해야할듯
         if (kakaoUser == null ) {
             // 회원가입
             // password: random UUID
             String password = UUID.randomUUID().toString();
-            String encodedPassword = passwordEncoder.encode(password);
 
             //새 맴버로 추가
             kakaoUser = memberRepository.save(Member.builder()
