@@ -148,8 +148,13 @@ public class KakaoUserService {
 
         Long id = jsonNode.get("id").asLong();
         String email = jsonNode.get("kakao_account").get("email").asText();
+
         String nickname = jsonNode.get("properties")
-                .get("nickname").asText().substring(0,10);
+                .get("nickname").asText();
+
+        if (nickname.length() > 10) {
+            nickname = nickname.substring(0,10);
+        }
 
         return new SocialUserInfoDto(id, nickname, email);
     }
