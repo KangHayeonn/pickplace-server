@@ -148,8 +148,13 @@ public class KakaoUserService {
 
         Long id = jsonNode.get("id").asLong();
         String email = jsonNode.get("kakao_account").get("email").asText();
+
         String nickname = jsonNode.get("properties")
-                .get("nickname").asText().substring(0,10);
+                .get("nickname").asText();
+
+        if (nickname.length() > 10) {
+            nickname = nickname.substring(0,10);
+        }
 
         return new SocialUserInfoDto(id, nickname, email);
     }
@@ -162,12 +167,10 @@ public class KakaoUserService {
         Member kakaoUser = memberRepository.findByEmail(kakaoEmail)
                 .orElse(null);
 
-        //|| !kakaoUser.getType().equals("kakao") 카카오 일때만 보는 로직 추가해야할듯
         if (kakaoUser == null ) {
             // 회원가입
             // password: random UUID
             String password = UUID.randomUUID().toString();
-            String encodedPassword = passwordEncoder.encode(password);
 
             //새 맴버로 추가
             kakaoUser = memberRepository.save(Member.builder()

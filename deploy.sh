@@ -20,7 +20,7 @@ else
   sleep 5
 fi
 
-echo "> $JAR_PATH 배포"
+echo "> $JAR_PATH 배포 진행"
 nohup java -jar $JAR_PATH > /dev/null 2> /dev/null < /dev/null &
 
 echo "> ----------------------------------"
